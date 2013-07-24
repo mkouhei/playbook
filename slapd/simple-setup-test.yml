@@ -39,3 +39,14 @@
     with_items:
       - add_dc_ou_for_keystone
       - add_users
+  - name: cleanup temporary files
+    command: rm -f /tmp/${item}
+    with_items:
+      - add_users.ldif
+      - slapd-debconf.txt
+      - change_core_schema.ldif
+      - add_dc_ou_for_keystone.ldif
+      - modify_loglevel.ldif
+      - modify_olcAccess.ldif
+      - debconf.txt
+      - rootdnpw_for_test.ldif
