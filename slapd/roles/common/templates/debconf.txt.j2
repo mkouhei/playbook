@@ -1,0 +1,15 @@
+slapd	slapd/password2	${slapd_admin_pass}	
+slapd	slapd/internal/generated_adminpw	${slapd_admin_pass}	
+slapd	slapd/internal/adminpw	${slapd_admin_pass}	
+slapd	slapd/password1	${slapd_admin_pass}	
+slapd	slapd/password_mismatch	note	
+slapd	slapd/invalid_config	boolean	true
+slapd	shared/organization	string	${shared_organization}
+slapd	slapd/backend	select	${slapd_backend}
+slapd	slapd/dump_database	select	when needed
+slapd	slapd/allow_ldap_v2	boolean	${allow_ldap_v2}
+slapd	slapd/no_configuration	boolean	false
+slapd	slapd/move_old_database	boolean	true
+slapd	slapd/dump_database_destdir	string	/var/backups/slapd-VERSION
+slapd	slapd/purge_database	boolean	${purge_database}
+slapd	slapd/domain	string	${slapd_domain}

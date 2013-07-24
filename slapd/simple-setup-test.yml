@@ -1,0 +1,41 @@
+- hosts: test_servers
+  vars:
+    slapd_admin_pass: password
+    shared_organization: example.org
+    slapd_domain: example.org
+    slapd_backend: HDB
+    purge_database: false
+    allow_ldap_v2: false
+    rootdn: cn=admin,dc=example,dc=org
+    rootpw: password
+  sudo: yes
+  tasks:
+  - name: purge
+    command: "apt-get -y purge slapd"
+  - name: prepare debconf
+    template: src=roles/common/templates/debconf.txt.j2 dest=/tmp/debconf.txt
+  - name: set deconf selections
+    command: /usr/bin/debconf-set-selections /tmp/debconf.txt
+  - name: install
+    apt: pkg=slapd,ldap-utils,ldapvi update_cache=yes state=present
+  - name: prepare slapd setup
+    copy: src=$item dest=/tmp/
+    with_items:
+      - roles/common/files/modify_loglevel.ldif
+      - roles/development/files/modify_olcAccess.ldif
+      - roles/development/files/rootdnpw_for_test.ldif
+      - roles/backend_keystone/files/change_core_schema.ldif
+      - roles/backend_keystone/files/add_dc_ou_for_keystone.ldif
+      - roles/backend_keystone/files/add_users.ldif
+  - name: setup cn=config
+    command: ldapmodify -Y EXTERNAL -H ldapi:// -f /tmp/${item}.ldif
+    with_items:
+      - rootdnpw_for_test
+      - modify_loglevel
+      - modify_olcAccess
+      - change_core_schema
+  - name: ldapadd users
+    command: ldapmodify -x -D ${rootdn} -w ${rootpw} -H ldap:// -f /tmp/${item}.ldif
+    with_items:
+      - add_dc_ou_for_keystone
+      - add_users

@@ -1,0 +1,53 @@
+version: 1
+# to apply these changes using ldapvi, run:
+#   ldapvi --ldapmodify -h ldap://localhost ,ldapvi-vmdeb-7047.ldif
+
+dn: ou=People,dc=example,dc=org
+changetype: add
+objectClass: top
+objectClass: organizationalUnit
+ou: People
+
+dn: dc=auth,dc=example,dc=org
+changetype: add
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: auth.example.org
+dc: auth
+
+dn: ou=ServiceAdmin,dc=auth,dc=example,dc=org
+changetype: add
+objectClass: top
+objectClass: organizationalUnit
+ou: ServiceAdmin
+
+dn: ou=ProjectUsers,dc=auth,dc=example,dc=org
+changetype: add
+objectClass: top
+objectClass: organizationalUnit
+ou: ProjectUser
+
+dn: ou=Projects,dc=auth,dc=example,dc=org
+changetype: add
+objectClass: top
+objectClass: organizationalUnit
+ou: Projects
+
+dn: ou=Roles,dc=auth,dc=example,dc=org
+changetype: add
+objectClass: top
+objectClass: organizationalUnit
+ou: Roles
+
+dn: ou=Groups,dc=auth,dc=example,dc=org
+changetype: add
+objectClass: top
+objectClass: organizationalUnit
+ou: Groups
+
+dn: ou=Domains,dc=auth,dc=example,dc=org
+changetype: add
+objectClass: top
+objectClass: organizationalUnit
+ou: Domains
