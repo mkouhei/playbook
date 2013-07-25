@@ -12,3 +12,7 @@ usage
 
 execute `setup.sh`
 
+Note
+====
+
+Comment out `ssh_args` in `/etc/ansible/ansible.cfg`, for Jessie/Sid.
