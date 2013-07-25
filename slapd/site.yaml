@@ -1,0 +1,7 @@
+---
+- hosts: test_servers
+  sudo: yes
+  roles:
+    - common
+    - development
+    - backend_keystone

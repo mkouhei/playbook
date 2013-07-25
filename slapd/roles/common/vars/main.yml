@@ -1,0 +1,4 @@
+---
+slapd_backend: HDB
+purge_database: false
+allow_ldap_v2: false

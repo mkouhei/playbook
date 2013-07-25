@@ -1,0 +1,22 @@
+---
+- name: prepare slapd setup
+  copy: src={{ item }} dest=/tmp/
+  with_items:
+    - change_core_schema.ldif
+    - add_dc_ou_for_keystone.ldif
+    - add_users.ldif
+- name: setup cn=config
+  command: ldapmodify -Y EXTERNAL -H ldapi:// -f /tmp/{{ item }}.ldif
+  with_items:
+    - change_core_schema
+- name: ldapadd users
+  command: ldapmodify -x -D {{ rootdn }} -w {{ rootpw }} -H ldap:// -f /tmp/{{ item }}.ldif
+  with_items:
+    - add_dc_ou_for_keystone
+    - add_users
+- name: cleanup temporary files
+  command: rm -f /tmp/{{ item }}
+  with_items:
+    - add_users.ldif
+    - change_core_schema.ldif
+    - add_dc_ou_for_keystone.ldif

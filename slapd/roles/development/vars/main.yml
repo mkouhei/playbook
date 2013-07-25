@@ -1,0 +1,6 @@
+---
+slapd_admin_pass: password
+shared_organization: example.org
+slapd_domain: example.org
+rootdn: cn=admin,dc=example,dc=org
+rootpw: password

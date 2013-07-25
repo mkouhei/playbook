@@ -1,0 +1,16 @@
+---
+- name: prepare slapd setup
+  copy: src={{ item }} dest=/tmp/
+  with_items:
+    - modify_olcAccess.ldif
+    - rootdnpw_for_test.ldif
+- name: setup cn=config
+  command: ldapmodify -Y EXTERNAL -H ldapi:// -f /tmp/{{ item }}.ldif
+  with_items:
+    - rootdnpw_for_test
+    - modify_olcAccess
+- name: cleanup temporary files
+  command: rm -f /tmp/{{ item }}
+  with_items:
+    - modify_olcAccess.ldif
+    - rootdnpw_for_test.ldif

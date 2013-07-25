@@ -1,0 +1,22 @@
+---
+- name: purge
+  command: "apt-get -y purge slapd"
+- name: prepare debconf
+  template: src=debconf.txt.j2 dest=/tmp/debconf.txt
+- name: set deconf selections
+  command: /usr/bin/debconf-set-selections /tmp/debconf.txt
+- name: install
+  apt: pkg=slapd,ldap-utils,ldapvi update_cache=yes state=present
+- name: prepare slapd setup
+  copy: src={{ item }} dest=/tmp/
+  with_items:
+    - modify_loglevel.ldif
+- name: setup cn=config
+  command: ldapmodify -Y EXTERNAL -H ldapi:// -f /tmp/{{ item }}.ldif
+  with_items:
+    - modify_loglevel
+- name: cleanup temporary files
+  command: rm -f /tmp/{{ item }}
+  with_items:
+    - debconf.txt
+    - modify_loglevel.ldif
