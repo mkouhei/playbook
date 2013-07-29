@@ -1,6 +1,6 @@
 ---
 # package version
-keystone_version: 2013.1.2-5.1
+keystone_version: 2013.1.2-6+cust1
 
 # debconf
 auth_token: password
