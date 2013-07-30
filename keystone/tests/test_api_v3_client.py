@@ -121,7 +121,7 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_list_domains(self):
         self.k.create_domain(v.default_domain_name)
-        res = self.k.list_domains()
+        res = self.k.list_target('domains')
         id = res['domains'][0]['id']
         self_links = res['domains'][0]['links']['self']
         self.assertEqual(v.default_domain_name, res['domains'][0]['name'])
@@ -129,6 +129,16 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(v.default_domain_name, res['domains'][0]['description'])
         self.assertEqual(True, res['domains'][0]['enabled'])
         self.assertEqual(200, self.k._get(self_links).status_code)
+        self.l.delete_entry(v.default_domain_name, v.target_domain)
+
+    def test_show_domain(self):
+        self.k.create_domain(v.default_domain_name)
+        res = self.k.show_target('domains', target_name=v.default_domain_name)
+        self.assertEqual(v.default_domain_name, res.json()['domain']['name'])
+        self.assertEqual(v.default_domain_name, res.json()['domain']['description'])
+        self.assertEqual(v.default_domain_name, res.json()['domain']['description'])
+        self.assertEqual(True, res.json()['domain']['enabled'])
+        self.assertEqual(200, res.status_code)
         self.l.delete_entry(v.default_domain_name, v.target_domain)
 
     def test_create_project(self):
@@ -144,6 +154,16 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(res.status_code,
                          self.k.create_project(v.default_project_name, v.default_domain_name).status_code)
                          """
+
+    def test_show_project(self):
+        self.k.create_project(v.default_project_name)
+        res = self.k.show_target('projects', target_name=v.default_project_name)
+        self.assertEqual(v.default_project_name, res.json()['project']['name'])
+        self.assertEqual(v.default_project_name, res.json()['project']['description'])
+        self.assertEqual(v.default_project_name, res.json()['project']['description'])
+        self.assertEqual(True, res.json()['project']['enabled'])
+        self.assertEqual(200, res.status_code)
+        self.l.delete_entry(v.default_project_name, v.target_project)
 
     def test_delete_project(self):
         self.k.create_project(v.default_project_name)

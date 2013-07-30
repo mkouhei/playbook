@@ -143,6 +143,26 @@ class ApiV3Client(object):
                           timeout=TIMEOUT, verify=self.verify)
         return r
 
+    def list_target(self, target):
+        """list organizationalUnit"""
+        url = self._set_api_url(target)
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r.json()
+
+    def show_target(self, target, target_id=None, target_name=None):
+        """show target
+
+        Arguments:
+            target_name:
+        """
+        if target_name:
+            target_id = retrieve_id_by_name(self.list_target(target), target_name, target)
+        url = self._set_api_url(target, target_id)
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r
+
     def create_domain(self, domain_name):
         """Create domain
 
@@ -159,26 +179,6 @@ class ApiV3Client(object):
                           timeout=TIMEOUT, verify=self.verify)
         return r
 
-    def list_domains(self):
-        """list domains"""
-        url = self._set_api_url('domains')
-        headers = {'X-Auth-Token': self.admin_token}
-        r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
-        return r.json()
-
-    def show_domain(self, domain_id=None, domain_name=None):
-        """show domain
-
-        Arguments:
-            domain_id:
-            domain_name:
-        """
-        if domain_name:
-            domain_id = retrieve_id_by_name(list_domains(), domain_name, 'domains')
-        url = self._set_api_url('domains', domain_id)
-        headers = {'X-Auth-Token': self.admin_token}
-        r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
-        return r
 
     # not implemented now
     def delete_domain(self, domain_id=None, domain_name=None):
@@ -189,7 +189,7 @@ class ApiV3Client(object):
             domain_name:
         """
         if domain_name:
-            domain_id = retrieve_id_by_name(list_domains(), domain_name, 'domains')
+            domain_id = retrieve_id_by_name(list_target('domains'), domain_name, 'domains')
         """
         url = self._set_api_url('domains', domain_id)
         headers = {'X-Auth-Token': self.admin_token}
@@ -231,31 +231,10 @@ class ApiV3Client(object):
                                'enabled': True,
                                'name': project_name}}
         if domain_name:
-            payload['project']['domain_id'] = retrieve_id_by_name(self.list_domains(), domain_name, 'domains')
+            payload['project']['domain_id'] = retrieve_id_by_name(self.list_target('domains'), domain_name, 'domains')
         headers = {'Content-Type': 'application/json', 'X-Auth-Token': self.admin_token}
         r = requests.post(url, headers=headers, data=json.dumps(payload),
                           timeout=TIMEOUT, verify=self.verify)
-        return r
-
-    def list_projects(self):
-        """list projects"""
-        url = self._set_api_url('projects')
-        headers = {'X-Auth-Token': self.admin_token}
-        r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
-        return r.json()
-    
-    def show_project(self, project_id=None, project_name=None):
-        """show project
-
-        Arguments:
-            project_id:
-            project_name:
-        """
-        if project_name:
-            project_id = retrieve_id_by_name(list_projects(), project_name, 'projects')
-        url = self._set_api_url('projects', project_id)
-        headers = {'X-Auth-Token': self.admin_token}
-        r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
         return r
 
     # Not Implemented
@@ -267,7 +246,7 @@ class ApiV3Client(object):
             project_name:
         """
         if project_name:
-            project_id = retrieve_id_by_name(list_projects(), project_name, 'projects')
+            project_id = retrieve_id_by_name(list_target('projects'), project_name, 'projects')
         url = self._set_api_url('projects', project_id)
         headers = {'X-Auth-Token': self.admin_token}
         r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
@@ -284,7 +263,7 @@ class ApiV3Client(object):
         payload = {'project': {'description': group_name,
                                'name': group_name}}
         if domain_name:
-            payload['group']['domain_id'] = retrieve_id_by_name(list_domains(),
+            payload['group']['domain_id'] = retrieve_id_by_name(list_target('domains'),
                                                                 domain_name,
                                                                 'domains')
         headers = {'Content-Type': 'application/json', 'X-Auth-Token': self.admin_token}
