@@ -19,18 +19,17 @@ import requests
 import os.path
 import json
 
-API_V3 = 'http://localhost:35357/v3'
 TIMEOUT = 5.000
-VERIFY = False
-ADMIN_TOKEN = 'password'
 
-def set_auth_payload(userid=None, password=None, domain_id=None, domain_name=None,
-                 project_id=None, project_name=None):
+
+def set_auth_payload(userid=None, password=None, domain_id=None,
+                     domain_name=None, project_id=None, project_name=None):
     payload = {'auth': {'identity': {'methods': ['password'],
                                      'password': {'user': {}}}}}
     if userid:
-        payload['auth']['identity']['password']['user'] = {'id': userid, 'password': password}
-        
+        payload['auth']['identity']['password']['user'] = {'id': userid,
+                                                           'password': password}
+
     """
     if domain_id:
         payload['auth']['identity']['password']['user']['domain'] = {'id': domain_id}
@@ -42,128 +41,209 @@ def set_auth_payload(userid=None, password=None, domain_id=None, domain_name=Non
     elif project_name:
         payload['auth']['scope'] = {'project': {'name': project_name}}
         """
+
     if domain_name and project_name:
         payload['auth']['scope'] = {'project': {'domain': {'name': domain_name},
                                                 'name': project_name}}
     return payload
 
 
-
-def authenticate(userid, password, domain_name=None, project_name=None):
-    url = os.path.join(API_V3, 'auth/tokens')
-    headers = {'Content-Type': 'application/json'}
-    payload = set_auth_payload(userid=userid, password=password, domain_name=domain_name,
-                               project_name=project_name)
-    r = requests.post(url, headers=headers, data=json.dumps(payload),
-                      timeout=TIMEOUT, verify=VERIFY)
-    return r
-
-
 def retrieve_id_by_name(list_json, entry_name, key):
+    """retrieve name by id
+
+    Arguments:
+        list_json:
+        entry_name:
+        key:
+    """
     return [entry.get('id')
             for entry in list_json.get(key)
             if entry.get('name') == entry_name][0]
 
 
-def create_domain(domain_name):
-    url = os.path.join(API_V3, 'domains')
-    payload = {'domain': {'description': domain_name,
-                          'enabled': True,
-                          'name': domain_name}}
-    admin_token = ADMIN_TOKEN
-    headers = {'Content-Type': 'application/json', 'X-Auth-Token': admin_token}
-    r = requests.post(url, headers=headers, data=json.dumps(payload),
-                      timeout=TIMEOUT, verify=VERIFY)
-    return r
+class ApiV3Client(object):
 
-def list_domains():
-    url = os.path.join(API_V3, 'domains')
-    admin_token = ADMIN_TOKEN
-    headers = {'X-Auth-Token': admin_token}
-    r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=VERIFY)
-    return r.json()
+    def __init__(self, base_url, admin_token, verify=True):
+        """initialize variable
 
+        Arguments:
+            base_url:
+            admin_token:
+            verify:
+        """
+        self.base_url = base_url
+        self.admin_token = admin_token
+        self.verify = verify
 
-def show_domain(domain_id=None, domain_name=None):
-    if domain_name:
-        domain_id = retrieve_id_by_name(list_domains(), domain_name, 'domains')
-    url = os.path.join(API_V3, 'domains', domain_id)
-    admin_token = ADMIN_TOKEN
-    headers = {'X-Auth-Token': admin_token}
-    r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=VERIFY)
-    return r
+    def _set_api_url(self, *kwards):
+        """return api url
 
-# not implemented now ?
-def delete_domain(domain_id=None, domain_name=None):
-    if domain_name:
-        domain_id = retrieve_id_by_name(list_domains(), domain_name, 'domains')
-    url = os.path.join(API_V3, 'domains', domain_id)
-    admin_token = ADMIN_TOKEN
-    headers = {'X-Auth-Token': admin_token}
-    r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=VERIFY)
-    return r
+        Arguments:
+            *kwards:
+        """
+        return os.path.join(self.base_url, kwards)
+
+    def authenticate(self, userid, password, domain_name=None, project_name=None):
+        """Authenticate
+
+        Arguments:
+            userid:
+            password:
+            domain_name:
+            project_name:
+        """
+        url = self._set_api_url('auth/tokens')
+        headers = {'Content-Type': 'application/json'}
+        payload = set_auth_payload(userid=userid,
+                                   password=password,
+                                   domain_name=domain_name,
+                                   project_name=project_name)
+        r = requests.post(url, headers=headers, data=json.dumps(payload),
+                          timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    def create_domain(self, domain_name):
+        """Create domain
+
+        Argument:
+            domain_name:
+        """
+        url = self._set_api_url('domains')
+        payload = {'domain': {'description': domain_name,
+                              'enabled': True,
+                              'name': domain_name}}
+        headers = {'Content-Type': 'application/json',
+                   'X-Auth-Token': self.admin_token}
+        r = requests.post(url, headers=headers, data=json.dumps(payload),
+                          timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    def list_domains(self):
+        """list domains"""
+        url = self._set_api_url('domains')
+        headers = {'X-Auth-Token': admin_token}
+        r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r.json()
+
+    def show_domain(self, domain_id=None, domain_name=None):
+        """show domain
+
+        Arguments:
+            domain_id:
+            domain_name:
+        """
+        if domain_name:
+            domain_id = retrieve_id_by_name(list_domains(), domain_name, 'domains')
+        url = self._set_api_url('domains', domain_id)
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    # not implemented now ?
+    def delete_domain(self, domain_id=None, domain_name=None):
+        """delete domain
+
+        Arguments:
+            domain_id:
+            domain_name:
+        """
+        if domain_name:
+            domain_id = retrieve_id_by_name(list_domains(), domain_name, 'domains')
+        url = self._set_api_url('domains', domain_id)
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r
     
-# not implemented now ?
-def update_domain(domain_id, enable=True):
-    url = os.path.join(API_V3, 'domains', domain_id)
-    payload = {'domain': {'description': 'hoge',
-                          'enabled': enable,
-                          'name': 'hoge',
-                          'id': domain_id,
-                          'links': {'self': url}}}
-    admin_token = ADMIN_TOKEN
-    headers = {'Content-Type': 'application/json', 'X-Auth-Token': admin_token}
-    r = requests.patch(url, headers=headers, data=json.dumps(payload),
-                       timeout=TIMEOUT, verify=VERIFY)
-    return r
+    # not implemented now ?
+    def update_domain(self, domain_id, domain_name, enable=True, description=None,):
+        """update domain
 
-def create_project(project_name, domain_name=None):
-    url = os.path.join(API_V3, 'projects')
-    payload = {'project': {'description': project_name,
-                          'enabled': True,
-                          'name': project_name}}
-    if domain_name:
-        payload['project']['domain_id'] = retrieve_id_by_name(list_domains(), domain_name, 'domains')
-    admin_token = ADMIN_TOKEN
-    headers = {'Content-Type': 'application/json', 'X-Auth-Token': admin_token}
-    r = requests.post(url, headers=headers, data=json.dumps(payload),
-                      timeout=TIMEOUT, verify=VERIFY)
-    return r
+        Arguments:
+            domain_id:
+            domain_name:
+            enable:
+            description:
+        """
+        url = self._set_api_url('domains', domain_id)
+        payload = {'domain': {'description': description,
+                              'enabled': enable,
+                              'name': domain_name,
+                              'id': domain_id,
+                              'links': {'self': url}}}
+        headers = {'Content-Type': 'application/json', 'X-Auth-Token': self.admin_token}
+        r = requests.patch(url, headers=headers, data=json.dumps(payload),
+                           timeout=TIMEOUT, verify=self.verify)
+        return r
 
-def list_projects():
-    url = os.path.join(API_V3, 'projects')
-    admin_token = ADMIN_TOKEN
-    headers = {'X-Auth-Token': admin_token}
-    r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=VERIFY)
-    return r.json()
+    def create_project(self, project_name, domain_name=None):
+        """create project
+
+        Arguments:
+            project_name:
+            domain_name:
+        """
+        url = self._set_api_url('projects')
+        payload = {'project': {'description': project_name,
+                               'enabled': True,
+                               'name': project_name}}
+        if domain_name:
+            payload['project']['domain_id'] = retrieve_id_by_name(list_domains(), domain_name, 'domains')
+            headers = {'Content-Type': 'application/json', 'X-Auth-Token': self.admin_token}
+            r = requests.post(url, headers=headers, data=json.dumps(payload),
+                              timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    def list_projects(self):
+        """list projects"""
+        url = self._set_api_url('projects')
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r.json()
     
-def show_project(project_id=None, project_name=None):
-    if project_name:
-        project_id = retrieve_id_by_name(list_projects(), project_name, 'projects')
-    url = os.path.join(API_V3, 'projects', project_id)
-    admin_token = ADMIN_TOKEN
-    headers = {'X-Auth-Token': admin_token}
-    r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=VERIFY)
-    return r
+    def show_project(self, project_id=None, project_name=None):
+        """show project
 
-# Not Implemented
-def delete_project(project_id=None, project_name=None):
-    if project_name:
-        project_id = retrieve_id_by_name(list_projects(), project_name, 'projects')
-    url = os.path.join(API_V3, 'projects', project_id)
-    admin_token = ADMIN_TOKEN
-    headers = {'X-Auth-Token': admin_token}
-    r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=VERIFY)
-    return r
+        Arguments:
+            project_id:
+            project_name:
+        """
+        if project_name:
+            project_id = retrieve_id_by_name(list_projects(), project_name, 'projects')
+        url = self._set_api_url('projects', project_id)
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r
 
-def create_group(group_name, domain_name=None):
-    url = os.path.join(API_V3, 'groups')
-    payload = {'project': {'description': group_name,
-                          'name': group_name}}
-    if domain_name:
-        payload['group']['domain_id'] = retrieve_id_by_name(list_domains(), domain_name, 'domains')
-    admin_token = ADMIN_TOKEN
-    headers = {'Content-Type': 'application/json', 'X-Auth-Token': admin_token}
-    r = requests.post(url, headers=headers, data=json.dumps(payload),
-                      timeout=TIMEOUT, verify=VERIFY)
-    return r
+    # Not Implemented
+    def delete_project(self, project_id=None, project_name=None):
+        """delete project
+
+        Arguments:
+            project_id:
+            project_name:
+        """
+        if project_name:
+            project_id = retrieve_id_by_name(list_projects(), project_name, 'projects')
+        url = self._set_api_url('projects', project_id)
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    def create_group(self, group_name, domain_name=None):
+        """create group
+
+        Arguments:
+            group_name:
+            domain_name:
+        """
+        url = self._set_api_url('groups')
+        payload = {'project': {'description': group_name,
+                               'name': group_name}}
+        if domain_name:
+            payload['group']['domain_id'] = retrieve_id_by_name(list_domains(),
+                                                                domain_name,
+                                                                'domains')
+        headers = {'Content-Type': 'application/json', 'X-Auth-Token': self.admin_token}
+        r = requests.post(url, headers=headers, data=json.dumps(payload),
+                          timeout=TIMEOUT, verify=self.verify)
+        return r

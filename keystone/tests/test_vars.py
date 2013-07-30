@@ -1,0 +1,16 @@
+# -*- coding: utf-8 -*-
+base_url_api_v3 = 'http://localhost:35357/v3'
+verify = False
+admin_token = 'password'
+user01_userid = 'user01'
+user01_password = 'password'
+default_domain_id = 'default'
+default_domain_name = 'default'
+shared_domain_name = 'shared'
+net_domain_name = 'net'
+com_domain_name = 'com'
+default_project_id = 'default'
+default_project_name = 'default'
+x_project_name = 'projectx'
+y_project_name = 'projecty'
+z_project_name = 'projectz'
