@@ -18,6 +18,7 @@
 import requests
 import os.path
 import json
+import ldap
 
 TIMEOUT = 5.000
 
@@ -64,6 +65,35 @@ def retrieve_id_by_name(list_json, entry_name, key):
     return [entry.get('id')
             for entry in list_json.get(key)
             if entry.get('name') == entry_name][0]
+
+
+class LdapClient(object):
+    
+    def __init__(self, ldap_url, search_base, binddn, bindpw):
+        """initialize variable
+
+        Arguments:
+            base_url:
+            admin_token:
+            verify:
+        """
+        self.conn = ldap.initialize(ldap_url)
+        method = ldap.AUTH_SIMPLE
+        self.search_scope = ldap.SCOPE_SUBTREE
+        self.search_base = search_base
+        try:
+            self.conn.bind(binddn, bindpw, method)
+        except ldap.SERVER_DOWN as e:
+            print(e)
+
+    def search_entry(self, search_word, target):
+        if search_word:
+            search_filter = '(ou=%s)' % search_word
+        if target:
+            search_base = 'ou=%s,dc=auth,%s' % (target, self.search_base)
+        return  self.conn.search_s(search_base,
+                                   self.search_scope,
+                                   search_filter)
 
 
 class ApiV3Client(object):
@@ -147,7 +177,7 @@ class ApiV3Client(object):
         r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
         return r
 
-    # not implemented now ?
+    # not implemented now
     def delete_domain(self, domain_id=None, domain_name=None):
         """delete domain
 
@@ -157,10 +187,13 @@ class ApiV3Client(object):
         """
         if domain_name:
             domain_id = retrieve_id_by_name(list_domains(), domain_name, 'domains')
+        """
         url = self._set_api_url('domains', domain_id)
         headers = {'X-Auth-Token': self.admin_token}
         r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
         return r
+        """
+        
     
     # not implemented now ?
     def update_domain(self, domain_id, domain_name, enable=True, description=None,):

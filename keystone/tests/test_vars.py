@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 base_url_api_v3 = 'http://localhost:35357/v3'
+ldap_url = 'ldap://localhost'
+search_base = 'dc=example,dc=org'
+binddn = 'cn=admin,dc=example,dc=org'
+bindpw = 'password'
 verify = False
 admin_token = 'password'
 user01_userid = 'user01'
@@ -60,3 +64,11 @@ test_domains = {'domains': [{'id': 'default', 'name': 'default'},
 
 domains_url = base_url_api_v3 + '/domains'
 domain_url = base_url_api_v3 + '/domains/default'
+search_word = 'domains'
+domain_entry_member = ['cn=dumb,dc=nonexistent']
+domain_entry_description = ['default']
+domain_entry_enabled = ['TRUE']
+domain_entry_objectClass = ['groupOfNames']
+domain_entry_ou = ['default']
+domain_entry_dn = 'ou=Domains,dc=auth,dc=example,dc=org'
+

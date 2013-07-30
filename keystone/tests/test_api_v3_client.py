@@ -18,6 +18,7 @@
 import unittest
 import sys
 import os.path
+import requests
 sys.path.append(os.path.abspath('tests'))
 import tests.api_v3_client as c
 import tests.test_vars as v
@@ -26,7 +27,8 @@ import tests.test_vars as v
 class ApiV3ClientTests(unittest.TestCase):
     def setUp(self):
         self.maxDiff = None
-        self.session = c.ApiV3Client(v.base_url_api_v3, v.admin_token, verify=v.verify)
+        self.k = c.ApiV3Client(v.base_url_api_v3, v.admin_token, verify=v.verify)
+        self.l = c.LdapClient(v.ldap_url, v.search_base, v.binddn, v.bindpw)
 
     def test_set_auth_payload_with_domain_name_and_project_name(self):
         self.assertDictEqual(v.auth_payload_domain_name_project_name,
@@ -79,8 +81,35 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_set_api_url(self):
         self.assertEqual(v.domains_url,
-                         self.session._set_api_url('domains'))
+                         self.k._set_api_url('domains'))
 
     def test_set_api_url2(self):
         self.assertEqual(v.domain_url,
-                         self.session._set_api_url('domains', 'default'))
+                         self.k._set_api_url('domains', 'default'))
+
+    """
+    def test_authenticate(self):
+        self.assertEqual(1,
+                         self.k.authenticate(v.user01_userid,
+                                             v.user01_password,
+                                             v.default_domain_name,
+                                             v.default_project_name))
+                                             """
+
+    """
+    def test_create_domain(self):
+        res = requests.Response()
+        res.status_code = 201
+        self.assertEqual(res.status_code,
+                         self.k.create_domain(v.default_domain_name).status_code)
+                         """
+
+    def test_search_entry(self):
+        res = self.l.search_entry(v.default_domain_name, v.search_word)
+        self.assertTrue(v.domain_entry_dn in res[0][0])
+        self.assertListEqual(v.domain_entry_member, res[0][1].get('member'))
+        self.assertListEqual(v.domain_entry_description, res[0][1].get('description'))
+        self.assertListEqual(v.domain_entry_enabled, res[0][1].get('enabled'))
+        self.assertListEqual(v.domain_entry_objectClass, res[0][1].get('objectClass'))
+        self.assertListEqual(v.domain_entry_ou, res[0][1].get('ou'))
+        self.assertEqual(res[0][0].split(',')[0].split('=')[1], res[0][1].get('cn')[0])
