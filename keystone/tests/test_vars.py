@@ -18,6 +18,12 @@ default_project_name = 'default'
 x_project_name = 'projectx'
 y_project_name = 'projecty'
 z_project_name = 'projectz'
+default_group_id = 'default'
+default_group_name = 'default'
+x_group_name = 'groupx'
+y_group_name = 'groupy'
+z_group_name = 'groupz'
+
 
 auth_payload_domain_name_project_name = {'auth': {'identity': {'methods': ['password'],
                                                                'password': {'user': {'id': 'user01',
@@ -66,6 +72,7 @@ domains_url = base_url_api_v3 + '/domains'
 domain_url = base_url_api_v3 + '/domains/default'
 target_domain = 'domains'
 target_project = 'projects'
+target_group = 'groups'
 domain_entry_member = ['cn=dumb,dc=nonexistent']
 domain_entry_description = ['default']
 domain_entry_enabled = ['TRUE']

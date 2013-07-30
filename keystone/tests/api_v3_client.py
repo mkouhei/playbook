@@ -233,6 +233,7 @@ class ApiV3Client(object):
         if domain_name:
             payload['project']['domain_id'] = retrieve_id_by_name(self.list_target('domains'), domain_name, 'domains')
         headers = {'Content-Type': 'application/json', 'X-Auth-Token': self.admin_token}
+        print(payload)
         r = requests.post(url, headers=headers, data=json.dumps(payload),
                           timeout=TIMEOUT, verify=self.verify)
         return r
@@ -246,7 +247,7 @@ class ApiV3Client(object):
             project_name:
         """
         if project_name:
-            project_id = retrieve_id_by_name(list_target('projects'), project_name, 'projects')
+            project_id = retrieve_id_by_name(self.list_target('projects'), project_name, 'projects')
         url = self._set_api_url('projects', project_id)
         headers = {'X-Auth-Token': self.admin_token}
         r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
@@ -260,15 +261,29 @@ class ApiV3Client(object):
             domain_name:
         """
         url = self._set_api_url('groups')
-        payload = {'project': {'description': group_name,
+        payload = {'group': {'description': group_name,
                                'name': group_name}}
         if domain_name:
-            payload['group']['domain_id'] = retrieve_id_by_name(list_target('domains'),
+            payload['group']['domain_id'] = retrieve_id_by_name(self.list_target('domains'),
                                                                 domain_name,
                                                                 'domains')
         headers = {'Content-Type': 'application/json', 'X-Auth-Token': self.admin_token}
         r = requests.post(url, headers=headers, data=json.dumps(payload),
                           timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    def delete_group(self, group_id=None, group_name=None):
+        """delete group
+
+        Arguments:
+            group_id:
+            group_name:
+        """
+        if group_name:
+            group_id = retrieve_id_by_name(self.list_target('groups'), group_name, 'groups')
+        url = self._set_api_url('groups', group_id)
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
         return r
 
     def _get(self, url):
