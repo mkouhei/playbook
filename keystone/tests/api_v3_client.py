@@ -232,9 +232,9 @@ class ApiV3Client(object):
                                'name': project_name}}
         if domain_name:
             payload['project']['domain_id'] = retrieve_id_by_name(list_domains(), domain_name, 'domains')
-            headers = {'Content-Type': 'application/json', 'X-Auth-Token': self.admin_token}
-            r = requests.post(url, headers=headers, data=json.dumps(payload),
-                              timeout=TIMEOUT, verify=self.verify)
+        headers = {'Content-Type': 'application/json', 'X-Auth-Token': self.admin_token}
+        r = requests.post(url, headers=headers, data=json.dumps(payload),
+                          timeout=TIMEOUT, verify=self.verify)
         return r
 
     def list_projects(self):

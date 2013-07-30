@@ -104,7 +104,7 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_search_entry(self):
         self.k.create_domain(v.default_domain_name)
-        res = self.l.search_entry(v.default_domain_name, v.search_word)
+        res = self.l.search_entry(v.default_domain_name, v.target_domain)
         self.assertTrue(v.domain_entry_dn in res[0][0])
         self.assertListEqual(v.domain_entry_member, res[0][1].get('member'))
         self.assertListEqual(v.domain_entry_description, res[0][1].get('description'))
@@ -112,8 +112,12 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertListEqual(v.domain_entry_objectClass, res[0][1].get('objectClass'))
         self.assertListEqual(v.domain_entry_ou, res[0][1].get('ou'))
         self.assertEqual(res[0][0].split(',')[0].split('=')[1], res[0][1].get('cn')[0])
-        self.l.delete_entry(v.default_domain_name, v.search_word)
+        self.l.delete_entry(v.default_domain_name, v.target_domain)
 
-    def test_delete_entry(self):
+    def test_delete_domain(self):
         self.k.create_domain(v.default_domain_name)
-        self.assertEqual(107, self.l.delete_entry(v.default_domain_name, v.search_word)[0])
+        self.assertEqual(107, self.l.delete_entry(v.default_domain_name, v.target_domain)[0])
+
+    def test_delete_project(self):
+        self.k.create_project(v.default_project_name)
+        self.assertEqual(107, self.l.delete_entry(v.default_project_name, v.target_project)[0])

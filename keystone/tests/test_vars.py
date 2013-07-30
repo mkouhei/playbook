@@ -64,7 +64,8 @@ test_domains = {'domains': [{'id': 'default', 'name': 'default'},
 
 domains_url = base_url_api_v3 + '/domains'
 domain_url = base_url_api_v3 + '/domains/default'
-search_word = 'domains'
+target_domain = 'domains'
+target_project = 'projects'
 domain_entry_member = ['cn=dumb,dc=nonexistent']
 domain_entry_description = ['default']
 domain_entry_enabled = ['TRUE']
