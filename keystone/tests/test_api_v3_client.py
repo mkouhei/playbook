@@ -19,6 +19,7 @@ import unittest
 import sys
 import os.path
 import requests
+import json
 sys.path.append(os.path.abspath('tests'))
 import tests.api_v3_client as c
 import tests.test_vars as v
@@ -117,6 +118,32 @@ class ApiV3ClientTests(unittest.TestCase):
     def test_delete_domain(self):
         self.k.create_domain(v.default_domain_name)
         self.assertEqual(107, self.l.delete_entry(v.default_domain_name, v.target_domain)[0])
+
+    def test_list_domains(self):
+        self.k.create_domain(v.default_domain_name)
+        res = self.k.list_domains()
+        id = res['domains'][0]['id']
+        self_links = res['domains'][0]['links']['self']
+        self.assertEqual(v.default_domain_name, res['domains'][0]['name'])
+        self.assertEqual(v.default_domain_name, res['domains'][0]['description'])
+        self.assertEqual(v.default_domain_name, res['domains'][0]['description'])
+        self.assertEqual(True, res['domains'][0]['enabled'])
+        self.assertEqual(200, self.k._get(self_links).status_code)
+        self.l.delete_entry(v.default_domain_name, v.target_domain)
+
+    def test_create_project(self):
+        res = requests.Response()
+        res.status_code = 201
+        self.assertEqual(res.status_code,
+                         self.k.create_project(v.default_project_name).status_code)
+
+    """
+    def test_create_project_with_domain(self):
+        res = requests.Response()
+        res.status_code = 201
+        self.assertEqual(res.status_code,
+                         self.k.create_project(v.default_project_name, v.default_domain_name).status_code)
+                         """
 
     def test_delete_project(self):
         self.k.create_project(v.default_project_name)

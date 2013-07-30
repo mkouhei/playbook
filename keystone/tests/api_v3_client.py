@@ -162,7 +162,7 @@ class ApiV3Client(object):
     def list_domains(self):
         """list domains"""
         url = self._set_api_url('domains')
-        headers = {'X-Auth-Token': admin_token}
+        headers = {'X-Auth-Token': self.admin_token}
         r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
         return r.json()
 
@@ -231,7 +231,7 @@ class ApiV3Client(object):
                                'enabled': True,
                                'name': project_name}}
         if domain_name:
-            payload['project']['domain_id'] = retrieve_id_by_name(list_domains(), domain_name, 'domains')
+            payload['project']['domain_id'] = retrieve_id_by_name(self.list_domains(), domain_name, 'domains')
         headers = {'Content-Type': 'application/json', 'X-Auth-Token': self.admin_token}
         r = requests.post(url, headers=headers, data=json.dumps(payload),
                           timeout=TIMEOUT, verify=self.verify)
@@ -290,4 +290,14 @@ class ApiV3Client(object):
         headers = {'Content-Type': 'application/json', 'X-Auth-Token': self.admin_token}
         r = requests.post(url, headers=headers, data=json.dumps(payload),
                           timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    def _get(self, url):
+        """show domain
+
+        Arguments:
+            url:
+        """
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
         return r
