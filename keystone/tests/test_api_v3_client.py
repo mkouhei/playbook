@@ -76,3 +76,11 @@ class ApiV3ClientTests(unittest.TestCase):
     def test_retrieve_id_by_name(self):
         self.assertEqual(v.default_domain_id,
                          c.retrieve_id_by_name(v.test_domains, v.default_domain_name, 'domains'))
+
+    def test_set_api_url(self):
+        self.assertEqual(v.domains_url,
+                         self.session._set_api_url('domains'))
+
+    def test_set_api_url2(self):
+        self.assertEqual(v.domain_url,
+                         self.session._set_api_url('domains', 'default'))

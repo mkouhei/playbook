@@ -86,7 +86,10 @@ class ApiV3Client(object):
         Arguments:
             *kwards:
         """
-        return os.path.join(self.base_url, kwards)
+        url = self.base_url
+        for i in kwards:
+            url = os.path.join(url, i)
+        return url
 
     def authenticate(self, userid, password, domain_name=None, project_name=None):
         """Authenticate

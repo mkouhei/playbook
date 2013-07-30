@@ -57,3 +57,6 @@ test_domains = {'domains': [{'id': 'default', 'name': 'default'},
                             {'id': 'net', 'name': 'net'},
                             {'id': 'com', 'name': 'com'},
                             {'id': 'shared', 'name': 'shared'}]}
+
+domains_url = base_url_api_v3 + '/domains'
+domain_url = base_url_api_v3 + '/domains/default'
