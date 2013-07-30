@@ -52,3 +52,8 @@ auth_payload_domain_name = {'auth': {'identity': {'methods': ['password'],
 auth_payload = {'auth': {'identity': {'methods': ['password'],
                                       'password': {'user': {'id': 'user01',
                                                             'password': 'password'}}}}}
+
+test_domains = {'domains': [{'id': 'default', 'name': 'default'},
+                            {'id': 'net', 'name': 'net'},
+                            {'id': 'com', 'name': 'com'},
+                            {'id': 'shared', 'name': 'shared'}]}

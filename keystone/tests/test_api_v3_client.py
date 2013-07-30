@@ -72,3 +72,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertDictEqual(v.auth_payload,
                              c.set_auth_payload(userid=v.user01_userid,
                                                 password=v.user01_password))
+
+    def test_retrieve_id_by_name(self):
+        self.assertEqual(v.default_domain_id,
+                         c.retrieve_id_by_name(v.test_domains, v.default_domain_name, 'domains'))
