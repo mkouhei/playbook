@@ -96,15 +96,14 @@ class ApiV3ClientTests(unittest.TestCase):
                                              v.default_project_name))
                                              """
 
-    """
     def test_create_domain(self):
         res = requests.Response()
         res.status_code = 201
         self.assertEqual(res.status_code,
                          self.k.create_domain(v.default_domain_name).status_code)
-                         """
 
     def test_search_entry(self):
+        self.k.create_domain(v.default_domain_name)
         res = self.l.search_entry(v.default_domain_name, v.search_word)
         self.assertTrue(v.domain_entry_dn in res[0][0])
         self.assertListEqual(v.domain_entry_member, res[0][1].get('member'))
@@ -113,3 +112,8 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertListEqual(v.domain_entry_objectClass, res[0][1].get('objectClass'))
         self.assertListEqual(v.domain_entry_ou, res[0][1].get('ou'))
         self.assertEqual(res[0][0].split(',')[0].split('=')[1], res[0][1].get('cn')[0])
+        self.l.delete_entry(v.default_domain_name, v.search_word)
+
+    def test_delete_entry(self):
+        self.k.create_domain(v.default_domain_name)
+        self.assertEqual(107, self.l.delete_entry(v.default_domain_name, v.search_word)[0])

@@ -71,4 +71,3 @@ domain_entry_enabled = ['TRUE']
 domain_entry_objectClass = ['groupOfNames']
 domain_entry_ou = ['default']
 domain_entry_dn = 'ou=Domains,dc=auth,dc=example,dc=org'
-

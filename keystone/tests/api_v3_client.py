@@ -95,6 +95,9 @@ class LdapClient(object):
                                    self.search_scope,
                                    search_filter)
 
+    def delete_entry(self, search_word, target):
+        return self.conn.delete_s(self.search_entry(search_word, target)[0][0])
+
 
 class ApiV3Client(object):
 
