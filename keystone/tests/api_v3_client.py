@@ -27,24 +27,38 @@ def set_auth_payload(userid=None, password=None, domain_id=None,
     payload = {'auth': {'identity': {'methods': ['password'],
                                      'password': {'user': {}}}}}
     if userid:
+        print(1)
         payload['auth']['identity']['password']['user'] = {'id': userid,
                                                            'password': password}
-
-    """
-    if domain_id:
-        payload['auth']['identity']['password']['user']['domain'] = {'id': domain_id}
-    elif domain_name:
-        payload['auth']['identity']['password']['user']['domain'] = {'name': domain_name}
-
-    if project_id:
-        payload['auth']['scope'] = {'project': {'id': project_id}}
-    elif project_name:
-        payload['auth']['scope'] = {'project': {'name': project_name}}
-        """
-
     if domain_name and project_name:
+        print(2)
         payload['auth']['scope'] = {'project': {'domain': {'name': domain_name},
                                                 'name': project_name}}
+    elif domain_name and project_id:
+        print(3)
+        payload['auth']['scope'] = {'project': {'domain': {'name': domain_name},
+                                                'id': project_id}}
+    elif domain_id and project_name:
+        print(4)
+        payload['auth']['scope'] = {'project': {'domain': {'id': domain_id},
+                                                'name': project_name}}
+    elif domain_id and project_id:
+        print(5)
+        payload['auth']['scope'] = {'project': {'domain': {'id': domain_id},
+                                                'id': project_id}}
+    elif domain_id and not (project_name and project_id):
+        print(6)
+        payload['auth']['identity']['password']['user']['domain'] = {'id': domain_id}
+    elif domain_name and not (project_name and project_id):
+        print(7)
+        payload['auth']['identity']['password']['user']['domain'] = {'name': domain_name}
+    elif project_id and not (domain_name and domain_id):
+        print(8)
+        payload['auth']['scope'] = {'project': {'id': project_id}}
+    elif project_name and (not domain_name and not domain_id):
+        print(9)
+        payload['auth']['scope'] = {'project': {'name': project_name}}
+    print(10)
     return payload
 
 
