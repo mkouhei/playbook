@@ -138,6 +138,17 @@ class ApiV3Client(object):
             url = os.path.join(url, i)
         return url
 
+    def _set_api_url_with_tuple(self, kwards):
+        """return api url
+
+        Arguments:
+            *kwards:
+        """
+        url = self.base_url
+        for i in kwards:
+            url = os.path.join(url, i)
+        return url
+
     def authenticate(self, userid, password, domain_name=None, project_name=None):
         """Authenticate
 
@@ -203,9 +214,27 @@ class ApiV3Client(object):
                           timeout=TIMEOUT, verify=self.verify)
         return r
 
-    def list_target(self, target):
+    def create_role(self, role_name):
+        """create role
+
+        Arguments:
+            role_name:
+
+        """
+        url = self._set_api_url('roles')
+        headers = {'X-Auth-Token': self.admin_token, 'Content-Type': 'application/json'}
+        payload = {'role': {'name': role_name}}
+        roles = [role for role in self.list_target('roles').get('roles')
+                 if role.get('name') == role_name]
+        if roles:
+            return None
+        r = requests.post(url, headers=headers, data=json.dumps(payload),
+                          timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    def list_target(self, *target):
         """list organizationalUnit"""
-        url = self._set_api_url(target)
+        url = self._set_api_url_with_tuple(target)
         headers = {'X-Auth-Token': self.admin_token}
         r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
         return r.json()

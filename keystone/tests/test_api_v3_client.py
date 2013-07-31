@@ -328,3 +328,26 @@ class ApiV3ClientTests(unittest.TestCase):
         res =requests.Response()
         res.status_code = 204
         self.assertEqual(204, self.k.delete_group(group_name=v.default_group_name).status_code)
+
+    def test_list_users(self):
+        self.assertEqual(14, len(self.k.list_target('users').get('users')))
+
+    def test_show_users(self):
+        res = self.k.show_target('users', target_name=v.user01_userid).json()
+        self.assertEqual(v.user01_userid, res.get('user').get('id'))
+
+    # not implemented
+    def test_x_list_user_projects(self):
+        res = self.k.show_target('users', target_name=v.user01_userid).json()
+        userid = res.get('user').get('id')
+        res = self.k.list_target('users', userid, 'projects')
+        self.assertEqual(501, res.get('error').get('code'))
+
+    """
+    def test_x_list_user_groups(self):
+        res = self.k.show_target('users', target_name=v.user01_userid).json()
+        userid = res.get('user').get('id')
+        res = self.k.list_target('users', userid, 'groups')
+        print res
+        self.assertEqual(501, res.get('error').get('code'))
+        """
