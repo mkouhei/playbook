@@ -77,4 +77,7 @@ domain_entry_objectClass = ['groupOfNames']
 domain_entry_ou = ['default']
 domain_entry_dn = 'ou=Domains,dc=auth,dc=example,dc=org'
 service_type = 'identity'
-
+endpoint_interface = 'internal'
+endpoint_name = 'KeyStone Authentication'
+endpoint_url = 'http://localhost:35357/v3/'
+region = 'regionOne'

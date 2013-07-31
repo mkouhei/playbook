@@ -66,6 +66,7 @@ def retrieve_id_by_name(list_json, entry_name, key):
             for entry in list_json.get(key)
             if entry.get('name') == entry_name][0]
 
+
 def retrieve_id_by_type(list_json, entry_type, key):
     """retrieve id by type
 
@@ -113,7 +114,7 @@ class LdapClient(object):
 
 class ApiV3Client(object):
 
-    def __init__(self, base_url, admin_token, verify=True):
+    def __init__(self, base_url, admin_token, region, verify=True):
         """initialize variable
 
         Arguments:
@@ -124,6 +125,7 @@ class ApiV3Client(object):
         self.base_url = base_url
         self.admin_token = admin_token
         self.verify = verify
+        self.region = region
 
     def _set_api_url(self, *kwards):
         """return api url
@@ -168,6 +170,34 @@ class ApiV3Client(object):
         services = [service for service in self.list_target('services').get('services')
                     if service.get('type') == service_type]
         if services:
+            return None
+        r = requests.post(url, headers=headers, data=json.dumps(payload),
+                          timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    def create_endpoint(self, interface, endpoint_name, endpoint_url, service_type):
+        """create endpoint
+
+        Arguments:
+            interface:     [admin|public|internal]
+            endpoint_name:
+            endpoint_url:
+            service_type:
+
+        """
+        url = self._set_api_url('endpoints')
+        headers = {'X-Auth-Token': self.admin_token, 'Content-Type': 'application/json'}
+        res = self.show_target('services', target_type=service_type).json()
+        service_id = res.get('service').get('id')
+        payload = {'endpoint': {'name': endpoint_name,
+                                'url': endpoint_url,
+                                'interface': interface,
+                                'region': self.region,
+                                'service_id': service_id}}
+        endpoints = [endpoint for endpoint in self.list_target('endpoints').get('endpoints')
+                     if endpoint.get('name') == endpoint_name]
+        print endpoints
+        if endpoints:
             return None
         r = requests.post(url, headers=headers, data=json.dumps(payload),
                           timeout=TIMEOUT, verify=self.verify)

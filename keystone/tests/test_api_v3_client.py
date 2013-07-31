@@ -28,7 +28,7 @@ import tests.test_vars as v
 class ApiV3ClientTests(unittest.TestCase):
     def setUp(self):
         self.maxDiff = None
-        self.k = c.ApiV3Client(v.base_url_api_v3, v.admin_token, verify=v.verify)
+        self.k = c.ApiV3Client(v.base_url_api_v3, v.admin_token, v.region, verify=v.verify)
         self.l = c.LdapClient(v.ldap_url, v.search_base, v.binddn, v.bindpw)
 
     def test_create_service(self):
@@ -50,7 +50,6 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_show_service(self):
         self.k.create_service(v.service_type)
-        self.k.create_service(v.service_type)
         res = self.k.show_target('services', target_type=v.service_type)
         self.assertEqual(v.service_type, res.json().get('service').get('type'))
         self.k.delete_target('services', target_type=v.service_type)
@@ -65,19 +64,53 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(204, self.k.delete_target('services', target_type=v.service_type).status_code)
 
     def test_create_endpoint(self):
-        pass
+        self.k.create_service(v.service_type)
+        res = requests.Response()
+        res.status_code = 201
+        self.assertEqual(201, self.k.create_endpoint(v.endpoint_interface,
+                                                     v.endpoint_name,
+                                                     v.endpoint_url,
+                                                     v.service_type).status_code)
+        self.k.delete_target('services', target_type=v.service_type)
+
+    def test_list_endpoints_none(self):
+        res = self.k.list_target('endpoints')
+        self.assertListEqual([], res.get('endpoints'))
 
     def test_list_endpoints(self):
-        pass
+        self.k.create_service(v.service_type)
+        self.k.create_endpoint(v.endpoint_interface, v.endpoint_name, v.endpoint_url, v.service_type)
+        res = self.k.list_target('endpoints')
+        self.assertEqual(1, len(res.get('endpoints')))
+        self.assertEqual(v.endpoint_name, res.get('endpoints')[0].get('name'))
+        self.assertEqual(v.endpoint_url, res.get('endpoints')[0].get('url'))
+        self.assertEqual(v.endpoint_interface, res.get('endpoints')[0].get('interface'))
+        self.k.delete_target('endpoints', target_name=v.endpoint_name)
+        self.k.delete_target('services', target_type=v.service_type)
 
     def test_show_endpoint(self):
-        pass
+        self.k.create_service(v.service_type)
+        self.k.create_endpoint(v.endpoint_interface, v.endpoint_name, v.endpoint_url, v.service_type)
+        res = self.k.show_target('endpoints', target_name=v.endpoint_name).json()
+        self.assertEqual(v.endpoint_name, res.get('endpoint').get('name'))
+        self.assertEqual(v.endpoint_interface, res.get('endpoint').get('interface'))
+        self.assertEqual(v.region, res.get('endpoint').get('region'))
+        self.assertEqual(v.endpoint_url, res.get('endpoint').get('url'))
+        self.k.delete_target('endpoints', target_name=v.endpoint_name)
+        self.k.delete_target('services', target_type=v.service_type)
 
     def test_update_endpoint(self):
         pass
 
     def test_delete_endpoint(self):
-        pass
+        self.k.create_service(v.service_type)
+        self.k.create_endpoint(v.endpoint_interface, v.endpoint_name, v.endpoint_url, v.service_type)
+        res = requests.Response()
+        res.status_code = 204
+        self.assertEqual(204, self.k.delete_target('endpoints', target_name=v.endpoint_name).status_code)
+        self.k.delete_target('services', target_type=v.service_type)
+
+
 
     def test_set_auth_payload_with_domain_name_and_project_name(self):
         self.assertDictEqual(v.auth_payload_domain_name_project_name,
