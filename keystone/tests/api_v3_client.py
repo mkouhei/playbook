@@ -55,7 +55,7 @@ def set_auth_payload(userid=None, password=None, domain_id=None,
 
 
 def retrieve_id_by_name(list_json, entry_name, key):
-    """retrieve name by id
+    """retrieve id by name
 
     Arguments:
         list_json:
@@ -65,6 +65,18 @@ def retrieve_id_by_name(list_json, entry_name, key):
     return [entry.get('id')
             for entry in list_json.get(key)
             if entry.get('name') == entry_name][0]
+
+def retrieve_id_by_type(list_json, entry_type, key):
+    """retrieve id by type
+
+    Arguments:
+        list_json:
+        entry_type:
+        key:
+    """
+    return [entry.get('id')
+            for entry in list_json.get(key)
+            if entry.get('type') == entry_type][0]
 
 
 class LdapClient(object):
@@ -143,6 +155,24 @@ class ApiV3Client(object):
                           timeout=TIMEOUT, verify=self.verify)
         return r
 
+    def create_service(self, service_type):
+        """create service
+
+        Arguments:
+            service_type:
+
+        """
+        url = self._set_api_url('services')
+        headers = {'X-Auth-Token': self.admin_token, 'Content-Type': 'application/json'}
+        payload = {'service': {'type': service_type}}
+        services = [service for service in self.list_target('services').get('services')
+                    if service.get('type') == service_type]
+        if services:
+            return None
+        r = requests.post(url, headers=headers, data=json.dumps(payload),
+                          timeout=TIMEOUT, verify=self.verify)
+        return r
+
     def list_target(self, target):
         """list organizationalUnit"""
         url = self._set_api_url(target)
@@ -150,17 +180,41 @@ class ApiV3Client(object):
         r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
         return r.json()
 
-    def show_target(self, target, target_id=None, target_name=None):
+    def show_target(self, target, target_id=None, target_name=None, target_type=None):
         """show target
 
         Arguments:
+            target:
+            target_id:
             target_name:
+            target_type:
+
         """
-        if target_name:
+        if target_type:
+            target_id = retrieve_id_by_type(self.list_target(target), target_type, target)
+        elif target_name:
             target_id = retrieve_id_by_name(self.list_target(target), target_name, target)
         url = self._set_api_url(target, target_id)
         headers = {'X-Auth-Token': self.admin_token}
         r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    def delete_target(self, target, target_id=None, target_name=None, target_type=None):
+        """delete target
+
+        Arguments:
+            target:
+            target_id:
+            target_name:
+
+        """
+        if target_type:
+            target_id = retrieve_id_by_type(self.list_target(target), target_type, target)
+        elif target_name:
+            target_id = retrieve_id_by_name(self.list_target(target), target_name, target)
+        url = self._set_api_url(target, target_id)
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
         return r
 
     def create_domain(self, domain_name):

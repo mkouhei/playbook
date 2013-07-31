@@ -31,6 +31,54 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k = c.ApiV3Client(v.base_url_api_v3, v.admin_token, verify=v.verify)
         self.l = c.LdapClient(v.ldap_url, v.search_base, v.binddn, v.bindpw)
 
+    def test_create_service(self):
+        res = requests.Response()
+        res.status_code = 201
+        self.assertEqual(201, self.k.create_service(v.service_type).status_code)
+        self.k.delete_target('services', target_type=v.service_type)
+
+    def test_list_services_none(self):
+        res = self.k.list_target('services')
+        self.assertListEqual([], res.get('services'))
+
+    def test_list_services(self):
+        self.k.create_service(v.service_type)
+        res = self.k.list_target('services')
+        self.assertEqual(1, len(res.get('services')))
+        self.assertEqual(v.service_type, res.get('services')[0].get('type'))
+        self.k.delete_target('services', target_type=v.service_type)
+
+    def test_show_service(self):
+        self.k.create_service(v.service_type)
+        self.k.create_service(v.service_type)
+        res = self.k.show_target('services', target_type=v.service_type)
+        self.assertEqual(v.service_type, res.json().get('service').get('type'))
+        self.k.delete_target('services', target_type=v.service_type)
+
+    def test_update_service(self):
+        pass
+
+    def test_delete_service(self):
+        self.k.create_service(v.service_type)
+        res = requests.Response()
+        res.status_code = 204
+        self.assertEqual(204, self.k.delete_target('services', target_type=v.service_type).status_code)
+
+    def test_create_endpoint(self):
+        pass
+
+    def test_list_endpoints(self):
+        pass
+
+    def test_show_endpoint(self):
+        pass
+
+    def test_update_endpoint(self):
+        pass
+
+    def test_delete_endpoint(self):
+        pass
+
     def test_set_auth_payload_with_domain_name_and_project_name(self):
         self.assertDictEqual(v.auth_payload_domain_name_project_name,
                              c.set_auth_payload(userid=v.user01_userid,
@@ -105,7 +153,7 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_search_entry(self):
         self.k.create_domain(v.default_domain_name)
-        res = self.l.search_entry(v.default_domain_name, v.target_domain)
+        res = self.l.search_entry(v.default_domain_name, 'domains')
         self.assertTrue(v.domain_entry_dn in res[0][0])
         self.assertListEqual(v.domain_entry_member, res[0][1].get('member'))
         self.assertListEqual(v.domain_entry_description, res[0][1].get('description'))
@@ -113,7 +161,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertListEqual(v.domain_entry_objectClass, res[0][1].get('objectClass'))
         self.assertListEqual(v.domain_entry_ou, res[0][1].get('ou'))
         self.assertEqual(res[0][0].split(',')[0].split('=')[1], res[0][1].get('cn')[0])
-        self.l.delete_entry(v.default_domain_name, v.target_domain)
+        self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_list_domains(self):
         self.k.create_domain(v.default_domain_name)
@@ -124,7 +172,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(v.default_domain_name, res['domains'][0]['description'])
         self.assertEqual(True, res['domains'][0]['enabled'])
         self.assertEqual(200, self.k._get(self_links).status_code)
-        self.l.delete_entry(v.default_domain_name, v.target_domain)
+        self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_show_domain(self):
         self.k.create_domain(v.default_domain_name)
@@ -133,11 +181,11 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(v.default_domain_name, res.json()['domain']['description'])
         self.assertEqual(True, res.json()['domain']['enabled'])
         self.assertEqual(200, res.status_code)
-        self.l.delete_entry(v.default_domain_name, v.target_domain)
+        self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_delete_domain(self):
         self.k.create_domain(v.default_domain_name)
-        self.assertEqual(107, self.l.delete_entry(v.default_domain_name, v.target_domain)[0])
+        self.assertEqual(107, self.l.delete_entry(v.default_domain_name, 'domains')[0])
 
     def test_create_project(self):
         res = requests.Response()
@@ -162,7 +210,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(v.default_project_name, res['projects'][0]['description'])
         self.assertEqual(True, res['projects'][0]['enabled'])
         self.assertEqual(200, self.k._get(self_links).status_code)
-        self.l.delete_entry(v.default_project_name, v.target_project)
+        self.l.delete_entry(v.default_project_name, 'projects')
 
     def test_show_project(self):
         self.k.create_project(v.default_project_name)
@@ -171,18 +219,18 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(v.default_project_name, res.json()['project']['description'])
         self.assertEqual(True, res.json()['project']['enabled'])
         self.assertEqual(200, res.status_code)
-        self.l.delete_entry(v.default_project_name, v.target_project)
+        self.l.delete_entry(v.default_project_name, 'projects')
 
     def test_delete_project(self):
         self.k.create_project(v.default_project_name)
-        self.assertEqual((107, [], 3, []), self.l.delete_entry(v.default_project_name, v.target_project))
+        self.assertEqual((107, [], 3, []), self.l.delete_entry(v.default_project_name, 'projects'))
 
     def test_create_group(self):
         res = requests.Response()
         res.status_code = 201
         self.assertEqual(res.status_code,
                          self.k.create_group(v.default_group_name).status_code),
-        self.l.delete_entry(v.default_group_name, v.target_group)
+        self.l.delete_entry(v.default_group_name, 'groups')
 
     def test_create_group_in_domain(self):
         res = requests.Response()
@@ -190,7 +238,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(res.status_code,
                          self.k.create_group(v.default_group_name,
                                              v.default_domain_name).status_code),
-        self.l.delete_entry(v.default_group_name, v.target_group)
+        self.l.delete_entry(v.default_group_name, 'groups')
 
     def test_list_groups(self):
         self.k.create_group(v.default_group_name)
@@ -201,7 +249,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(v.default_group_name, res['groups'][0]['description'])
         self.assertEqual(v.default_domain_name, res['groups'][0]['domain_id'])
         self.assertEqual(200, self.k._get(self_links).status_code)
-        self.l.delete_entry(v.default_group_name, v.target_group)
+        self.l.delete_entry(v.default_group_name, 'groups')
 
     def test_show_group(self):
         self.k.create_group(v.default_group_name)
@@ -209,7 +257,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(v.default_project_name, res.json()['group']['name'])
         self.assertEqual(v.default_project_name, res.json()['group']['description'])
         self.assertEqual(200, res.status_code)
-        self.l.delete_entry(v.default_group_name, v.target_group)
+        self.l.delete_entry(v.default_group_name, 'groups')
 
     def test_delete_group(self):
         self.k.create_group(v.default_group_name)

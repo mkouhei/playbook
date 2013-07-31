@@ -70,12 +70,11 @@ test_domains = {'domains': [{'id': 'default', 'name': 'default'},
 
 domains_url = base_url_api_v3 + '/domains'
 domain_url = base_url_api_v3 + '/domains/default'
-target_domain = 'domains'
-target_project = 'projects'
-target_group = 'groups'
 domain_entry_member = ['cn=dumb,dc=nonexistent']
 domain_entry_description = ['default']
 domain_entry_enabled = ['TRUE']
 domain_entry_objectClass = ['groupOfNames']
 domain_entry_ou = ['default']
 domain_entry_dn = 'ou=Domains,dc=auth,dc=example,dc=org'
+service_type = 'identity'
+
