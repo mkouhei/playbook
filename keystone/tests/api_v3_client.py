@@ -276,6 +276,20 @@ class ApiV3Client(object):
         r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
         return r
 
+    # not implemented; 'Identity' object has no attribute 'create_grant'
+    def grant_role_user_on_domain(self, domain_id, user_id, role_id):
+        url = self._set_api_url('domains', domain_id, 'users', user_id, 'roles', role_id)
+        headers = {'X-Auth_Token': self.admin_token}
+        r = requests.put(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    # not implemented; 'Identity' object has no attribute 'create_grant'
+    def grant_role_group_on_domain(self, domain_id, group_id, role_id):
+        url = self._set_api_url('domains', domain_id, 'groups', group_id, 'roles', role_id)
+        headers = {'X-Auth_Token': self.admin_token}
+        r = requests.put(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r
+
     def create_domain(self, domain_name):
         """Create domain
 
@@ -398,6 +412,27 @@ class ApiV3Client(object):
         headers = {'X-Auth-Token': self.admin_token}
         r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
         return r
+
+    def add_user_to_group(self, user_id, group_id=None, group_name=None):
+        if group_name:
+            group_id = retrieve_id_by_name(self.list_target('groups'), group_name, 'groups')
+        url = self._set_api_url('groups', group_id, 'users', user_id)
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.put(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    def check_user_in_group(self, group_id, user_id):
+        url = self._set_api_url('groups', group_id, 'users', user_id)
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.head(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    def list_users_in_group(self, group_id):
+        url = self._set_api_url('groups', group_id, 'users')
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r.json()
+        
 
     def _get(self, url):
         """show domain

@@ -351,3 +351,14 @@ class ApiV3ClientTests(unittest.TestCase):
         print res
         self.assertEqual(501, res.get('error').get('code'))
         """
+
+    def test_add_user_to_group(self):
+        res = requests.Response()
+        res.status_code = 201
+        self.k.create_domain(v.default_group_name)
+        domain_id = self.k.show_target('domains', target_name=v.default_domain_name).json().get('domain').get('id')
+        self.k.create_group(v.default_group_name, domain_name=v.default_domain_name).json()
+        res = self.k.add_user_to_group(v.user01_userid, group_name=v.default_group_name)
+        self.assertEqual(204, res.status_code)
+        self.k.delete_group(group_name=v.default_group_name)
+        self.l.delete_entry(v.default_domain_name, 'domains')
