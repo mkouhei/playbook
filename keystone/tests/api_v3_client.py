@@ -147,6 +147,29 @@ def _show(func):
     return show_object
 
 
+def _delete(func):
+    """delete target"""
+    def delete_object(self, target_id=None, target_name=None, target_type=None):
+        """
+
+        Arguments:
+            target:
+            target_id:
+            target_name:
+
+        """
+        target = func.func_name.split('delete_')[1]
+        if target_type:
+            target_id = retrieve_id_by_type(self.list_target(target), target_type, target)
+        elif target_name:
+            target_id = retrieve_id_by_name(self.list_target(target), target_name, target)
+        url = self._set_api_url(target, target_id)
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r
+    return delete_object
+
+
 class ApiV3Client(object):
 
     def __init__(self, base_url, admin_token, region, verify=True):
@@ -273,6 +296,10 @@ class ApiV3Client(object):
     def show_services(self):
         pass
 
+    @_delete
+    def delete_services(self):
+        pass
+
     def create_endpoint(self, interface, endpoint_name, endpoint_url, service_type):
         """create endpoint
 
@@ -308,6 +335,10 @@ class ApiV3Client(object):
     def show_endpoints(self):
         pass
 
+    @_delete
+    def delete_endpoints(self):
+        pass
+
     def create_role(self, role_name):
         """create role
 
@@ -332,6 +363,10 @@ class ApiV3Client(object):
 
     @_show
     def show_roles(self):
+        pass
+
+    @_delete
+    def delete_roles(self):
         pass
 
     # not implemented; 'Identity' object has no attribute 'create_grant'
@@ -373,6 +408,11 @@ class ApiV3Client(object):
         pass
 
     # not implemented now
+    """
+    @_delete
+    def delete_domains(self):
+        pass
+        """
     def delete_domain(self, domain_id=None, domain_name=None):
         """delete domain
 
@@ -438,6 +478,11 @@ class ApiV3Client(object):
         pass
 
     # Not Implemented
+    """
+    @_delete
+    def delete_projects(self):
+        pass
+    """
     def delete_project(self, project_id=None, project_name=None):
         """delete project
 
@@ -477,6 +522,10 @@ class ApiV3Client(object):
 
     @_show
     def show_groups(self):
+        pass
+
+    @_delete
+    def delete_groups(self):
         pass
 
     def delete_group(self, group_id=None, group_name=None):
