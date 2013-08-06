@@ -38,12 +38,13 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_target('services', target_type=v.service_type)
 
     def test_list_services_none(self):
-        res = self.k.list_target('services')
+        res = self.k.list_services()
+        print res
         self.assertListEqual([], res.get('services'))
 
     def test_list_services(self):
         self.k.create_service(v.service_type)
-        res = self.k.list_target('services')
+        res = self.k.list_services()
         self.assertEqual(1, len(res.get('services')))
         self.assertEqual(v.service_type, res.get('services')[0].get('type'))
         self.k.delete_target('services', target_type=v.service_type)
@@ -74,13 +75,13 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_target('services', target_type=v.service_type)
 
     def test_list_endpoints_none(self):
-        res = self.k.list_target('endpoints')
+        res = self.k.list_endpoints()
         self.assertListEqual([], res.get('endpoints'))
 
     def test_list_endpoints(self):
         self.k.create_service(v.service_type)
         self.k.create_endpoint(v.endpoint_interface, v.endpoint_name, v.endpoint_url, v.service_type)
-        res = self.k.list_target('endpoints')
+        res = self.k.list_endpoints()
         self.assertEqual(1, len(res.get('endpoints')))
         self.assertEqual(v.endpoint_name, res.get('endpoints')[0].get('name'))
         self.assertEqual(v.endpoint_url, res.get('endpoints')[0].get('url'))
@@ -112,7 +113,7 @@ class ApiV3ClientTests(unittest.TestCase):
 
     # not implmented
     def test_list_credentials(self):
-        self.assertEqual(501, self.k.list_target('credentials').get('error').get('code'))
+        self.assertEqual(501, self.k.list_credentials().get('error').get('code'))
 
     def test_create_role(self):
         res = requests.Response()
@@ -121,11 +122,11 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_target('roles', target_name=v.role_name)
 
     def test_list_roles_none(self):
-        self.assertListEqual([], self.k.list_target('roles').get('roles'))
+        self.assertListEqual([], self.k.list_roles().get('roles'))
 
     def test_list_roles(self):
         self.k.create_role(v.role_name)
-        res = self.k.list_target('roles').get('roles')
+        res = self.k.list_roles().get('roles')
         self.assertEqual(1, len(res))
         self.assertEqual(v.role_name, res[0].get('name'))
         self.k.delete_target('roles', target_name=v.role_name)
@@ -229,7 +230,7 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_list_domains(self):
         self.k.create_domain(v.default_domain_name)
-        res = self.k.list_target('domains')
+        res = self.k.list_domains()
         id = res['domains'][0]['id']
         self_links = res['domains'][0]['links']['self']
         self.assertEqual(v.default_domain_name, res['domains'][0]['name'])
@@ -267,7 +268,7 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_list_projects(self):
         self.k.create_project(v.default_project_name)
-        res = self.k.list_target('projects')
+        res = self.k.list_projects()
         id = res['projects'][0]['id']
         self_links = res['projects'][0]['links']['self']
         self.assertEqual(v.default_project_name, res['projects'][0]['name'])
@@ -306,7 +307,7 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_list_groups(self):
         self.k.create_group(v.default_group_name)
-        res = self.k.list_target('groups')
+        res = self.k.list_groups()
         id = res['groups'][0]['id']
         self_links = res['groups'][0]['links']['self']
         self.assertEqual(v.default_group_name, res['groups'][0]['name'])
@@ -330,7 +331,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(204, self.k.delete_group(group_name=v.default_group_name).status_code)
 
     def test_list_users(self):
-        self.assertEqual(14, len(self.k.list_target('users').get('users')))
+        self.assertEqual(14, len(self.k.list_users().get('users')))
 
     def test_show_users(self):
         res = self.k.show_target('users', target_name=v.user01_userid).json()
@@ -341,6 +342,7 @@ class ApiV3ClientTests(unittest.TestCase):
         res = self.k.show_target('users', target_name=v.user01_userid).json()
         userid = res.get('user').get('id')
         res = self.k.list_target('users', userid, 'projects')
+        #res = self.k.list_users(userid, 'projects')
         self.assertEqual(501, res.get('error').get('code'))
 
     """

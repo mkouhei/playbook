@@ -112,6 +112,17 @@ class LdapClient(object):
         return self.conn.delete_s(self.search_entry(search_word, target)[0][0])
 
 
+def _list(func):
+    """list organizationalUnit"""
+    def list_objects(self):
+        target = (func.func_name.split('list_')[1],)
+        url = self._set_api_url_with_tuple(target)
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r.json()
+    return list_objects
+
+
 class ApiV3Client(object):
 
     def __init__(self, base_url, admin_token, region, verify=True):
@@ -148,89 +159,6 @@ class ApiV3Client(object):
         for i in kwards:
             url = os.path.join(url, i)
         return url
-
-    def authenticate(self, userid, password, domain_name=None, project_name=None):
-        """Authenticate
-
-        Arguments:
-            userid:
-            password:
-            domain_name:
-            project_name:
-        """
-        url = self._set_api_url('auth/tokens')
-        headers = {'Content-Type': 'application/json'}
-        payload = set_auth_payload(userid=userid,
-                                   password=password,
-                                   domain_name=domain_name,
-                                   project_name=project_name)
-        r = requests.post(url, headers=headers, data=json.dumps(payload),
-                          timeout=TIMEOUT, verify=self.verify)
-        return r
-
-    def create_service(self, service_type):
-        """create service
-
-        Arguments:
-            service_type:
-
-        """
-        url = self._set_api_url('services')
-        headers = {'X-Auth-Token': self.admin_token, 'Content-Type': 'application/json'}
-        payload = {'service': {'type': service_type}}
-        services = [service for service in self.list_target('services').get('services')
-                    if service.get('type') == service_type]
-        if services:
-            return None
-        r = requests.post(url, headers=headers, data=json.dumps(payload),
-                          timeout=TIMEOUT, verify=self.verify)
-        return r
-
-    def create_endpoint(self, interface, endpoint_name, endpoint_url, service_type):
-        """create endpoint
-
-        Arguments:
-            interface:     [admin|public|internal]
-            endpoint_name:
-            endpoint_url:
-            service_type:
-
-        """
-        url = self._set_api_url('endpoints')
-        headers = {'X-Auth-Token': self.admin_token, 'Content-Type': 'application/json'}
-        res = self.show_target('services', target_type=service_type).json()
-        service_id = res.get('service').get('id')
-        payload = {'endpoint': {'name': endpoint_name,
-                                'url': endpoint_url,
-                                'interface': interface,
-                                'region': self.region,
-                                'service_id': service_id}}
-        endpoints = [endpoint for endpoint in self.list_target('endpoints').get('endpoints')
-                     if endpoint.get('name') == endpoint_name]
-        print endpoints
-        if endpoints:
-            return None
-        r = requests.post(url, headers=headers, data=json.dumps(payload),
-                          timeout=TIMEOUT, verify=self.verify)
-        return r
-
-    def create_role(self, role_name):
-        """create role
-
-        Arguments:
-            role_name:
-
-        """
-        url = self._set_api_url('roles')
-        headers = {'X-Auth-Token': self.admin_token, 'Content-Type': 'application/json'}
-        payload = {'role': {'name': role_name}}
-        roles = [role for role in self.list_target('roles').get('roles')
-                 if role.get('name') == role_name]
-        if roles:
-            return None
-        r = requests.post(url, headers=headers, data=json.dumps(payload),
-                          timeout=TIMEOUT, verify=self.verify)
-        return r
 
     def list_target(self, *target):
         """list organizationalUnit"""
@@ -276,6 +204,101 @@ class ApiV3Client(object):
         r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
         return r
 
+    def authenticate(self, userid, password, domain_name=None, project_name=None):
+        """Authenticate
+
+        Arguments:
+            userid:
+            password:
+            domain_name:
+            project_name:
+        """
+        url = self._set_api_url('auth/tokens')
+        headers = {'Content-Type': 'application/json'}
+        payload = set_auth_payload(userid=userid,
+                                   password=password,
+                                   domain_name=domain_name,
+                                   project_name=project_name)
+        r = requests.post(url, headers=headers, data=json.dumps(payload),
+                          timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    def create_service(self, service_type):
+        """create service
+
+        Arguments:
+            service_type:
+
+        """
+        url = self._set_api_url('services')
+        headers = {'X-Auth-Token': self.admin_token, 'Content-Type': 'application/json'}
+        payload = {'service': {'type': service_type}}
+        services = [service for service in self.list_target('services').get('services')
+                    if service.get('type') == service_type]
+        if services:
+            return None
+        r = requests.post(url, headers=headers, data=json.dumps(payload),
+                          timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    @_list
+    def list_services(self):
+        pass
+
+    def create_endpoint(self, interface, endpoint_name, endpoint_url, service_type):
+        """create endpoint
+
+        Arguments:
+            interface:     [admin|public|internal]
+            endpoint_name:
+            endpoint_url:
+            service_type:
+
+        """
+        url = self._set_api_url('endpoints')
+        headers = {'X-Auth-Token': self.admin_token, 'Content-Type': 'application/json'}
+        res = self.show_target('services', target_type=service_type).json()
+        service_id = res.get('service').get('id')
+        payload = {'endpoint': {'name': endpoint_name,
+                                'url': endpoint_url,
+                                'interface': interface,
+                                'region': self.region,
+                                'service_id': service_id}}
+        endpoints = [endpoint for endpoint in self.list_target('endpoints').get('endpoints')
+                     if endpoint.get('name') == endpoint_name]
+        print endpoints
+        if endpoints:
+            return None
+        r = requests.post(url, headers=headers, data=json.dumps(payload),
+                          timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    @_list
+    def list_endpoints(self):
+        pass
+
+    def create_role(self, role_name):
+        """create role
+
+        Arguments:
+            role_name:
+
+        """
+        url = self._set_api_url('roles')
+        headers = {'X-Auth-Token': self.admin_token, 'Content-Type': 'application/json'}
+        payload = {'role': {'name': role_name}}
+        roles = [role for role in self.list_target('roles').get('roles')
+                 if role.get('name') == role_name]
+        if roles:
+            return None
+        r = requests.post(url, headers=headers, data=json.dumps(payload),
+                          timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    @_list
+    def list_roles(self):
+        pass
+
     # not implemented; 'Identity' object has no attribute 'create_grant'
     def grant_role_user_on_domain(self, domain_id, user_id, role_id):
         url = self._set_api_url('domains', domain_id, 'users', user_id, 'roles', role_id)
@@ -306,6 +329,9 @@ class ApiV3Client(object):
                           timeout=TIMEOUT, verify=self.verify)
         return r
 
+    @_list
+    def list_domains(self):
+        pass
 
     # not implemented now
     def delete_domain(self, domain_id=None, domain_name=None):
@@ -365,6 +391,10 @@ class ApiV3Client(object):
                           timeout=TIMEOUT, verify=self.verify)
         return r
 
+    @_list
+    def list_projects():
+        self
+
     # Not Implemented
     def delete_project(self, project_id=None, project_name=None):
         """delete project
@@ -399,6 +429,10 @@ class ApiV3Client(object):
                           timeout=TIMEOUT, verify=self.verify)
         return r
 
+    @_list
+    def list_groups():
+        pass
+
     def delete_group(self, group_id=None, group_name=None):
         """delete group
 
@@ -432,7 +466,14 @@ class ApiV3Client(object):
         headers = {'X-Auth-Token': self.admin_token}
         r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
         return r.json()
-        
+
+    @_list
+    def list_users(self):
+        pass
+
+    @_list
+    def list_credentials(self):
+        pass
 
     def _get(self, url):
         """show domain
