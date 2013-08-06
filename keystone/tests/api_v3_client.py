@@ -214,43 +214,6 @@ class ApiV3Client(object):
         r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
         return r.json()
 
-    def show_target(self, target, target_id=None, target_name=None, target_type=None):
-        """show target
-
-        Arguments:
-            target:
-            target_id:
-            target_name:
-            target_type:
-
-        """
-        if target_type:
-            target_id = retrieve_id_by_type(self.list_target(target), target_type, target)
-        elif target_name:
-            target_id = retrieve_id_by_name(self.list_target(target), target_name, target)
-        url = self._set_api_url(target, target_id)
-        headers = {'X-Auth-Token': self.admin_token}
-        r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
-        return r
-
-    def delete_target(self, target, target_id=None, target_name=None, target_type=None):
-        """delete target
-
-        Arguments:
-            target:
-            target_id:
-            target_name:
-
-        """
-        if target_type:
-            target_id = retrieve_id_by_type(self.list_target(target), target_type, target)
-        elif target_name:
-            target_id = retrieve_id_by_name(self.list_target(target), target_name, target)
-        url = self._set_api_url(target, target_id)
-        headers = {'X-Auth-Token': self.admin_token}
-        r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
-        return r
-
     def authenticate(self, userid, password, domain_name=None, project_name=None):
         """Authenticate
 
@@ -280,7 +243,7 @@ class ApiV3Client(object):
         url = self._set_api_url('services')
         headers = {'X-Auth-Token': self.admin_token, 'Content-Type': 'application/json'}
         payload = {'service': {'type': service_type}}
-        services = [service for service in self.list_target('services').get('services')
+        services = [service for service in self.list_services().get('services')
                     if service.get('type') == service_type]
         if services:
             return None
@@ -312,14 +275,14 @@ class ApiV3Client(object):
         """
         url = self._set_api_url('endpoints')
         headers = {'X-Auth-Token': self.admin_token, 'Content-Type': 'application/json'}
-        res = self.show_target('services', target_type=service_type).json()
+        res = self.show_services(target_type=service_type).json()
         service_id = res.get('service').get('id')
         payload = {'endpoint': {'name': endpoint_name,
                                 'url': endpoint_url,
                                 'interface': interface,
                                 'region': self.region,
                                 'service_id': service_id}}
-        endpoints = [endpoint for endpoint in self.list_target('endpoints').get('endpoints')
+        endpoints = [endpoint for endpoint in self.list_endpoints().get('endpoints')
                      if endpoint.get('name') == endpoint_name]
         if endpoints:
             return None
@@ -349,7 +312,7 @@ class ApiV3Client(object):
         url = self._set_api_url('roles')
         headers = {'X-Auth-Token': self.admin_token, 'Content-Type': 'application/json'}
         payload = {'role': {'name': role_name}}
-        roles = [role for role in self.list_target('roles').get('roles')
+        roles = [role for role in self.list_roles().get('roles')
                  if role.get('name') == role_name]
         if roles:
             return None
@@ -408,27 +371,9 @@ class ApiV3Client(object):
         pass
 
     # not implemented now
-    """
     @_delete
     def delete_domains(self):
         pass
-        """
-    def delete_domain(self, domain_id=None, domain_name=None):
-        """delete domain
-
-        Arguments:
-            domain_id:
-            domain_name:
-        """
-        if domain_name:
-            domain_id = retrieve_id_by_name(list_target('domains'), domain_name, 'domains')
-        """
-        url = self._set_api_url('domains', domain_id)
-        headers = {'X-Auth-Token': self.admin_token}
-        r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
-        return r
-        """
-        
     
     # not implemented now ?
     def update_domain(self, domain_id, domain_name, enable=True, description=None,):
@@ -463,7 +408,7 @@ class ApiV3Client(object):
                                'enabled': True,
                                'name': project_name}}
         if domain_name:
-            payload['project']['domain_id'] = retrieve_id_by_name(self.list_target('domains'), domain_name, 'domains')
+            payload['project']['domain_id'] = retrieve_id_by_name(self.list_domains(), domain_name, 'domains')
         headers = {'Content-Type': 'application/json', 'X-Auth-Token': self.admin_token}
         r = requests.post(url, headers=headers, data=json.dumps(payload),
                           timeout=TIMEOUT, verify=self.verify)
@@ -478,24 +423,9 @@ class ApiV3Client(object):
         pass
 
     # Not Implemented
-    """
     @_delete
     def delete_projects(self):
         pass
-    """
-    def delete_project(self, project_id=None, project_name=None):
-        """delete project
-
-        Arguments:
-            project_id:
-            project_name:
-        """
-        if project_name:
-            project_id = retrieve_id_by_name(self.list_target('projects'), project_name, 'projects')
-        url = self._set_api_url('projects', project_id)
-        headers = {'X-Auth-Token': self.admin_token}
-        r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
-        return r
 
     def create_group(self, group_name, domain_name=None):
         """create group
@@ -508,7 +438,7 @@ class ApiV3Client(object):
         payload = {'group': {'description': group_name,
                                'name': group_name}}
         if domain_name:
-            payload['group']['domain_id'] = retrieve_id_by_name(self.list_target('domains'),
+            payload['group']['domain_id'] = retrieve_id_by_name(self.list_domains(),
                                                                 domain_name,
                                                                 'domains')
         headers = {'Content-Type': 'application/json', 'X-Auth-Token': self.admin_token}
@@ -536,7 +466,7 @@ class ApiV3Client(object):
             group_name:
         """
         if group_name:
-            group_id = retrieve_id_by_name(self.list_target('groups'), group_name, 'groups')
+            group_id = retrieve_id_by_name(self.list_groups(), group_name, 'groups')
         url = self._set_api_url('groups', group_id)
         headers = {'X-Auth-Token': self.admin_token}
         r = requests.delete(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
@@ -544,7 +474,7 @@ class ApiV3Client(object):
 
     def add_user_to_group(self, user_id, group_id=None, group_name=None):
         if group_name:
-            group_id = retrieve_id_by_name(self.list_target('groups'), group_name, 'groups')
+            group_id = retrieve_id_by_name(self.list_groups(), group_name, 'groups')
         url = self._set_api_url('groups', group_id, 'users', user_id)
         headers = {'X-Auth-Token': self.admin_token}
         r = requests.put(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
