@@ -341,15 +341,16 @@ class ApiV3ClientTests(unittest.TestCase):
     def test_x_list_user_projects(self):
         res = self.k.show_users(target_name=v.user01_userid).json()
         userid = res.get('user').get('id')
-        res = self.k.list_target('users', userid, 'projects')
-        #res = self.k.list_users(userid, 'projects')
+        #res = self.k.list_target('users', userid, 'projects')
+        res = self.k.list_users(userid, 'projects')
         self.assertEqual(501, res.get('error').get('code'))
+
 
     """
     def test_x_list_user_groups(self):
         res = self.k.show_users(target_name=v.user01_userid).json()
         userid = res.get('user').get('id')
-        res = self.k.list_target('users', userid, 'groups')
+        res = self.k.list_users(userid, 'groups')
         print res
         self.assertEqual(501, res.get('error').get('code'))
         """

@@ -114,8 +114,10 @@ class LdapClient(object):
 
 def _list(func):
     """list organizationalUnit"""
-    def list_objects(self):
+    def list_objects(self, *args):
         target = (func.func_name.split('list_')[1],)
+        if args:
+            target += args
         url = self._set_api_url_with_tuple(target)
         headers = {'X-Auth-Token': self.admin_token}
         r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
@@ -292,7 +294,6 @@ class ApiV3Client(object):
                                 'service_id': service_id}}
         endpoints = [endpoint for endpoint in self.list_target('endpoints').get('endpoints')
                      if endpoint.get('name') == endpoint_name]
-        print endpoints
         if endpoints:
             return None
         r = requests.post(url, headers=headers, data=json.dumps(payload),
@@ -424,7 +425,6 @@ class ApiV3Client(object):
         if domain_name:
             payload['project']['domain_id'] = retrieve_id_by_name(self.list_target('domains'), domain_name, 'domains')
         headers = {'Content-Type': 'application/json', 'X-Auth-Token': self.admin_token}
-        print(payload)
         r = requests.post(url, headers=headers, data=json.dumps(payload),
                           timeout=TIMEOUT, verify=self.verify)
         return r
