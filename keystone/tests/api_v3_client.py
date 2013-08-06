@@ -122,6 +122,28 @@ def _list(func):
         return r.json()
     return list_objects
 
+def _show(func):
+    """show target"""
+    def show_object(self, target_id=None, target_name=None, target_type=None):
+        """
+
+        Arguments:
+            target_id:
+            target_name:
+            target_type:
+
+        """
+        target = func.func_name.split('show_')[1]
+        if target_type:
+            target_id = retrieve_id_by_type(self.list_target(target), target_type, target)
+        elif target_name:
+            target_id = retrieve_id_by_name(self.list_target(target), target_name, target)
+        url = self._set_api_url(target, target_id)
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.get(url, headers=headers, timeout=TIMEOUT, verify=self.verify)
+        return r
+    return show_object
+
 
 class ApiV3Client(object):
 
@@ -245,6 +267,10 @@ class ApiV3Client(object):
     def list_services(self):
         pass
 
+    @_show
+    def show_services(self):
+        pass
+
     def create_endpoint(self, interface, endpoint_name, endpoint_url, service_type):
         """create endpoint
 
@@ -277,6 +303,10 @@ class ApiV3Client(object):
     def list_endpoints(self):
         pass
 
+    @_show
+    def show_endpoints(self):
+        pass
+
     def create_role(self, role_name):
         """create role
 
@@ -297,6 +327,10 @@ class ApiV3Client(object):
 
     @_list
     def list_roles(self):
+        pass
+
+    @_show
+    def show_roles(self):
         pass
 
     # not implemented; 'Identity' object has no attribute 'create_grant'
@@ -331,6 +365,10 @@ class ApiV3Client(object):
 
     @_list
     def list_domains(self):
+        pass
+
+    @_show
+    def show_domains(self):
         pass
 
     # not implemented now
@@ -392,8 +430,12 @@ class ApiV3Client(object):
         return r
 
     @_list
-    def list_projects():
-        self
+    def list_projects(self):
+        pass
+
+    @_show
+    def show_projects(self):
+        pass
 
     # Not Implemented
     def delete_project(self, project_id=None, project_name=None):
@@ -430,7 +472,11 @@ class ApiV3Client(object):
         return r
 
     @_list
-    def list_groups():
+    def list_groups(self):
+        pass
+
+    @_show
+    def show_groups(self):
         pass
 
     def delete_group(self, group_id=None, group_name=None):
@@ -469,6 +515,10 @@ class ApiV3Client(object):
 
     @_list
     def list_users(self):
+        pass
+
+    @_show
+    def show_users(self):
         pass
 
     @_list

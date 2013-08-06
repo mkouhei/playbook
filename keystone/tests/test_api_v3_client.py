@@ -51,7 +51,7 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_show_service(self):
         self.k.create_service(v.service_type)
-        res = self.k.show_target('services', target_type=v.service_type)
+        res = self.k.show_services(target_type=v.service_type)
         self.assertEqual(v.service_type, res.json().get('service').get('type'))
         self.k.delete_target('services', target_type=v.service_type)
 
@@ -92,7 +92,7 @@ class ApiV3ClientTests(unittest.TestCase):
     def test_show_endpoint(self):
         self.k.create_service(v.service_type)
         self.k.create_endpoint(v.endpoint_interface, v.endpoint_name, v.endpoint_url, v.service_type)
-        res = self.k.show_target('endpoints', target_name=v.endpoint_name).json()
+        res = self.k.show_endpoints(target_name=v.endpoint_name).json()
         self.assertEqual(v.endpoint_name, res.get('endpoint').get('name'))
         self.assertEqual(v.endpoint_interface, res.get('endpoint').get('interface'))
         self.assertEqual(v.region, res.get('endpoint').get('region'))
@@ -133,7 +133,7 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_show_role(self):
         self.k.create_role(v.role_name)
-        res = self.k.show_target('roles', target_name=v.role_name).json()
+        res = self.k.show_roles(target_name=v.role_name).json()
         self.assertEqual(v.role_name, res.get('role').get('name'))
         self.k.delete_target('roles', target_name=v.role_name)
 
@@ -241,7 +241,7 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_show_domain(self):
         self.k.create_domain(v.default_domain_name)
-        res = self.k.show_target('domains', target_name=v.default_domain_name)
+        res = self.k.show_domains(target_name=v.default_domain_name)
         self.assertEqual(v.default_domain_name, res.json()['domain']['name'])
         self.assertEqual(v.default_domain_name, res.json()['domain']['description'])
         self.assertEqual(True, res.json()['domain']['enabled'])
@@ -279,7 +279,7 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_show_project(self):
         self.k.create_project(v.default_project_name)
-        res = self.k.show_target('projects', target_name=v.default_project_name)
+        res = self.k.show_projects(target_name=v.default_project_name)
         self.assertEqual(v.default_project_name, res.json()['project']['name'])
         self.assertEqual(v.default_project_name, res.json()['project']['description'])
         self.assertEqual(True, res.json()['project']['enabled'])
@@ -318,7 +318,7 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_show_group(self):
         self.k.create_group(v.default_group_name)
-        res = self.k.show_target('groups', target_name=v.default_group_name)
+        res = self.k.show_groups(target_name=v.default_group_name)
         self.assertEqual(v.default_project_name, res.json()['group']['name'])
         self.assertEqual(v.default_project_name, res.json()['group']['description'])
         self.assertEqual(200, res.status_code)
@@ -334,12 +334,12 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(14, len(self.k.list_users().get('users')))
 
     def test_show_users(self):
-        res = self.k.show_target('users', target_name=v.user01_userid).json()
+        res = self.k.show_users(target_name=v.user01_userid).json()
         self.assertEqual(v.user01_userid, res.get('user').get('id'))
 
     # not implemented
     def test_x_list_user_projects(self):
-        res = self.k.show_target('users', target_name=v.user01_userid).json()
+        res = self.k.show_users(target_name=v.user01_userid).json()
         userid = res.get('user').get('id')
         res = self.k.list_target('users', userid, 'projects')
         #res = self.k.list_users(userid, 'projects')
@@ -347,7 +347,7 @@ class ApiV3ClientTests(unittest.TestCase):
 
     """
     def test_x_list_user_groups(self):
-        res = self.k.show_target('users', target_name=v.user01_userid).json()
+        res = self.k.show_users(target_name=v.user01_userid).json()
         userid = res.get('user').get('id')
         res = self.k.list_target('users', userid, 'groups')
         print res
@@ -358,7 +358,7 @@ class ApiV3ClientTests(unittest.TestCase):
         res = requests.Response()
         res.status_code = 201
         self.k.create_domain(v.default_group_name)
-        domain_id = self.k.show_target('domains', target_name=v.default_domain_name).json().get('domain').get('id')
+        domain_id = self.k.show_domains(target_name=v.default_domain_name).json().get('domain').get('id')
         self.k.create_group(v.default_group_name, domain_name=v.default_domain_name).json()
         res = self.k.add_user_to_group(v.user01_userid, group_name=v.default_group_name)
         self.assertEqual(204, res.status_code)
