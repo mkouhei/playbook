@@ -292,12 +292,14 @@ class ApiV3ClientTests(unittest.TestCase):
                                              """
 
     def test_create_domain(self):
+        """ OK """
         res = requests.Response()
         res.status_code = 201
         self.assertEqual(res.status_code,
                          self.k.create_domain(v.default_domain_name).status_code)
 
     def test_search_entry(self):
+        """ OK """
         self.k.create_domain(v.default_domain_name)
         res = self.l.search_entry(v.default_domain_name, 'domains')
         self.assertTrue(v.domain_entry_dn in res[0][0])
@@ -310,6 +312,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_list_domains(self):
+        """ OK """
         self.k.create_domain(v.default_domain_name)
         res = self.k.list_domains()
         id = res['domains'][0]['id']
@@ -321,6 +324,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_show_domain(self):
+        """ OK """
         self.k.create_domain(v.default_domain_name)
         res = self.k.show_domains(target_name=v.default_domain_name)
         self.assertEqual(v.default_domain_name, res.json()['domain']['name'])
@@ -330,10 +334,12 @@ class ApiV3ClientTests(unittest.TestCase):
         self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_delete_domain(self):
+        """ OK, but this api is not implemented, so connect LDAP directly in work around."""
         self.k.create_domain(v.default_domain_name)
         self.assertEqual(107, self.l.delete_entry(v.default_domain_name, 'domains')[0])
 
     def test_create_project(self):
+        """ OK """
         res = requests.Response()
         res.status_code = 201
         self.assertEqual(res.status_code,
@@ -348,6 +354,7 @@ class ApiV3ClientTests(unittest.TestCase):
                          """
 
     def test_list_projects(self):
+        """ OK """
         self.k.create_project(v.default_project_name)
         res = self.k.list_projects()
         id = res['projects'][0]['id']
@@ -359,6 +366,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.l.delete_entry(v.default_project_name, 'projects')
 
     def test_show_project(self):
+        """ OK """
         self.k.create_project(v.default_project_name)
         res = self.k.show_projects(target_name=v.default_project_name)
         self.assertEqual(v.default_project_name, res.json()['project']['name'])
@@ -368,10 +376,12 @@ class ApiV3ClientTests(unittest.TestCase):
         self.l.delete_entry(v.default_project_name, 'projects')
 
     def test_delete_project(self):
+        """ OK, but this api is not implemented, so connect LDAP directly in work around."""
         self.k.create_project(v.default_project_name)
         self.assertEqual((107, [], 3, []), self.l.delete_entry(v.default_project_name, 'projects'))
 
     def test_create_group(self):
+        """ OK """
         res = requests.Response()
         res.status_code = 201
         self.assertEqual(res.status_code,
@@ -379,6 +389,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_groups(target_name=v.default_group_name)
 
     def test_create_group_in_domain(self):
+        """ OK """
         res = requests.Response()
         res.status_code = 201
         self.assertEqual(res.status_code,
@@ -387,6 +398,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_groups(target_name=v.default_group_name)
 
     def test_list_groups(self):
+        """ OK """
         self.k.create_group(v.default_group_name)
         res = self.k.list_groups()
         id = res['groups'][0]['id']
@@ -398,6 +410,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_groups(target_name=v.default_group_name)
 
     def test_show_group(self):
+        """ OK """
         self.k.create_group(v.default_group_name)
         res = self.k.show_groups(target_name=v.default_group_name)
         self.assertEqual(v.default_project_name, res.json()['group']['name'])
@@ -406,26 +419,28 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_groups(target_name=v.default_group_name)
 
     def test_delete_group(self):
+        """ OK """
         self.k.create_group(v.default_group_name)
         res =requests.Response()
         res.status_code = 204
         self.assertEqual(204, self.k.delete_groups(target_name=v.default_group_name).status_code)
 
     def test_list_users(self):
+        """ OK """
         self.assertEqual(14, len(self.k.list_users().get('users')))
 
     def test_show_users(self):
+        """ OK """
         res = self.k.show_users(target_name=v.user01_userid).json()
         self.assertEqual(v.user01_userid, res.get('user').get('id'))
 
-    # not implemented
     def test_x_list_user_projects(self):
+        """ Not implemented """
         res = self.k.show_users(target_name=v.user01_userid).json()
         userid = res.get('user').get('id')
         #res = self.k.list_target('users', userid, 'projects')
         res = self.k.list_users(userid, 'projects')
         self.assertEqual(501, res.get('error').get('code'))
-
 
     """
     def test_x_list_user_groups(self):
@@ -437,6 +452,7 @@ class ApiV3ClientTests(unittest.TestCase):
         """
 
     def test_add_user_to_group(self):
+        """ OK """
         res = requests.Response()
         res.status_code = 201
         self.k.create_domain(v.default_group_name)
