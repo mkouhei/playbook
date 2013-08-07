@@ -352,6 +352,10 @@ class ApiV3Client(object):
     def show_roles(self):
         pass
 
+    @_update
+    def update_roles(self):
+        pass
+
     @_delete
     def delete_roles(self):
         pass

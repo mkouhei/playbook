@@ -140,15 +140,18 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(501, self.k.list_credentials().get('error').get('code'))
 
     def test_create_role(self):
+        """ OK """
         res = requests.Response()
         res.status_code = 201
         self.assertEqual(201, self.k.create_role(v.role_name).status_code)
         self.k.delete_roles(target_name=v.role_name)
 
     def test_list_roles_none(self):
+        """ OK """
         self.assertListEqual([], self.k.list_roles().get('roles'))
 
     def test_list_roles(self):
+        """ OK """
         self.k.create_role(v.role_name)
         res = self.k.list_roles().get('roles')
         self.assertEqual(1, len(res))
@@ -156,17 +159,31 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_roles(target_name=v.role_name)
 
     def test_show_role(self):
+        """ OK """
         self.k.create_role(v.role_name)
         res = self.k.show_roles(target_name=v.role_name).json()
         self.assertEqual(v.role_name, res.get('role').get('name'))
         self.k.delete_roles(target_name=v.role_name)
 
+    def test_update_role(self):
+        """ response is error, but update is succeed.
+            TODO: BTS and send patch.
+        """
+        self.k.create_role(v.role_name)
+        res = self.k.show_roles(target_name=v.role_name).json()
+        id = res.get('role').get('id')
+        payload = {'role': {'id': id, 'name': 'member'}}
+        #self.assertTrue(200, self.k.update_roles(target_id=id, payload=payload).status_code)
+        print self.k.update_roles(target_id=id, payload=payload).json()
+        self.assertEqual('member', self.k.show_roles(target_id=id).json().get('role').get('name'))
+        self.k.delete_roles(target_id=id)
+
     def test_delete_role(self):
+        """ OK """
         self.k.create_role(v.role_name)
         res = requests.Response()
         res.status_code = 204
         self.assertEqual(204, self.k.delete_roles(target_name=v.role_name).status_code)
-
 
     def test_set_auth_payload_with_domain_name_and_project_name(self):
         self.assertDictEqual(v.auth_payload_domain_name_project_name,
