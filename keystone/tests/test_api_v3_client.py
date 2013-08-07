@@ -31,6 +31,58 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k = c.ApiV3Client(v.base_url_api_v3, v.admin_token, v.region, verify=v.verify)
         self.l = c.LdapClient(v.ldap_url, v.search_base, v.binddn, v.bindpw)
 
+    def test_set_auth_payload_with_domain_name_and_project_name(self):
+        """ OK """
+        self.assertDictEqual(v.auth_payload_domain_name_project_name,
+                             c.set_auth_payload(userid=v.user01_userid,
+                                                password=v.user01_password,
+                                                domain_name=v.default_domain_name,
+                                                project_name=v.default_project_name))
+
+    def test_set_auth_payload_with_domain_name_and_project_id(self):
+        """ OK """
+        self.assertDictEqual(v.auth_payload_domain_name_project_id,
+                             c.set_auth_payload(userid=v.user01_userid,
+                                                password=v.user01_password,
+                                                domain_name=v.default_domain_name,
+                                                project_id=v.default_project_id))
+
+    def test_set_auth_payload_with_domain_id_and_project_id(self):
+        """ OK """
+        self.assertDictEqual(v.auth_payload_domain_id_project_id,
+                             c.set_auth_payload(userid=v.user01_userid,
+                                                password=v.user01_password,
+                                                domain_id=v.default_domain_id,
+                                                project_id=v.default_project_id))
+
+    def test_set_auth_payload_with_domain_id_and_project_name(self):
+        """ OK """
+        self.assertDictEqual(v.auth_payload_domain_id_project_name,
+                             c.set_auth_payload(userid=v.user01_userid,
+                                                password=v.user01_password,
+                                                domain_id=v.default_domain_id,
+                                                project_name=v.default_project_name))
+
+    def test_set_auth_payload_with_domain_id(self):
+        """ OK """
+        self.assertDictEqual(v.auth_payload_domain_id,
+                             c.set_auth_payload(userid=v.user01_userid,
+                                                password=v.user01_password,
+                                                domain_id=v.default_domain_id))
+
+    def test_set_auth_payload_with_domain_name(self):
+        """ OK """
+        self.assertDictEqual(v.auth_payload_domain_name,
+                             c.set_auth_payload(userid=v.user01_userid,
+                                                password=v.user01_password,
+                                                domain_name=v.default_domain_name))
+
+    def test_set_auth_payload(self):
+        """ OK """
+        self.assertDictEqual(v.auth_payload,
+                             c.set_auth_payload(userid=v.user01_userid,
+                                                password=v.user01_password))
+
     def test_create_service(self):
         """ OK """
         res = requests.Response()
@@ -185,50 +237,6 @@ class ApiV3ClientTests(unittest.TestCase):
         res.status_code = 204
         self.assertEqual(204, self.k.delete_roles(target_name=v.role_name).status_code)
 
-    def test_set_auth_payload_with_domain_name_and_project_name(self):
-        self.assertDictEqual(v.auth_payload_domain_name_project_name,
-                             c.set_auth_payload(userid=v.user01_userid,
-                                                password=v.user01_password,
-                                                domain_name=v.default_domain_name,
-                                                project_name=v.default_project_name))
-
-    def test_set_auth_payload_with_domain_name_and_project_id(self):
-        self.assertDictEqual(v.auth_payload_domain_name_project_id,
-                             c.set_auth_payload(userid=v.user01_userid,
-                                                password=v.user01_password,
-                                                domain_name=v.default_domain_name,
-                                                project_id=v.default_project_id))
-
-    def test_set_auth_payload_with_domain_id_and_project_id(self):
-        self.assertDictEqual(v.auth_payload_domain_id_project_id,
-                             c.set_auth_payload(userid=v.user01_userid,
-                                                password=v.user01_password,
-                                                domain_id=v.default_domain_id,
-                                                project_id=v.default_project_id))
-
-    def test_set_auth_payload_with_domain_id_and_project_name(self):
-        self.assertDictEqual(v.auth_payload_domain_id_project_name,
-                             c.set_auth_payload(userid=v.user01_userid,
-                                                password=v.user01_password,
-                                                domain_id=v.default_domain_id,
-                                                project_name=v.default_project_name))
-
-    def test_set_auth_payload_with_domain_id(self):
-        self.assertDictEqual(v.auth_payload_domain_id,
-                             c.set_auth_payload(userid=v.user01_userid,
-                                                password=v.user01_password,
-                                                domain_id=v.default_domain_id))
-
-    def test_set_auth_payload_with_domain_name(self):
-        self.assertDictEqual(v.auth_payload_domain_name,
-                             c.set_auth_payload(userid=v.user01_userid,
-                                                password=v.user01_password,
-                                                domain_name=v.default_domain_name))
-
-    def test_set_auth_payload(self):
-        self.assertDictEqual(v.auth_payload,
-                             c.set_auth_payload(userid=v.user01_userid,
-                                                password=v.user01_password))
 
     def test_retrieve_id_by_name(self):
         self.assertEqual(v.default_domain_id,
