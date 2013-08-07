@@ -76,6 +76,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(204, self.k.delete_services(target_type=v.service_type).status_code)
 
     def test_create_endpoint(self):
+        """ OK """
         self.k.create_service(v.service_type)
         res = requests.Response()
         res.status_code = 201
@@ -86,10 +87,12 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_services(target_type=v.service_type)
 
     def test_list_endpoints_none(self):
+        """ OK """
         res = self.k.list_endpoints()
         self.assertListEqual([], res.get('endpoints'))
 
     def test_list_endpoints(self):
+        """ OK """
         self.k.create_service(v.service_type)
         self.k.create_endpoint(v.endpoint_interface, v.endpoint_name, v.endpoint_url, v.service_type)
         res = self.k.list_endpoints()
@@ -101,6 +104,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_services(target_type=v.service_type)
 
     def test_show_endpoint(self):
+        """ OK """
         self.k.create_service(v.service_type)
         self.k.create_endpoint(v.endpoint_interface, v.endpoint_name, v.endpoint_url, v.service_type)
         res = self.k.show_endpoints(target_name=v.endpoint_name).json()
@@ -112,9 +116,18 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_services(target_type=v.service_type)
 
     def test_update_endpoint(self):
-        pass
+        """ OK """
+        self.k.create_service(v.service_type)
+        self.k.create_endpoint(v.endpoint_interface, v.endpoint_name, v.endpoint_url, v.service_type)
+        res = self.k.show_endpoints(target_name=v.endpoint_name).json()
+        id = res.get('endpoint').get('id')
+        payload = {'endpoint': {'id': id, 'interface': 'admin'}}
+        self.assertEqual(200, self.k.update_endpoints(target_id=id, payload=payload).status_code)
+        self.k.delete_endpoints(target_id=id)
+        self.k.delete_services(target_type=v.service_type)
 
     def test_delete_endpoint(self):
+        """ OK """
         self.k.create_service(v.service_type)
         self.k.create_endpoint(v.endpoint_interface, v.endpoint_name, v.endpoint_url, v.service_type)
         res = requests.Response()

@@ -318,6 +318,10 @@ class ApiV3Client(object):
     def show_endpoints(self):
         pass
 
+    @_update
+    def update_endpoints(self):
+        pass
+
     @_delete
     def delete_endpoints(self):
         pass
