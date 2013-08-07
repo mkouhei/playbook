@@ -207,9 +207,33 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(204, self.k.delete_endpoints(target_name=v.endpoint_name).status_code)
         self.k.delete_services(target_type=v.service_type)
 
-    # not implmented
+    def test_create_credentials(self):
+        """ Not Implemented """
+        project_id = self.k.create_project(v.default_project_name).json().get('project').get('id')
+        res = self.k.create_credentials(v.user01_userid,
+                                        v.credential_type,
+                                        project_id,
+                                        json.dumps(v.credential_blob))
+        #self.assertEqual(201, res.status_code)
+        self.assertEqual(501, res.status_code)
+        #self.delete_credential(target_id=credential_id)
+        self.l.delete_entry(v.default_project_name, 'projects')
+
     def test_list_credentials(self):
+        """ Not implmented """
         self.assertEqual(501, self.k.list_credentials().get('error').get('code'))
+
+    def test_show_credentials(self):
+        """ Not implmented """
+        pass
+
+    def test_update_credentials(self):
+        """ Not implmented """
+        pass
+
+    def test_delete_credentials(self):
+        """ Not implmented """
+        pass
 
     def test_create_role(self):
         """ OK """

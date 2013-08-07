@@ -84,3 +84,5 @@ endpoint_name = 'KeyStone Authentication'
 endpoint_url = 'http://localhost:35357/v3/'
 region = 'regionOne'
 role_name = 'admin'
+credential_type = 'ec2'
+credential_blob = {'access': 'hogehoge', 'secret': 'mogemoge'}

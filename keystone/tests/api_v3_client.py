@@ -528,8 +528,39 @@ class ApiV3Client(object):
     def show_users(self):
         pass
 
+    def create_credentials(self, userid, credential_type, project_id, json_blob):
+        """create credential, but not implemented this API.
+
+        Arguments:
+            userid:          user id
+            credential_type: "ec2", etc.
+            project_id:      project id
+            json_blob:       JSON serialized object containing 'access' and 'secret'
+        """
+        url = self._set_api_url('credentials')
+        payload = {'credential': {'blob': json_blob,
+                                  'project_id': project_id,
+                                  'type': credential_type,
+                                  'user_id': userid}}
+        headers = {'Content-Type': 'application/json', 'X-Auth-Token': self.admin_token}
+        r = requests.post(url, headers=headers, data=json.dumps(payload),
+                          timeout=TIMEOUT, verify=self.verify)
+        return r
+
     @_list
     def list_credentials(self):
+        pass
+
+    @_show
+    def show_credentials(self):
+        pass
+
+    @_update
+    def update_credentials(self):
+        pass
+
+    @_delete
+    def delete_credentials(self):
         pass
 
     def _get(self, url):
