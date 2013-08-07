@@ -67,6 +67,7 @@ test_domains = {'domains': [{'id': 'default', 'name': 'default'},
                             {'id': 'net', 'name': 'net'},
                             {'id': 'com', 'name': 'com'},
                             {'id': 'shared', 'name': 'shared'}]}
+test_services = {'services': [{'id': '1111', 'type': 'identity'}]}
 
 domains_url = base_url_api_v3 + '/domains'
 domain_url = base_url_api_v3 + '/domains/default'
@@ -76,6 +77,7 @@ domain_entry_enabled = ['TRUE']
 domain_entry_objectClass = ['groupOfNames']
 domain_entry_ou = ['default']
 domain_entry_dn = 'ou=Domains,dc=auth,dc=example,dc=org'
+service_id = '1111'
 service_type = 'identity'
 endpoint_interface = 'internal'
 endpoint_name = 'KeyStone Authentication'

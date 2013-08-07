@@ -55,7 +55,7 @@ def set_auth_payload(userid=None, password=None, domain_id=None,
 
 
 def retrieve_id_by_name(list_json, entry_name, key):
-    """retrieve id by name
+    """retrieve id by name, for except services
 
     Arguments:
         list_json:
@@ -68,7 +68,7 @@ def retrieve_id_by_name(list_json, entry_name, key):
 
 
 def retrieve_id_by_type(list_json, entry_type, key):
-    """retrieve id by type
+    """retrieve id by type, for services
 
     Arguments:
         list_json:

@@ -83,6 +83,26 @@ class ApiV3ClientTests(unittest.TestCase):
                              c.set_auth_payload(userid=v.user01_userid,
                                                 password=v.user01_password))
 
+    def test_retrieve_id_by_name(self):
+        """ OK """
+        self.assertEqual(v.default_domain_id,
+                         c.retrieve_id_by_name(v.test_domains, v.default_domain_name, 'domains'))
+
+    def test_retrieve_id_by_type(self):
+        """ OK """
+        self.assertEqual(v.service_id,
+                         c.retrieve_id_by_type(v.test_services, v.service_type, 'services'))
+
+    def test_set_api_url(self):
+        """ OK """
+        self.assertEqual(v.domains_url,
+                         self.k._set_api_url('domains'))
+
+    def test_set_api_url2(self):
+        """ OK """
+        self.assertEqual(v.domain_url,
+                         self.k._set_api_url('domains', 'default'))
+
     def test_create_service(self):
         """ OK """
         res = requests.Response()
@@ -237,18 +257,6 @@ class ApiV3ClientTests(unittest.TestCase):
         res.status_code = 204
         self.assertEqual(204, self.k.delete_roles(target_name=v.role_name).status_code)
 
-
-    def test_retrieve_id_by_name(self):
-        self.assertEqual(v.default_domain_id,
-                         c.retrieve_id_by_name(v.test_domains, v.default_domain_name, 'domains'))
-
-    def test_set_api_url(self):
-        self.assertEqual(v.domains_url,
-                         self.k._set_api_url('domains'))
-
-    def test_set_api_url2(self):
-        self.assertEqual(v.domain_url,
-                         self.k._set_api_url('domains', 'default'))
 
     """
     def test_authenticate(self):
