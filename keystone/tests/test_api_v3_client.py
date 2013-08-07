@@ -462,3 +462,91 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(204, res.status_code)
         self.k.delete_groups(target_name=v.default_group_name)
         self.l.delete_entry(v.default_domain_name, 'domains')
+
+    def test_grant_role_user_on_domain(self):
+        """ not implemented; 'Identity' object has no attribute 'create_grant' """
+        pass
+
+    def test_grant_role_group_on_domain(self):
+        """ not implemented; 'Identity' object has no attribute 'create_grant' """
+        pass
+
+    def test_list_user_roles_on_domain(self):
+        """ not implemented; 'Identity' object has no attribute 'create_grant' """
+        pass
+
+    def test_list_group_roles_on_domain(self):
+        """ not implemented; 'Identity' object has no attribute 'create_grant' """
+        pass
+
+    def test_check_user_has_role_on_domain(self):
+        """ not implemented; 'Identity' object has no attribute 'create_grant' """
+        pass
+
+    def test_check_group_has_role_on_domain(self):
+        """ not implemented; 'Identity' object has no attribute 'create_grant' """
+        pass
+
+    def test_revoke_role_from_user_on_domain(self):
+        """ not implemented; 'Identity' object has no attribute 'create_grant' """
+        pass
+
+    def test_revoke_role_from_group_on_domain(self):
+        """ not implemented; 'Identity' object has no attribute 'create_grant' """
+        pass
+
+    def test_grant_role_user_on_project(self):
+        """ not yet tested """
+        pass
+
+    def test_grant_role_group_on_project(self):
+        """ not yet tested """
+        pass
+
+    def test_list_user_role_on_project(self):
+        """ not yet tested """
+        pass
+
+    def test_list_group_role_on_project(self):
+        """ not yet tested """
+        pass
+
+    def test_check_user_has_role_on_project(self):
+        """ not yet tested """
+        pass
+
+    def test_check_group_has_role_on_project(self):
+        """ not yet tested """
+        pass
+
+    def test_revoke_role_from_user_on_project(self):
+        """ not yet tested """
+        pass
+
+    def test_revoke_role_from_group_on_project(self):
+        """ not yet tested """
+        pass
+
+    def test_list_effective_role_assignments(self):
+        """ not yet tested """
+        pass
+
+    def test_create_policies(self):
+        """ not yet tested """
+        pass
+
+    def test_list_policies(self):
+        """ not yet tested """
+        pass
+
+    def test_show_policies(self):
+        """ not yet tested """
+        pass
+
+    def test_update_policies(self):
+        """ not yet tested """
+        pass
+
+    def test_delete_policies(self):
+        """ not yet tested """
+        pass
