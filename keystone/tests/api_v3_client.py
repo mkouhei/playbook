@@ -170,6 +170,22 @@ def _delete(func):
     return delete_object
 
 
+def _update(func):
+    def update_object(self, target_id=None, target_name=None, target_type=None, payload=None):
+        target = func.func_name.split('update_')[1]
+        if target_type:
+            target_id = retrieve_id_by_type(self.list_target(target), target_type, target)
+        elif target_name:
+            target_id = retrieve_id_by_name(self.list_target(target), target_name, target)
+        url = self._set_api_url(target, target_id)
+        print url
+        headers = {'X-Auth-Token': self.admin_token, 'Content-Type': 'application/json'}
+        r = requests.patch(url, headers=headers, data=json.dumps(payload),
+                           timeout=TIMEOUT, verify=self.verify)
+        return r
+    return update_object
+
+
 class ApiV3Client(object):
 
     def __init__(self, base_url, admin_token, region, verify=True):
@@ -253,6 +269,10 @@ class ApiV3Client(object):
 
     @_list
     def list_services(self):
+        pass
+
+    @_update
+    def update_services(self):
         pass
 
     @_show

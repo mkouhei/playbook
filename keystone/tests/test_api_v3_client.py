@@ -32,17 +32,20 @@ class ApiV3ClientTests(unittest.TestCase):
         self.l = c.LdapClient(v.ldap_url, v.search_base, v.binddn, v.bindpw)
 
     def test_create_service(self):
+        """ OK """
         res = requests.Response()
         res.status_code = 201
         self.assertEqual(201, self.k.create_service(v.service_type).status_code)
         self.k.delete_services(target_type=v.service_type)
 
     def test_list_services_none(self):
+        """ OK """
         res = self.k.list_services()
         print res
         self.assertListEqual([], res.get('services'))
 
     def test_list_services(self):
+        """ OK """
         self.k.create_service(v.service_type)
         res = self.k.list_services()
         self.assertEqual(1, len(res.get('services')))
@@ -50,15 +53,23 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_services(target_type=v.service_type)
 
     def test_show_service(self):
+        """ OK """
         self.k.create_service(v.service_type)
         res = self.k.show_services(target_type=v.service_type)
         self.assertEqual(v.service_type, res.json().get('service').get('type'))
         self.k.delete_services(target_type=v.service_type)
 
     def test_update_service(self):
-        pass
+        """ OK """
+        self.k.create_service(v.service_type)
+        res = self.k.show_services(target_type=v.service_type).json()
+        id = res.get('service').get('id')
+        payload = {'service': {'id': id, 'type': 'auth'}}
+        self.assertEqual(200, self.k.update_services(target_type=v.service_type, payload=payload).status_code)
+        self.k.delete_services(target_id=id)
 
     def test_delete_service(self):
+        """ OK """
         self.k.create_service(v.service_type)
         res = requests.Response()
         res.status_code = 204
