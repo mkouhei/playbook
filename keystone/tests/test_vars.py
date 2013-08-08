@@ -25,43 +25,53 @@ y_group_name = 'groupy'
 z_group_name = 'groupz'
 
 
-auth_payload_domain_name_project_name = {'auth': {'identity': {'methods': ['password'],
-                                                               'password': {'user': {'id': 'user01',
-                                                                                     'password': 'password'}}},
-                                                  'scope': {'project': {'domain': {'name': 'default'},
-                                                                        'name': 'default'}}}}
+a_d_name_p_name = {'auth': {'identity': {'methods': ['password'],
+                                         'password': {'user': {'id': 'user01',
+                                                               'password': 'pa'
+                                                               'ssword'}}},
+                            'scope': {'project': {'domain': {'name': 'def'
+                                                             'ault'},
+                                                  'name': 'default'}}}}
 
-auth_payload_domain_name_project_id = {'auth': {'identity': {'methods': ['password'],
-                                                             'password': {'user': {'id': 'user01',
-                                                                                   'password': 'password'}}},
-                                                'scope': {'project': {'domain': {'name': 'default'},
-                                                                      'id': 'default'}}}}
+a_d_name_p_id = {'auth': {'identity': {'methods': ['password'],
+                                       'password': {'user': {'id': 'user01',
+                                                             'password': 'pass'
+                                                             'word'}}},
+                          'scope': {'project': {'domain': {'name': 'default'},
+                                                'id': 'default'}}}}
 
-auth_payload_domain_id_project_name = {'auth': {'identity': {'methods': ['password'],
-                                                             'password': {'user': {'id': 'user01',
-                                                                                   'password': 'password'}}},
-                                                  'scope': {'project': {'domain': {'id': 'default'},
-                                                                        'name': 'default'}}}}
+a_d_id_p_name = {'auth': {'identity': {'methods': ['password'],
+                                       'password': {'user': {'id': 'user01',
+                                                             'password': 'pass'
+                                                             'word'}}},
+                          'scope': {'project': {'domain': {'id': 'default'},
+                                                'name': 'default'}}}}
 
-auth_payload_domain_id_project_id = {'auth': {'identity': {'methods': ['password'],
-                                                           'password': {'user': {'id': 'user01',
-                                                                                 'password': 'password'}}},
-                                              'scope': {'project': {'domain': {'id': 'default'},
-                                                                    'id': 'default'}}}}
+a_d_id_p_id = {'auth': {'identity': {'methods': ['password'],
+                                     'password': {'user': {'id': 'user01',
+                                                           'password': 'pass'
+                                                           'word'}}},
+                        'scope': {'project': {'domain': {'id': 'default'},
+                                              'id': 'default'}}}}
 
-auth_payload_domain_id = {'auth': {'identity': {'methods': ['password'],
-                                                'password': {'user': {'domain': {'id': 'default'},
-                                                                      'id': 'user01',
-                                                                      'password': 'password'}}}}}
+a_d_id = {'auth': {'identity': {'methods': ['password'],
+                                'password': {'user': {'domain': {'id': 'defa'
+                                                                 'ult'},
+                                                      'id': 'user01',
+                                                      'password': 'pass'
+                                                      'word'}}}}}
 
-auth_payload_domain_name = {'auth': {'identity': {'methods': ['password'],
-                                                  'password': {'user': {'domain': {'name': 'default'},
-                                                                        'id': 'user01',
-                                                                        'password': 'password'}}}}}
+a_d_name = {'auth': {'identity': {'methods': ['password'],
+                                  'password': {'user': {'domain': {'name': 'd'
+                                                                   'efault'},
+                                                        'id': 'user01',
+                                                        'password': 'pass'
+                                                        'word'}}}}}
 
 auth_payload = {'auth': {'identity': {'methods': ['password'],
                                       'password': {'user': {'id': 'user01',
-                                                            'password': 'password'}}}}}
+                                                            'password': 'pass'
+                                                            'word'}}}}}
 
 test_domains = {'domains': [{'id': 'default', 'name': 'default'},
                             {'id': 'net', 'name': 'net'},
@@ -83,6 +93,7 @@ endpoint_interface = 'internal'
 endpoint_name = 'KeyStone Authentication'
 endpoint_url = 'http://localhost:35357/v3/'
 region = 'regionOne'
-role_name = 'admin'
+admin_role_name = 'admin'
+member_role_name = 'member'
 credential_type = 'ec2'
 credential_blob = {'access': 'hogehoge', 'secret': 'mogemoge'}

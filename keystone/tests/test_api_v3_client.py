@@ -28,54 +28,57 @@ import tests.test_vars as v
 class ApiV3ClientTests(unittest.TestCase):
     def setUp(self):
         self.maxDiff = None
-        self.k = c.ApiV3Client(v.base_url_api_v3, v.admin_token, v.region, verify=v.verify)
+        self.k = c.ApiV3Client(v.base_url_api_v3,
+                               v.admin_token,
+                               v.region,
+                               verify=v.verify)
         self.l = c.LdapClient(v.ldap_url, v.search_base, v.binddn, v.bindpw)
 
     def test_set_auth_payload_with_domain_name_and_project_name(self):
         """ OK """
-        self.assertDictEqual(v.auth_payload_domain_name_project_name,
-                             c.set_auth_payload(userid=v.user01_userid,
-                                                password=v.user01_password,
-                                                domain_name=v.default_domain_name,
-                                                project_name=v.default_project_name))
+        d = c.set_auth_payload(userid=v.user01_userid,
+                               password=v.user01_password,
+                               domain_name=v.default_domain_name,
+                               project_name=v.default_project_name)
+        self.assertDictEqual(v.a_d_name_p_name, d)
 
     def test_set_auth_payload_with_domain_name_and_project_id(self):
         """ OK """
-        self.assertDictEqual(v.auth_payload_domain_name_project_id,
-                             c.set_auth_payload(userid=v.user01_userid,
-                                                password=v.user01_password,
-                                                domain_name=v.default_domain_name,
-                                                project_id=v.default_project_id))
+        d = c.set_auth_payload(userid=v.user01_userid,
+                               password=v.user01_password,
+                               domain_name=v.default_domain_name,
+                               project_id=v.default_project_id)
+        self.assertDictEqual(v.a_d_name_p_id, d)
 
     def test_set_auth_payload_with_domain_id_and_project_id(self):
         """ OK """
-        self.assertDictEqual(v.auth_payload_domain_id_project_id,
-                             c.set_auth_payload(userid=v.user01_userid,
-                                                password=v.user01_password,
-                                                domain_id=v.default_domain_id,
-                                                project_id=v.default_project_id))
+        d = c.set_auth_payload(userid=v.user01_userid,
+                               password=v.user01_password,
+                               domain_id=v.default_domain_id,
+                               project_id=v.default_project_id)
+        self.assertDictEqual(v.a_d_id_p_id, d)
 
     def test_set_auth_payload_with_domain_id_and_project_name(self):
         """ OK """
-        self.assertDictEqual(v.auth_payload_domain_id_project_name,
-                             c.set_auth_payload(userid=v.user01_userid,
-                                                password=v.user01_password,
-                                                domain_id=v.default_domain_id,
-                                                project_name=v.default_project_name))
+        d = c.set_auth_payload(userid=v.user01_userid,
+                               password=v.user01_password,
+                               domain_id=v.default_domain_id,
+                               project_name=v.default_project_name)
+        self.assertDictEqual(v.a_d_id_p_name, d)
 
     def test_set_auth_payload_with_domain_id(self):
         """ OK """
-        self.assertDictEqual(v.auth_payload_domain_id,
+        self.assertDictEqual(v.a_d_id,
                              c.set_auth_payload(userid=v.user01_userid,
                                                 password=v.user01_password,
                                                 domain_id=v.default_domain_id))
 
     def test_set_auth_payload_with_domain_name(self):
         """ OK """
-        self.assertDictEqual(v.auth_payload_domain_name,
-                             c.set_auth_payload(userid=v.user01_userid,
-                                                password=v.user01_password,
-                                                domain_name=v.default_domain_name))
+        d = c.set_auth_payload(userid=v.user01_userid,
+                               password=v.user01_password,
+                               domain_name=v.default_domain_name)
+        self.assertDictEqual(v.a_d_name, d)
 
     def test_set_auth_payload(self):
         """ OK """
@@ -86,12 +89,16 @@ class ApiV3ClientTests(unittest.TestCase):
     def test_retrieve_id_by_name(self):
         """ OK """
         self.assertEqual(v.default_domain_id,
-                         c.retrieve_id_by_name(v.test_domains, v.default_domain_name, 'domains'))
+                         c.retrieve_id_by_name(v.test_domains,
+                                               v.default_domain_name,
+                                               'domains'))
 
     def test_retrieve_id_by_type(self):
         """ OK """
         self.assertEqual(v.service_id,
-                         c.retrieve_id_by_type(v.test_services, v.service_type, 'services'))
+                         c.retrieve_id_by_type(v.test_services,
+                                               v.service_type,
+                                               'services'))
 
     def test_set_api_url(self):
         """ OK """
@@ -105,9 +112,8 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_create_service(self):
         """ OK """
-        res = requests.Response()
-        res.status_code = 201
-        self.assertEqual(201, self.k.create_service(v.service_type).status_code)
+        res = self.k.create_service(v.service_type)
+        self.assertEqual(201, res.status_code)
         self.k.delete_services(target_type=v.service_type)
 
     def test_list_services_none(self):
@@ -137,25 +143,25 @@ class ApiV3ClientTests(unittest.TestCase):
         res = self.k.show_services(target_type=v.service_type).json()
         id = res.get('service').get('id')
         payload = {'service': {'id': id, 'type': 'auth'}}
-        self.assertEqual(200, self.k.update_services(target_type=v.service_type, payload=payload).status_code)
+        self.assertEqual(200,
+                         self.k.update_services(target_type=v.service_type,
+                                                payload=payload).status_code)
         self.k.delete_services(target_id=id)
 
     def test_delete_service(self):
         """ OK """
         self.k.create_service(v.service_type)
-        res = requests.Response()
-        res.status_code = 204
-        self.assertEqual(204, self.k.delete_services(target_type=v.service_type).status_code)
+        res = self.k.delete_services(target_type=v.service_type)
+        self.assertEqual(204, res.status_code)
 
     def test_create_endpoint(self):
         """ OK """
         self.k.create_service(v.service_type)
-        res = requests.Response()
-        res.status_code = 201
-        self.assertEqual(201, self.k.create_endpoint(v.endpoint_interface,
-                                                     v.endpoint_name,
-                                                     v.endpoint_url,
-                                                     v.service_type).status_code)
+        res = self.k.create_endpoint(v.endpoint_interface,
+                                     v.endpoint_name,
+                                     v.endpoint_url,
+                                     v.service_type)
+        self.assertEqual(201, res.status_code)
         self.k.delete_services(target_type=v.service_type)
 
     def test_list_endpoints_none(self):
@@ -166,22 +172,30 @@ class ApiV3ClientTests(unittest.TestCase):
     def test_list_endpoints(self):
         """ OK """
         self.k.create_service(v.service_type)
-        self.k.create_endpoint(v.endpoint_interface, v.endpoint_name, v.endpoint_url, v.service_type)
+        self.k.create_endpoint(v.endpoint_interface,
+                               v.endpoint_name,
+                               v.endpoint_url,
+                               v.service_type)
         res = self.k.list_endpoints()
         self.assertEqual(1, len(res.get('endpoints')))
         self.assertEqual(v.endpoint_name, res.get('endpoints')[0].get('name'))
         self.assertEqual(v.endpoint_url, res.get('endpoints')[0].get('url'))
-        self.assertEqual(v.endpoint_interface, res.get('endpoints')[0].get('interface'))
+        self.assertEqual(v.endpoint_interface,
+                         res.get('endpoints')[0].get('interface'))
         self.k.delete_endpoints(target_name=v.endpoint_name)
         self.k.delete_services(target_type=v.service_type)
 
     def test_show_endpoint(self):
         """ OK """
         self.k.create_service(v.service_type)
-        self.k.create_endpoint(v.endpoint_interface, v.endpoint_name, v.endpoint_url, v.service_type)
+        self.k.create_endpoint(v.endpoint_interface,
+                               v.endpoint_name,
+                               v.endpoint_url,
+                               v.service_type)
         res = self.k.show_endpoints(target_name=v.endpoint_name).json()
         self.assertEqual(v.endpoint_name, res.get('endpoint').get('name'))
-        self.assertEqual(v.endpoint_interface, res.get('endpoint').get('interface'))
+        self.assertEqual(v.endpoint_interface,
+                         res.get('endpoint').get('interface'))
         self.assertEqual(v.region, res.get('endpoint').get('region'))
         self.assertEqual(v.endpoint_url, res.get('endpoint').get('url'))
         self.k.delete_endpoints(target_name=v.endpoint_name)
@@ -190,26 +204,32 @@ class ApiV3ClientTests(unittest.TestCase):
     def test_update_endpoint(self):
         """ OK """
         self.k.create_service(v.service_type)
-        self.k.create_endpoint(v.endpoint_interface, v.endpoint_name, v.endpoint_url, v.service_type)
+        self.k.create_endpoint(v.endpoint_interface,
+                               v.endpoint_name,
+                               v.endpoint_url,
+                               v.service_type)
         res = self.k.show_endpoints(target_name=v.endpoint_name).json()
         id = res.get('endpoint').get('id')
         payload = {'endpoint': {'id': id, 'interface': 'admin'}}
-        self.assertEqual(200, self.k.update_endpoints(target_id=id, payload=payload).status_code)
+        self.assertEqual(200,
+                         self.k.update_endpoints(target_id=id,
+                                                 payload=payload).status_code)
         self.k.delete_endpoints(target_id=id)
         self.k.delete_services(target_type=v.service_type)
 
     def test_delete_endpoint(self):
         """ OK """
         self.k.create_service(v.service_type)
-        self.k.create_endpoint(v.endpoint_interface, v.endpoint_name, v.endpoint_url, v.service_type)
-        res = requests.Response()
-        res.status_code = 204
-        self.assertEqual(204, self.k.delete_endpoints(target_name=v.endpoint_name).status_code)
+        self.k.create_endpoint(v.endpoint_interface, v.endpoint_name,
+                               v.endpoint_url, v.service_type)
+        res = self.k.delete_endpoints(target_name=v.endpoint_name)
+        self.assertEqual(204, res.status_code)
         self.k.delete_services(target_type=v.service_type)
 
     def test_create_credentials(self):
         """ Not Implemented """
-        project_id = self.k.create_project(v.default_project_name).json().get('project').get('id')
+        res = self.k.create_project(v.default_project_name)
+        project_id = res.json().get('project').get('id')
         res = self.k.create_credentials(v.user01_userid,
                                         v.credential_type,
                                         project_id,
@@ -221,7 +241,8 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_list_credentials(self):
         """ Not implmented """
-        self.assertEqual(501, self.k.list_credentials().get('error').get('code'))
+        self.assertEqual(501,
+                         self.k.list_credentials().get('error').get('code'))
 
     def test_show_credentials(self):
         """ Not implmented """
@@ -237,10 +258,9 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_create_role(self):
         """ OK """
-        res = requests.Response()
-        res.status_code = 201
-        self.assertEqual(201, self.k.create_role(v.role_name).status_code)
-        self.k.delete_roles(target_name=v.role_name)
+        res = self.k.create_role(v.admin_role_name)
+        self.assertEqual(201, res.status_code)
+        self.k.delete_roles(target_name=v.admin_role_name)
 
     def test_list_roles_none(self):
         """ OK """
@@ -248,39 +268,39 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_list_roles(self):
         """ OK """
-        self.k.create_role(v.role_name)
+        self.k.create_role(v.admin_role_name)
         res = self.k.list_roles().get('roles')
         self.assertEqual(1, len(res))
-        self.assertEqual(v.role_name, res[0].get('name'))
-        self.k.delete_roles(target_name=v.role_name)
+        self.assertEqual(v.admin_role_name, res[0].get('name'))
+        self.k.delete_roles(target_name=v.admin_role_name)
 
     def test_show_role(self):
         """ OK """
-        self.k.create_role(v.role_name)
-        res = self.k.show_roles(target_name=v.role_name).json()
-        self.assertEqual(v.role_name, res.get('role').get('name'))
-        self.k.delete_roles(target_name=v.role_name)
+        self.k.create_role(v.admin_role_name)
+        res = self.k.show_roles(target_name=v.admin_role_name).json()
+        self.assertEqual(v.admin_role_name, res.get('role').get('name'))
+        self.k.delete_roles(target_name=v.admin_role_name)
 
     def test_update_role(self):
         """ response is error, but update is succeed.
             TODO: BTS and send patch.
         """
-        self.k.create_role(v.role_name)
-        res = self.k.show_roles(target_name=v.role_name).json()
+        self.k.create_role(v.admin_role_name)
+        res = self.k.show_roles(target_name=v.admin_role_name).json()
         id = res.get('role').get('id')
         payload = {'role': {'id': id, 'name': 'member'}}
-        #self.assertTrue(200, self.k.update_roles(target_id=id, payload=payload).status_code)
-        print self.k.update_roles(target_id=id, payload=payload).json()
-        self.assertEqual('member', self.k.show_roles(target_id=id).json().get('role').get('name'))
+        #self.assertTrue(200, self.k.update_roles(target_id=id,
+        #                                         payload=payload).status_code)
+        self.k.update_roles(target_id=id, payload=payload).json()
+        res = self.k.show_roles(target_id=id).json()
+        self.assertEqual('member', res.json().get('role').get('name'))
         self.k.delete_roles(target_id=id)
 
     def test_delete_role(self):
         """ OK """
-        self.k.create_role(v.role_name)
-        res = requests.Response()
-        res.status_code = 204
-        self.assertEqual(204, self.k.delete_roles(target_name=v.role_name).status_code)
-
+        self.k.create_role(v.admin_role_name)
+        res = self.k.delete_roles(target_name=v.admin_role_name)
+        self.assertEqual(204, res.status_code)
 
     """
     def test_authenticate(self):
@@ -293,22 +313,25 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_create_domain(self):
         """ OK """
-        res = requests.Response()
-        res.status_code = 201
-        self.assertEqual(res.status_code,
-                         self.k.create_domain(v.default_domain_name).status_code)
+        res = self.k.create_domain(v.default_domain_name)
+        self.assertEqual(201, res.status_code)
 
     def test_search_entry(self):
         """ OK """
         self.k.create_domain(v.default_domain_name)
         res = self.l.search_entry(v.default_domain_name, 'domains')
         self.assertTrue(v.domain_entry_dn in res[0][0])
-        self.assertListEqual(v.domain_entry_member, res[0][1].get('member'))
-        self.assertListEqual(v.domain_entry_description, res[0][1].get('description'))
-        self.assertListEqual(v.domain_entry_enabled, res[0][1].get('enabled'))
-        self.assertListEqual(v.domain_entry_objectClass, res[0][1].get('objectClass'))
+        self.assertListEqual(v.domain_entry_member,
+                             res[0][1].get('member'))
+        self.assertListEqual(v.domain_entry_description,
+                             res[0][1].get('description'))
+        self.assertListEqual(v.domain_entry_enabled,
+                             res[0][1].get('enabled'))
+        self.assertListEqual(v.domain_entry_objectClass,
+                             res[0][1].get('objectClass'))
         self.assertListEqual(v.domain_entry_ou, res[0][1].get('ou'))
-        self.assertEqual(res[0][0].split(',')[0].split('=')[1], res[0][1].get('cn')[0])
+        self.assertEqual(res[0][0].split(',')[0].split('=')[1],
+                         res[0][1].get('cn')[0])
         self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_list_domains(self):
@@ -317,8 +340,10 @@ class ApiV3ClientTests(unittest.TestCase):
         res = self.k.list_domains()
         id = res['domains'][0]['id']
         self_links = res['domains'][0]['links']['self']
-        self.assertEqual(v.default_domain_name, res['domains'][0]['name'])
-        self.assertEqual(v.default_domain_name, res['domains'][0]['description'])
+        self.assertEqual(v.default_domain_name,
+                         res['domains'][0]['name'])
+        self.assertEqual(v.default_domain_name,
+                         res['domains'][0]['description'])
         self.assertEqual(True, res['domains'][0]['enabled'])
         self.assertEqual(200, self.k._get(self_links).status_code)
         self.l.delete_entry(v.default_domain_name, 'domains')
@@ -328,30 +353,29 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.create_domain(v.default_domain_name)
         res = self.k.show_domains(target_name=v.default_domain_name)
         self.assertEqual(v.default_domain_name, res.json()['domain']['name'])
-        self.assertEqual(v.default_domain_name, res.json()['domain']['description'])
+        self.assertEqual(v.default_domain_name,
+                         res.json()['domain']['description'])
         self.assertEqual(True, res.json()['domain']['enabled'])
         self.assertEqual(200, res.status_code)
         self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_delete_domain(self):
-        """ OK, but this api is not implemented, so connect LDAP directly in work around."""
+        """ OK, but this api is not implemented,
+            so connect LDAP directly in work around."""
         self.k.create_domain(v.default_domain_name)
-        self.assertEqual(107, self.l.delete_entry(v.default_domain_name, 'domains')[0])
+        self.assertEqual(107,
+                         self.l.delete_entry(v.default_domain_name,
+                                             'domains')[0])
 
     def test_create_project(self):
         """ OK """
-        res = requests.Response()
-        res.status_code = 201
-        self.assertEqual(res.status_code,
-                         self.k.create_project(v.default_project_name).status_code)
+        res = self.k.create_project(v.default_project_name)
+        self.assertEqual(201, res.status_code)
 
-    """
     def test_create_project_with_domain(self):
-        res = requests.Response()
-        res.status_code = 201
-        self.assertEqual(res.status_code,
-                         self.k.create_project(v.default_project_name, v.default_domain_name).status_code)
-                         """
+        res = self.k.create_project(v.default_project_name,
+                                    v.default_domain_name)
+        self.assertEqual(201, res.status_code)
 
     def test_list_projects(self):
         """ OK """
@@ -359,8 +383,10 @@ class ApiV3ClientTests(unittest.TestCase):
         res = self.k.list_projects()
         id = res['projects'][0]['id']
         self_links = res['projects'][0]['links']['self']
-        self.assertEqual(v.default_project_name, res['projects'][0]['name'])
-        self.assertEqual(v.default_project_name, res['projects'][0]['description'])
+        self.assertEqual(v.default_project_name,
+                         res['projects'][0]['name'])
+        self.assertEqual(v.default_project_name,
+                         res['projects'][0]['description'])
         self.assertEqual(True, res['projects'][0]['enabled'])
         self.assertEqual(200, self.k._get(self_links).status_code)
         self.l.delete_entry(v.default_project_name, 'projects')
@@ -369,32 +395,34 @@ class ApiV3ClientTests(unittest.TestCase):
         """ OK """
         self.k.create_project(v.default_project_name)
         res = self.k.show_projects(target_name=v.default_project_name)
-        self.assertEqual(v.default_project_name, res.json()['project']['name'])
-        self.assertEqual(v.default_project_name, res.json()['project']['description'])
+        self.assertEqual(v.default_project_name,
+                         res.json()['project']['name'])
+        self.assertEqual(v.default_project_name,
+                         res.json()['project']['description'])
         self.assertEqual(True, res.json()['project']['enabled'])
         self.assertEqual(200, res.status_code)
         self.l.delete_entry(v.default_project_name, 'projects')
 
     def test_delete_project(self):
-        """ OK, but this api is not implemented, so connect LDAP directly in work around."""
+        """ OK, but this api is not implemented,
+            so connect LDAP directly in work around."""
         self.k.create_project(v.default_project_name)
-        self.assertEqual((107, [], 3, []), self.l.delete_entry(v.default_project_name, 'projects'))
+        self.assertEqual((107, [], 3, []),
+                         self.l.delete_entry(v.default_project_name,
+                                             'projects'))
 
     def test_create_group(self):
         """ OK """
-        res = requests.Response()
-        res.status_code = 201
-        self.assertEqual(res.status_code,
-                         self.k.create_group(v.default_group_name).status_code),
+        res = self.k.create_group(v.default_group_name)
+        self.assertEqual(201,
+                         res.status_code)
         self.k.delete_groups(target_name=v.default_group_name)
 
     def test_create_group_in_domain(self):
         """ OK """
-        res = requests.Response()
-        res.status_code = 201
-        self.assertEqual(res.status_code,
-                         self.k.create_group(v.default_group_name,
-                                             v.default_domain_name).status_code),
+        res = self.k.create_group(v.default_group_name,
+                                  v.default_domain_name)
+        self.assertEqual(201, res.status_code)
         self.k.delete_groups(target_name=v.default_group_name)
 
     def test_list_groups(self):
@@ -413,17 +441,18 @@ class ApiV3ClientTests(unittest.TestCase):
         """ OK """
         self.k.create_group(v.default_group_name)
         res = self.k.show_groups(target_name=v.default_group_name)
-        self.assertEqual(v.default_project_name, res.json()['group']['name'])
-        self.assertEqual(v.default_project_name, res.json()['group']['description'])
+        self.assertEqual(v.default_project_name,
+                         res.json()['group']['name'])
+        self.assertEqual(v.default_project_name,
+                         res.json()['group']['description'])
         self.assertEqual(200, res.status_code)
         self.k.delete_groups(target_name=v.default_group_name)
 
     def test_delete_group(self):
         """ OK """
         self.k.create_group(v.default_group_name)
-        res =requests.Response()
-        res.status_code = 204
-        self.assertEqual(204, self.k.delete_groups(target_name=v.default_group_name).status_code)
+        res = self.k.delete_groups(target_name=v.default_group_name)
+        self.assertEqual(204, res.status_code)
 
     def test_list_users(self):
         """ OK """
@@ -453,48 +482,57 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_add_user_to_group(self):
         """ OK """
-        res = requests.Response()
-        res.status_code = 201
-        self.k.create_domain(v.default_group_name)
-        domain_id = self.k.show_domains(target_name=v.default_domain_name).json().get('domain').get('id')
-        self.k.create_group(v.default_group_name, domain_name=v.default_domain_name).json()
-        res = self.k.add_user_to_group(v.user01_userid, group_name=v.default_group_name)
+        res = self.k.create_domain(v.default_domain_name).json()
+        domain_id = res.get('domain').get('id')
+        self.k.create_group(v.default_group_name,
+                            domain_name=v.default_domain_name).json()
+        res = self.k.add_user_to_group(v.user01_userid,
+                                       group_name=v.default_group_name)
         self.assertEqual(204, res.status_code)
         self.k.delete_groups(target_name=v.default_group_name)
         self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_grant_role_user_on_domain(self):
-        """ not implemented; 'Identity' object has no attribute 'create_grant' """
+        """ not implemented
+        'Identity' object has no attribute 'create_grant' """
         pass
 
     def test_grant_role_group_on_domain(self):
-        """ not implemented; 'Identity' object has no attribute 'create_grant' """
+        """ not implemented
+            'Identity' object has no attribute 'create_grant' """
         pass
 
     def test_list_user_roles_on_domain(self):
-        """ not implemented; 'Identity' object has no attribute 'create_grant' """
+        """ not implemented
+            'Identity' object has no attribute 'create_grant' """
         pass
 
     def test_list_group_roles_on_domain(self):
-        """ not implemented; 'Identity' object has no attribute 'create_grant' """
+        """ not implemented
+            'Identity' object has no attribute 'create_grant' """
         pass
 
     def test_check_user_has_role_on_domain(self):
-        """ not implemented; 'Identity' object has no attribute 'create_grant' """
+        """ not implemented
+            'Identity' object has no attribute 'create_grant' """
         pass
 
     def test_check_group_has_role_on_domain(self):
-        """ not implemented; 'Identity' object has no attribute 'create_grant' """
+        """ not implemented
+            'Identity' object has no attribute 'create_grant' """
         pass
 
     def test_revoke_role_from_user_on_domain(self):
-        """ not implemented; 'Identity' object has no attribute 'create_grant' """
+        """ not implemented
+            'Identity' object has no attribute 'create_grant' """
         pass
 
     def test_revoke_role_from_group_on_domain(self):
-        """ not implemented; 'Identity' object has no attribute 'create_grant' """
+        """ not implemented
+            'Identity' object has no attribute 'create_grant' """
         pass
 
+    '''
     def test_grant_role_user_on_project(self):
         """ not yet tested """
         pass
