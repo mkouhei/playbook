@@ -419,28 +419,24 @@ class ApiV3Client(object):
     def delete_roles(self):
         pass
 
-    def grant_role_user_on_domain(self, domain_id, user_id, role_id):
-        """ not implemented
-            'Identity' object has no attribute 'create_grant' """
-        url = self._set_api_url('domains', domain_id,
-                                'users', user_id, 'roles', role_id)
-        headers = {'X-Auth-Token': self.admin_token}
-        r = requests.put(url, headers=headers,
-                         timeout=TIMEOUT, verify=self.verify)
-        return r
+    @_grant_role
+    def grant_role_user_on_domain(self):
+        """ Not Implmented"""
+        pass
 
-    def grant_role_group_on_domain(self, domain_id, group_id, role_id):
-        """ not implemented
-            'Identity' object has no attribute 'create_grant' """
-        url = self._set_api_url('domains', domain_id,
-                                'groups', group_id, 'roles', role_id)
-        headers = {'X-Auth-Token': self.admin_token}
-        r = requests.put(url, headers=headers,
-                         timeout=TIMEOUT, verify=self.verify)
-        return r
+    @_grant_role
+    def grant_role_group_on_domain(self):
+        """ Not Implmented"""
+        pass
 
     @_grant_role
     def grant_role_user_on_project(self):
+        """ Not Implmented"""
+        pass
+
+    @_grant_role
+    def grant_role_group_on_project(self):
+        """ Not Implmented"""
         pass
 
     def create_domain(self, domain_name):

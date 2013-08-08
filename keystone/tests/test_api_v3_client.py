@@ -497,13 +497,41 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_grant_role_user_on_domain(self):
         """ not implemented
-        'Identity' object has no attribute 'create_grant' """
-        pass
+        An unexpected error prevented the server from fulfilling your request.
+        'Identity' object has no attribute 'create_grant'
+        """
+        self.k.create_domain(v.default_domain_name)
+        self.k.create_project(v.default_project_name,
+                              domain_name=v.default_domain_name)
+        self.k.create_role(v.member_role_name)
+        res = self.k.grant_role_user_on_domain(ou_name=v.default_domain_name,
+                                               target_id=v.user01_userid,
+                                               role_name=v.member_role_name)
+        # not implemented
+        self.assertEqual(500, res.status_code)
+        self.k.delete_roles(target_name=v.member_role_name)
+        self.l.delete_entry(v.default_project_name, 'projects')
+        self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_grant_role_group_on_domain(self):
         """ not implemented
-            'Identity' object has no attribute 'create_grant' """
-        pass
+        An unexpected error prevented the server from fulfilling your request.
+        'Identity' object has no attribute 'create_grant'
+        """
+        self.k.create_domain(v.default_domain_name)
+        self.k.create_project(v.default_project_name,
+                              domain_name=v.default_domain_name)
+        self.k.create_role(v.member_role_name)
+        self.k.create_group(v.x_group_name)
+        res = self.k.grant_role_user_on_domain(ou_name=v.default_domain_name,
+                                               target_id=v.user01_userid,
+                                               role_name=v.member_role_name)
+        # not implemented
+        self.assertEqual(500, res.status_code)
+        self.k.delete_roles(target_name=v.member_role_name)
+        self.l.delete_entry(v.default_project_name, 'projects')
+        self.l.delete_entry(v.default_domain_name, 'domains')
+        self.l.delete_entry(v.x_group_name, 'groups')
 
     def test_list_user_roles_on_domain(self):
         """ not implemented
@@ -544,7 +572,6 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.create_project(v.default_project_name,
                               domain_name=v.default_domain_name)
         self.k.create_role(v.member_role_name)
-        print self.k.list_target('roles')
         res = self.k.grant_role_user_on_project(ou_name=v.default_project_name,
                                                 target_id=v.user01_userid,
                                                 role_name=v.member_role_name)
@@ -555,8 +582,25 @@ class ApiV3ClientTests(unittest.TestCase):
         self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_grant_role_group_on_project(self):
-        """ not yet tested """
-        pass
+        """ not implemented
+        An unexpected error prevented the server from fulfilling your request.
+        'Identity' object has no attribute 'create_grant'
+        """
+        self.k.create_domain(v.default_domain_name)
+        self.k.create_project(v.default_project_name,
+                              domain_name=v.default_domain_name)
+        self.k.create_role(v.member_role_name)
+        self.k.create_group(v.x_group_name)
+        res = self.k.grant_role_group_on_project(
+            ou_name=v.default_project_name,
+            target_name=v.x_group_name,
+            role_name=v.member_role_name)
+        # not implemented
+        self.assertEqual(500, res.status_code)
+        self.k.delete_roles(target_name=v.member_role_name)
+        self.l.delete_entry(v.x_group_name, 'groups')
+        self.l.delete_entry(v.default_project_name, 'projects')
+        self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_list_user_role_on_project(self):
         """ not yet tested """
