@@ -188,7 +188,8 @@ def _delete(func):
 
 def _grant_role(func):
     """grant role to <user|group> on <domain|project>"""
-    def grant_role(self, target_id=None, target_name=None,
+    def grant_role(self, role_id=None, role_name=None,
+                   target_id=None, target_name=None,
                    ou_id=None, ou_name=None):
         """
 
@@ -199,7 +200,26 @@ def _grant_role(func):
             ou_name:
 
         """
-        pass
+        target = func.func_name.split('grant_role_')[1].split('_')[0]
+        if target_name:
+            target_id = retrieve_id_by_name(self.list_target(target),
+                                            target_name, target)
+        ou_target = func.func_name.split('_on_')[1]
+        if ou_name:
+            ou_id = retrieve_id_by_name(self.list_target(ou_target),
+                                        ou_name, ou_target)
+        if role_name:
+            role_id = retrieve_id_by_name(self.list_target('roles'),
+                                          role_name, 'roles')
+
+        url = self._set_api_url(ou_target, ou_id,
+                                target, target_id,
+                                'roles', role_id)
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.put(url, headers=headers,
+                         timeout=TIMEOUT, verify=self.verify)
+        return r
+    return grant_role
 
 
 def _update(func):
@@ -408,7 +428,7 @@ class ApiV3Client(object):
             'Identity' object has no attribute 'create_grant' """
         url = self._set_api_url('domains', domain_id,
                                 'users', user_id, 'roles', role_id)
-        headers = {'X-Auth_Token': self.admin_token}
+        headers = {'X-Auth-Token': self.admin_token}
         r = requests.put(url, headers=headers,
                          timeout=TIMEOUT, verify=self.verify)
         return r
@@ -418,10 +438,14 @@ class ApiV3Client(object):
             'Identity' object has no attribute 'create_grant' """
         url = self._set_api_url('domains', domain_id,
                                 'groups', group_id, 'roles', role_id)
-        headers = {'X-Auth_Token': self.admin_token}
+        headers = {'X-Auth-Token': self.admin_token}
         r = requests.put(url, headers=headers,
                          timeout=TIMEOUT, verify=self.verify)
         return r
+
+    @_grant_role
+    def grant_role_user_on_project(self):
+        pass
 
     def create_domain(self, domain_name):
         """Create domain
