@@ -222,6 +222,37 @@ def _grant_role(func):
     return grant_role
 
 
+def _list_grants(func):
+    """list roles to <user|group> on <domain|project>"""
+    def list_grants(self, target_id=None, target_name=None,
+                    ou_id=None, ou_name=None):
+        """
+
+        Arguments:
+            target_id:
+            target_name:
+            ou_id:
+            ou_name:
+
+        """
+        target = func.func_name.split('list_roles_')[1].split('_')[0] + 's'
+        if target_name:
+            target_id = retrieve_id_by_name(self.list_target(target),
+                                            target_name, target)
+        ou_target = func.func_name.split('_on_')[1] + 's'
+        if ou_name:
+            ou_id = retrieve_id_by_name(self.list_target(ou_target),
+                                        ou_name, ou_target)
+
+        url = self._set_api_url(ou_target, ou_id,
+                                target, target_id, 'roles')
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.get(url, headers=headers,
+                         timeout=TIMEOUT, verify=self.verify)
+        return r
+    return list_grants
+
+
 def _update(func):
     def update_object(self, target_id=None, target_name=None,
                       target_type=None, payload=None):
@@ -436,6 +467,26 @@ class ApiV3Client(object):
 
     @_grant_role
     def grant_role_group_on_project(self):
+        """ Not Implmented"""
+        pass
+
+    @_list_grants
+    def list_roles_user_on_domain(self):
+        """ Not Implmented"""
+        pass
+
+    @_list_grants
+    def list_roles_group_on_domain(self):
+        """ Not Implmented"""
+        pass
+
+    @_list_grants
+    def list_roles_user_on_project(self):
+        """ Not Implmented"""
+        pass
+
+    @_list_grants
+    def list_roles_group_on_project(self):
         """ Not Implmented"""
         pass
 
