@@ -293,7 +293,7 @@ class ApiV3ClientTests(unittest.TestCase):
         #                                         payload=payload).status_code)
         self.k.update_roles(target_id=id, payload=payload).json()
         res = self.k.show_roles(target_id=id).json()
-        self.assertEqual('member', res.json().get('role').get('name'))
+        self.assertEqual('member', res.get('role').get('name'))
         self.k.delete_roles(target_id=id)
 
     def test_delete_role(self):
@@ -371,11 +371,14 @@ class ApiV3ClientTests(unittest.TestCase):
         """ OK """
         res = self.k.create_project(v.default_project_name)
         self.assertEqual(201, res.status_code)
+        self.l.delete_entry(v.default_project_name, 'projects')
 
     def test_create_project_with_domain(self):
+        print self.k.list_projects()
         res = self.k.create_project(v.default_project_name,
                                     v.default_domain_name)
         self.assertEqual(201, res.status_code)
+        self.l.delete_entry(v.default_project_name, 'projects')
 
     def test_list_projects(self):
         """ OK """
