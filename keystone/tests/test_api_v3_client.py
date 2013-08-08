@@ -373,10 +373,14 @@ class ApiV3ClientTests(unittest.TestCase):
         self.l.delete_entry(v.default_project_name, 'projects')
 
     def test_create_project_with_domain(self):
+        """ OK """
+        self.k.create_domain(v.net_domain_name)
         res = self.k.create_project(v.default_project_name,
-                                    v.default_domain_name)
+                                    v.net_domain_name)
         self.assertEqual(201, res.status_code)
+        self.k.list_domains()
         self.l.delete_entry(v.default_project_name, 'projects')
+        self.l.delete_entry(v.net_domain_name, 'domains')
 
     def test_list_projects(self):
         """ OK """
