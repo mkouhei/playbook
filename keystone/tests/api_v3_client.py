@@ -200,11 +200,11 @@ def _grant_role(func):
             ou_name:
 
         """
-        target = func.func_name.split('grant_role_')[1].split('_')[0]
+        target = func.func_name.split('grant_role_')[1].split('_')[0] + 's'
         if target_name:
             target_id = retrieve_id_by_name(self.list_target(target),
                                             target_name, target)
-        ou_target = func.func_name.split('_on_')[1]
+        ou_target = func.func_name.split('_on_')[1] + 's'
         if ou_name:
             ou_id = retrieve_id_by_name(self.list_target(ou_target),
                                         ou_name, ou_target)
@@ -399,10 +399,6 @@ class ApiV3Client(object):
         headers = {'X-Auth-Token': self.admin_token,
                    'Content-Type': 'application/json'}
         payload = {'role': {'name': role_name}}
-        roles = [role for role in self.list_roles().get('roles')
-                 if role.get('name') == role_name]
-        if roles:
-            return None
         r = requests.post(url, headers=headers, data=json.dumps(payload),
                           timeout=TIMEOUT, verify=self.verify)
         return r
