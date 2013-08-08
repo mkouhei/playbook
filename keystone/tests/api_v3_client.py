@@ -273,6 +273,44 @@ def _list_grants(func):
     return list_grants
 
 
+def _check_grant(func):
+    """check <user|group> has role on <project|domain>"""
+    def check_grant(self, target_id=None, target_name=None,
+                    ou_id=None, ou_name=None,
+                    role_id=None, role_name=None):
+        """
+
+        Arguments:
+            target_id:
+            target_name:
+            ou_id:
+            ou_name:
+            role_id:
+            role_name:
+        """
+        target = func.func_name.split('check_')[1].split('_')[0] + 's'
+
+        if target_name:
+            target_id = retrieve_id_by_name(self.list_target(target),
+                                            target_name, target)
+        ou_target = func.func_name.split('_on_')[1] + 's'
+        if ou_name:
+            ou_id = retrieve_id_by_name(self.list_target(ou_target),
+                                        ou_name, ou_target)
+        if role_name:
+            role_id = retrieve_id_by_name(self.list_target('roles'),
+                                          role_name, 'roles')
+
+        url = self._set_api_url(ou_target, ou_id,
+                                target, target_id,
+                                'roles', role_id)
+        headers = {'X-Auth-Token': self.admin_token}
+        r = requests.head(url, headers=headers,
+                          timeout=TIMEOUT, verify=self.verify)
+        return r
+    return check_grant
+
+
 class ApiV3Client(object):
 
     def __init__(self, base_url, admin_token, region, verify=True):
@@ -487,6 +525,26 @@ class ApiV3Client(object):
 
     @_list_grants
     def list_roles_group_on_project(self):
+        """ Not Implmented"""
+        pass
+
+    @_check_grant
+    def check_user_has_role_on_domain(self):
+        """ Not Implmented"""
+        pass
+
+    @_check_grant
+    def check_group_has_role_on_domain(self):
+        """ Not Implmented"""
+        pass
+
+    @_check_grant
+    def check_user_has_role_on_project(self):
+        """ Not Implmented"""
+        pass
+
+    @_check_grant
+    def check_group_has_role_on_project(self):
         """ Not Implmented"""
         pass
 
