@@ -809,21 +809,45 @@ class ApiV3ClientTests(unittest.TestCase):
         pass
 
     def test_create_policies(self):
-        """ not yet tested """
-        pass
+        """ OK """
+        res = self.k.create_policies(json.dumps(v.policy_blob),
+                                     v.policy_mimetype)
+        self.assertEqual(201, res.status_code)
+        self.k.delete_policies(target_blob=json.dumps(v.policy_blob))
+
+    def test_list_policies_none(self):
+        """ OK """
+        res = self.k.list_policies()
+        self.assertEqual(0, len(res.get('policies')))
 
     def test_list_policies(self):
-        """ not yet tested """
-        pass
+        """ OK """
+        self.k.create_policies(json.dumps(v.policy_blob),
+                               v.policy_mimetype)
+        self.k.create_policies(json.dumps(v.policy_blob2),
+                               v.policy_mimetype)
+        res = self.k.list_policies()
+        self.assertEqual(2, len(res.get('policies')))
+        self.k.delete_policies(target_blob=json.dumps(v.policy_blob))
+        self.k.delete_policies(target_blob=json.dumps(v.policy_blob2))
 
     def test_show_policies(self):
-        """ not yet tested """
-        pass
+        """ OK """
+        self.k.create_policies(json.dumps(v.policy_blob),
+                               v.policy_mimetype)
+        res = self.k.show_policies(target_blob=json.dumps(v.policy_blob))
+        self.assertEqual(200, res.status_code)
+        self.k.delete_policies(target_blob=json.dumps(v.policy_blob))
 
     def test_update_policies(self):
         """ not yet tested """
         pass
 
     def test_delete_policies(self):
-        """ not yet tested """
-        pass
+        """ OK """
+        self.k.create_policies(json.dumps(v.policy_blob),
+                               v.policy_mimetype)
+        res = self.k.show_policies(target_blob=json.dumps(v.policy_blob))
+        policy_id = res.json().get('policy').get('id')
+        res = self.k.delete_policies(target_id=policy_id)
+        self.assertEqual(204, res.status_code)

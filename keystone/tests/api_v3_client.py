@@ -87,6 +87,19 @@ def retrieve_id_by_type(list_json, entry_type, key):
             if entry.get('type') == entry_type][0]
 
 
+def retrieve_id_by_blob(list_json, entry_name, key):
+    """retrieve id by blob, for except services
+
+    Arguments:
+        list_json:
+        entry_name:
+        key:
+    """
+    return [entry.get('id')
+            for entry in list_json.get(key)
+            if entry.get('blob') == entry_name][0]
+
+
 class LdapClient(object):
 
     def __init__(self, ldap_url, search_base, binddn, bindpw):
@@ -135,13 +148,15 @@ def _list(func):
 
 def _show(func):
     """show target"""
-    def show_object(self, target_id=None, target_name=None, target_type=None):
+    def show_object(self, target_id=None, target_name=None,
+                    target_type=None, target_blob=None):
         """
 
         Arguments:
             target_id:
             target_name:
             target_type:
+            target_blob:
 
         """
         target = func.func_name.split('show_')[1]
@@ -151,6 +166,9 @@ def _show(func):
         elif target_name:
             target_id = retrieve_id_by_name(self.list_target(target),
                                             target_name, target)
+        elif target_blob:
+            target_id = retrieve_id_by_blob(self.list_target(target),
+                                            target_blob, target)
         url = self._set_api_url(target, target_id)
         headers = {'X-Auth-Token': self.admin_token}
         r = requests.get(url, headers=headers,
@@ -161,14 +179,15 @@ def _show(func):
 
 def _delete(func):
     """delete target"""
-    def delete_object(self, target_id=None,
-                      target_name=None, target_type=None):
+    def delete_object(self, target_id=None, target_name=None,
+                      target_type=None, target_blob=None):
         """
 
         Arguments:
             target:
             target_id:
             target_name:
+            target_blob:
 
         """
         target = func.func_name.split('delete_')[1]
@@ -178,6 +197,9 @@ def _delete(func):
         elif target_name:
             target_id = retrieve_id_by_name(self.list_target(target),
                                             target_name, target)
+        elif target_blob:
+            target_id = retrieve_id_by_blob(self.list_target(target),
+                                            target_blob, target)
         url = self._set_api_url(target, target_id)
         headers = {'X-Auth-Token': self.admin_token}
         r = requests.delete(url, headers=headers,
@@ -821,3 +843,31 @@ class ApiV3Client(object):
         r = requests.get(url, headers=headers,
                          timeout=TIMEOUT, verify=self.verify)
         return r
+
+    def create_policies(self, json_blob, mimetype):
+        """create policy
+
+        Arguments:
+            json_blob:       JSON serialized containing 'access' and 'secret'
+            mimetype:
+        """
+        url = self._set_api_url('policies')
+        payload = {'policy': {'blob': json_blob,
+                              'type': mimetype}}
+        headers = {'Content-Type': 'application/json',
+                   'X-Auth-Token': self.admin_token}
+        r = requests.post(url, headers=headers, data=json.dumps(payload),
+                          timeout=TIMEOUT, verify=self.verify)
+        return r
+
+    @_list
+    def list_policies(self):
+        pass
+
+    @_show
+    def show_policies(self):
+        pass
+
+    @_delete
+    def delete_policies(self):
+        pass
