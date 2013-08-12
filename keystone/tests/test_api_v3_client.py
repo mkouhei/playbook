@@ -840,8 +840,16 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_policies(target_blob=json.dumps(v.policy_blob))
 
     def test_update_policies(self):
-        """ not yet tested """
-        pass
+        """ OK """
+        self.k.create_policies(json.dumps(v.policy_blob),
+                               v.policy_mimetype)
+        res = self.k.show_policies(target_blob=json.dumps(v.policy_blob))
+        payload = res.json()
+        policy_id = payload.get('policy').get('id')
+        payload['policy']['blob'] = json.dumps(v.policy_blob2)
+        res = self.k.update_policies(target_id=policy_id, payload=payload)
+        self.assertEqual(200, res.status_code)
+        self.k.delete_policies(target_id=policy_id)
 
     def test_delete_policies(self):
         """ OK """

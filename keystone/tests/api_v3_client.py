@@ -871,3 +871,7 @@ class ApiV3Client(object):
     @_delete
     def delete_policies(self):
         pass
+
+    @_update
+    def update_policies(self):
+        pass
