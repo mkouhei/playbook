@@ -477,7 +477,7 @@ class ApiV3ClientTests(unittest.TestCase):
         res = self.k.show_users(target_name=v.user01_userid).json()
         self.assertEqual(v.user01_userid, res.get('user').get('id'))
 
-    def test_x_list_user_projects(self):
+    def test_list_user_projects(self):
         """ Not implemented """
         res = self.k.show_users(target_name=v.user01_userid).json()
         userid = res.get('user').get('id')
@@ -485,13 +485,18 @@ class ApiV3ClientTests(unittest.TestCase):
         res = self.k.list_users(userid, 'projects')
         self.assertEqual(501, res.get('error').get('code'))
 
-    """
-    def test_x_list_user_groups(self):
-        res = self.k.show_users(target_name=v.user01_userid).json()
-        userid = res.get('user').get('id')
-        res = self.k.list_users(userid, 'groups')
-        self.assertEqual(501, res.get('error').get('code'))
-        """
+    def test_list_user_groups(self):
+        """ OK """
+        res = self.k.create_domain(v.default_domain_name).json()
+        domain_id = res.get('domain').get('id')
+        self.k.create_group(v.x_group_name,
+                            domain_name=v.default_domain_name).json()
+        self.k.add_user_to_group(v.user01_userid,
+                                 group_name=v.x_group_name)
+        res = self.k.list_users(v.user01_userid, 'groups')
+        self.assertTrue(v.user01_userid in res.get('links').get('self'))
+        self.k.delete_groups(target_name=v.x_group_name)
+        self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_add_user_to_group(self):
         """ OK """
