@@ -5,7 +5,7 @@ search_base = 'dc=example,dc=org'
 binddn = 'cn=admin,dc=example,dc=org'
 bindpw = 'password'
 verify = False
-admin_userid = 'admin'
+admin_userid = 'service-admin'
 admin_password = 'password'
 admin_token = 'password'
 user01_userid = 'user01'
