@@ -470,7 +470,7 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_list_users(self):
         """ OK """
-        self.assertEqual(14, len(self.k.list_users().get('users')))
+        self.assertEqual(16, len(self.k.list_users().get('users')))
 
     def test_show_users(self):
         """ OK """
