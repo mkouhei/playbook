@@ -1,0 +1,69 @@
+---
+- name: prepare organization dc LDIF
+  template: src=organization_dc.ldif.j2 dest=/tmp/organization_dc.ldif
+- name: check organization dc
+  shell: |
+    ldapsearch -x -h localhost -b {{ basedn }} dc={{ organization_dc }} | grep -q '^dn:'; echo $?
+  register: result
+- name: add organization dc
+  command: ldapadd -x -h localhost -D {{ rootdn }} -w {{ rootpw }} -f /tmp/organization_dc.ldif
+  when: result.stdout != '0'
+- name: prepare organizationalUnit LDIF
+  template: src=organizationalUnit.ldif.j2 dest=/tmp/{{ item.ou }}.ldif
+  with_items:
+    - { ou: 'People' }
+    - { ou: 'ServerAdmin', dc: $organization_dc }
+    - { ou: 'ProjectUser', dc: $organization_dc }
+    - { ou: 'Projects', dc: $organization_dc }
+    - { ou: 'Roles', dc: $organization_dc }
+    - { ou: 'Groups', dc: $organization_dc }
+    - { ou: 'Domains', dc: $organization_dc }
+- name: check organizationUnit of People
+  shell: |
+    ldapsearch -x -h localhost -b {{ basedn }} ou=People | grep -q '^dn:'; echo $?
+  register: result
+- name: add organizationalUnit of People
+  command: ldapadd -x -h localhost -D {{ rootdn }} -w {{ rootpw }} -f /tmp/People.ldif
+  when: result.stdout != '0'
+- name: check organizationUnit of ServerAdmin
+  shell: |
+    ldapsearch -x -h localhost -b {{ basedn }} ou=ServerAdmin | grep -q '^dn:'; echo $?
+  register: result
+- name: add organizationalUnit of ServerAdmin
+  command: ldapadd -x -h localhost -D {{ rootdn }} -w {{ rootpw }} -f /tmp/ServerAdmin.ldif
+  when: result.stdout != '0'
+- name: check organizationUnit of Roles
+  shell: |
+    ldapsearch -x -h localhost -b {{ basedn }} ou=Roles | grep -q '^dn:'; echo $?
+  register: result
+- name: add organizationalUnit of Roles
+  command: ldapadd -x -h localhost -D {{ rootdn }} -w {{ rootpw }} -f /tmp/Roles.ldif
+  when: result.stdout != '0'
+- name: check organizationUnit of Domains
+  shell: |
+    ldapsearch -x -h localhost -b {{ basedn }} ou=Domains | grep -q '^dn:'; echo $?
+  register: result
+- name: add organizationalUnit of Domains
+  command: ldapadd -x -h localhost -D {{ rootdn }} -w {{ rootpw }} -f /tmp/Domains.ldif
+  when: result.stdout != '0'
+- name: check organizationUnit of Projects
+  shell: |
+    ldapsearch -x -h localhost -b {{ basedn }} ou=Projects | grep -q '^dn:'; echo $?
+  register: result
+- name: add organizationalUnit of Projects
+  command: ldapadd -x -h localhost -D {{ rootdn }} -w {{ rootpw }} -f /tmp/Projects.ldif
+  when: result.stdout != '0'
+- name: check organizationUnit of ProjectUser
+  shell: |
+    ldapsearch -x -h localhost -b {{ basedn }} ou=ProjectUser | grep -q '^dn:'; echo $?
+  register: result
+- name: add organizationalUnit of ProjectUser
+  command: ldapadd -x -h localhost -D {{ rootdn }} -w {{ rootpw }} -f /tmp/ProjectUser.ldif
+  when: result.stdout != '0'
+- name: check organizationUnit of Groups
+  shell: |
+    ldapsearch -x -h localhost -b {{ basedn }} ou=Groups | grep -q '^dn:'; echo $?
+  register: result
+- name: add organizationalUnit of Groups
+  command: ldapadd -x -h localhost -D {{ rootdn }} -w {{ rootpw }} -f /tmp/Groups.ldif
+  when: result.stdout != '0'

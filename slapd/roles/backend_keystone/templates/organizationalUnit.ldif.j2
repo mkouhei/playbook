@@ -1,0 +1,8 @@
+{% if item.dc %}
+dn: ou={{ item.ou }},dc={{ item.dc }},{{ basedn }}
+{% else %}
+dn: ou={{ item.ou }},{{ basedn }}
+{% endif %}
+objectClass: top
+objectClass: organizationalUnit
+ou: {{ item.ou }}

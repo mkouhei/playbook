@@ -1,6 +1,6 @@
 ---
-- name: purge
-  command: "apt-get -y purge slapd"
+#- name: purge
+#  command: "apt-get -y purge slapd"
 - name: prepare debconf
   template: src=debconf.txt.j2 dest=/tmp/debconf.txt
 - name: set deconf selections

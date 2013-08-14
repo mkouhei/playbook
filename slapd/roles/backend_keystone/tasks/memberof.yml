@@ -1,0 +1,15 @@
+---
+- name: check module of memberof
+  shell: |
+    ldapsearch -Y EXTERNAL -H ldapi:/// -b cn=config | grep olcModuleLoad: | grep -q memberof.la; echo $?
+  register: result
+- name: load module of memberof
+  command: ldapadd -Y EXTERNAL -H ldapi:/// -f /tmp/add_module_memberof.ldif
+  when: result.stdout != '0'
+- name: check overlay of memberof
+  shell: |
+    ldapsearch -Y EXTERNAL -H ldapi:/// -b cn=config | grep olcOverlay: | grep -q memberof; echo $?
+  register: result
+- name: add overlay of memberof
+  command: ldapadd -Y EXTERNAL -H ldapi:/// -f /tmp/add_olcOverlay_memberof.ldif
+  when: result.stdout != '0'
