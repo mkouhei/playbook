@@ -1,0 +1,28 @@
+{% for user in item.users %}
+{% if user.dc %}
+dn: uid={{ user.uid }},ou=ServiceAdmin,dc={{ user.dc }},{{ basedn }}
+{% else %}
+dn: uid={{ user.uid }},ou=People,{{ basedn }}
+{% endif %}
+cn: {{ user.cn }}
+objectClass: inetOrgPerson
+objectClass: posixAccount
+description: default
+{% if user.desc %}
+description: {{ user.desc }}
+businessCategory: {{ user.desc }}
+{% endif %}
+businessCategory: default
+userPassword: {{ user.password }}
+uidNumber: {{ user.uidNumber }}
+gidNumber: {{ user.gidNumber }}
+sn: {{ user.sn }}
+{% if user.homeDirectory %}
+homeDirectory: {{ user.homeDirectory }}
+{% else %}
+homeDirectory: /home/{{ user.uid }}
+{% endif %}
+mail: {{ user.uid }}@{{ slapd_domain }}
+uid: {{ user.uid }}
+
+{% endfor %}
