@@ -1,15 +1,22 @@
 ---
-- name: purge
-  command: "apt-get -y purge keystone python-keystone"
+#- name: purge
+#  command: "apt-get -y purge keystone python-keystone"
+- name: check keystone istall state
+  shell: |
+    COLUMNS=120 dpkg -l keystone 2> /dev/null | grep -q {{ keystone_version }}; echo $?
+  register: result
 - name: prepare debconf
   template: src=debconf.txt.j2 dest=/tmp/debconf.txt
+  when: result.stdout != '0'
 - name: set deconf selections
   command: /usr/bin/debconf-set-selections /tmp/debconf.txt
+  when: result.stdout != '0'
 - name: prepare debpkg files
   copy: src={{ item }} dest=/tmp/
   with_items:
     - python-keystone_{{ keystone_version }}_all.deb
     - keystone_{{ keystone_version }}_all.deb
+  when: result.stdout != '0'
 - name: install
   #apt: pkg=keystone,python-keystone update_cache=yes state=present
   command: "dpkg -i /tmp/{{ item }}"
@@ -18,6 +25,7 @@
   with_items:
     - python-keystone_{{ keystone_version }}_all.deb
     - keystone_{{ keystone_version }}_all.deb
+  when: result.stdout != '0'
 - name: prepare keystone setup
   template: src=keystone.conf.j2 dest=/etc/keystone/keystone.conf backup=yes owner=keystone group=keystone mode=0640
 - name: restart keystone
