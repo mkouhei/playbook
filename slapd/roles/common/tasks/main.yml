@@ -3,10 +3,12 @@
 #  command: "apt-get -y purge slapd"
 - name: prepare debconf
   template: src=debconf.txt.j2 dest=/tmp/debconf.txt
-- name: set deconf selections
+- name: set deconf selections of slapd
   command: /usr/bin/debconf-set-selections /tmp/debconf.txt
-- name: install
-  apt: pkg=slapd,ldap-utils,ldapvi update_cache=yes state=present
+- name: install slapd
+  apt: pkg=slapd update_cache=yes state=present force=yes
+- name: install related packages
+  apt: pkg=ldap-utils,ldapvi update_cache=yes state=present
 - name: prepare slapd setup
   copy: src={{ item }} dest=/tmp/
   with_items:

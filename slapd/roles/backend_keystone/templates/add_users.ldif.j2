@@ -22,7 +22,7 @@ homeDirectory: {{ user.homeDirectory }}
 {% else %}
 homeDirectory: /home/{{ user.uid }}
 {% endif %}
-mail: {{ user.uid }}@{{ slapd_domain }}
+mail: {{ user.uid }}@{{ domain }}
 uid: {{ user.uid }}
 
 {% endfor %}
