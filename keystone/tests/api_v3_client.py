@@ -19,6 +19,7 @@ import requests
 import os.path
 import json
 import ldap
+import ldap.modlist
 
 TIMEOUT = 5.000
 
@@ -114,13 +115,26 @@ class LdapClient(object):
         method = ldap.AUTH_SIMPLE
         self.search_scope = ldap.SCOPE_SUBTREE
         self.search_base = search_base
+        self.ou_base = 'dc=auth,' + search_base
         try:
             self.conn.bind(binddn, bindpw, method)
         except ldap.SERVER_DOWN as e:
             print(e)
 
-    def create_entry(self, payload, target):
-        return self.conn.add_s()
+    def _add_entry(func):
+        def add_entry(self, target_id):
+            target = func.func_name.split('create_')[1] + 's'
+            attrs_d = {'objectClass': ['groupOfNames'],
+                       'description': [target_id],
+                       'businessCategory': [target_id],
+                       'ou': [target_id],
+                       'enabled': ['TRUE'],
+                       'member': ['cn=dumb,dc=noexistent'],
+                       'cn': [target_id]}
+            attrs_l = ldap.modlist.addModlist(attrs_d)
+            entry_dn = 'cn=%s,ou=%s,%s' % (target_id, target, self.ou_base)
+            return self.conn.add_s(entry_dn, attrs_l)
+        return add_entry
 
     def search_entry(self, search_word, target):
         if search_word:
@@ -133,6 +147,10 @@ class LdapClient(object):
 
     def delete_entry(self, search_word, target):
         return self.conn.delete_s(self.search_entry(search_word, target)[0][0])
+
+    @_add_entry
+    def create_domain(self, target_id):
+        pass
 
 
 def _list(func):

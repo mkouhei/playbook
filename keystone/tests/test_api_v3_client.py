@@ -311,9 +311,9 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_create_domain_via_ldap(self):
         """ OK """
-        res = self.l.create_entry(v.default_domain_name, 'domain')
-        self.assertEqual(201, res.status_code)
-        self.l.delete_entry(v.default_domain_name, 'domains')
+        res = self.l.create_domain(target_id=v.net_domain_name)
+        self.assertTupleEqual((105, []), res)
+        self.l.delete_entry(v.net_domain_name, 'domains')
 
     def test_search_entry(self):
         """ OK """
@@ -865,44 +865,13 @@ class ApiV3ClientTests(unittest.TestCase):
     def test_authenticate(self):
         # domain id must be same businessCategory
         # and be unique name and not using uuid
-        '''
-        print 1, self.k.create_domain(v.default_domain_name).json()
-        print 2, self.k.create_group(v.default_group_name,
-                                     domain_name=v.default_domain_name)
-        print 3, self.k.add_user_to_group(v.admin_userid,
-                                          group_name=v.default_group_name)
-        print 4, self.k.list_domains()
-        '''
-        """
-        res = self.k.create_domain(v.net_domain_name).json()
-        domain_id = res.get('domain').get('id')
+        self.l.create_domain(v.net_domain_name)
         self.k.create_group(v.default_group_name,
                             domain_name=v.net_domain_name)
-        self.k.add_user_to_group(v.user01_userid,
+        self.k.add_user_to_group(v.admin_userid,
                                  group_name=v.default_group_name)
-                                 """
-        # not implemented
-        """
         self.k.authenticate(v.user01_userid,
                             v.user01_password,
-                            v.net_domain_name,
-                            v.default_project_name).json()
-                            """
-        #print 5, self.k.show_users(target_id=v.user01_userid).json()
-        #print
-        #print 6, self.k.authenticate(v.admin_userid,
-        #v.admin_password,
-        domain_id = '7854700ba38f4c6d8cf9ad226e206821'
-        print 6, self.k.authenticate(v.user01_userid,
-                                     v.user01_password,
-                                     domain_id).json()
-        #self.k.delete_groups(target_name=v.default_group_name)
-        #self.l.delete_entry(v.default_domain_name, 'domains')
-        """
-        print self.k.authenticate(v.user01_userid,
-                                  v.user01_password,
-                                  v.net_domain_name).json()
+                            v.net_domain_name).json()
         self.k.delete_groups(target_name=v.default_group_name)
         self.l.delete_entry(v.net_domain_name, 'domains')
-        """
-        self.assertTrue(False)
