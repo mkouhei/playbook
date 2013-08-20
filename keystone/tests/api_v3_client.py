@@ -119,6 +119,9 @@ class LdapClient(object):
         except ldap.SERVER_DOWN as e:
             print(e)
 
+    def create_entry(self, payload, target):
+        return self.conn.add_s()
+
     def search_entry(self, search_word, target):
         if search_word:
             search_filter = '(ou=%s)' % search_word
@@ -429,10 +432,22 @@ class ApiV3Client(object):
         """
         url = self._set_api_url('auth/tokens')
         headers = {'Content-Type': 'application/json'}
+        '''
         payload = set_auth_payload(userid=userid,
                                    password=password,
                                    domain_name=domain_name,
                                    project_name=project_name)
+                                   '''
+        payload = {
+            "auth": {
+                "identity": {
+                    "methods": ["password"],
+                    "password": {
+                        "user": {
+                            "domain": {
+                                "id": domain_name},
+                            "id": userid,
+                            "password": password}}}}}
         r = requests.post(url, headers=headers, data=json.dumps(payload),
                           timeout=TIMEOUT, verify=self.verify)
         return r
@@ -631,6 +646,7 @@ class ApiV3Client(object):
 
     def create_domain(self, domain_name):
         """Create domain
+           But must not use this method, domain_id
 
         Argument:
             domain_name:
