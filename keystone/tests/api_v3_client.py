@@ -470,9 +470,11 @@ class ApiV3Client(object):
                           timeout=TIMEOUT, verify=self.verify)
         return r
 
-    def validate_token(self, subject_token):
+    def validate_token(self, subject_token, admin_token=None):
         url = self._set_api_url('auth/tokens')
-        headers = {'X-Auth-Token': self.admin_token,
+        if admin_token is None:
+            admin_token = self.admin_token
+        headers = {'X-Auth-Token': admin_token,
                    'X-Subject-Token': subject_token}
         r = requests.get(url, headers=headers,
                          timeout=TIMEOUT, verify=self.verify)

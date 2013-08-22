@@ -929,3 +929,30 @@ class ApiV3ClientTests(unittest.TestCase):
                         in res.get('error').get('message'))
         self.k.delete_groups(target_name=v.default_group_name)
         self.l.delete_entry(v.net_domain_name, 'domains')
+
+    def test_validate_token_with_adminuser(self):
+        # domain id must be same businessCategory
+        # and be unique name and not using uuid
+        """
+        self.l.create_domain(v.net_domain_name)
+        self.l.create_domain(v.default_domain_name)
+        self.k.create_group(v.default_group_name,
+                            domain_name=v.net_domain_name)
+        self.k.add_user_to_group(v.user01_userid,
+                                 group_name=v.default_group_name)
+                                 """
+        res = self.k.authenticate(v.user01_userid,
+                                  v.user01_password,
+                                  v.net_domain_name)
+        subject_token = res.headers.get('x-subject-token')
+        res = self.k.authenticate(v.admin_userid,
+                                  v.admin_password,
+                                  v.default_domain_name)
+        admin_token = res.headers.get('x-subject-token')
+        res = self.k.validate_token(subject_token,
+                                    admin_token=admin_token).json()
+        print res
+        #self.k.delete_groups(target_name=v.default_group_name)
+        #self.l.delete_entry(v.net_domain_name, 'domains')
+        #self.l.delete_entry(v.default_domain_name, 'domains')
+        self.assertTrue(False)
