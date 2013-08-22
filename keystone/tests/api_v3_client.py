@@ -486,6 +486,14 @@ class ApiV3Client(object):
                           timeout=TIMEOUT, verify=self.verify)
         return r
 
+    def revoke_token(self, subject_token):
+        url = self._set_api_url('auth/tokens')
+        headers = {'X-Auth-Token': self.admin_token,
+                   'X-Subject-Token': subject_token}
+        r = requests.delete(url, headers=headers,
+                            timeout=TIMEOUT, verify=self.verify)
+        return r
+
     def create_service(self, service_type):
         """create service
 
