@@ -233,7 +233,7 @@ class ApiV3ClientTests(unittest.TestCase):
         res = self.k.create_credentials(v.user01_userid,
                                         v.credential_type,
                                         project_id,
-                                        json.dumps(v.credential_blob))
+                                        v.credential_blob)
         #self.assertEqual(201, res.status_code)
         self.assertEqual(501, res.status_code)
         #self.delete_credential(target_id=credential_id)
@@ -812,10 +812,10 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_create_policies(self):
         """ OK """
-        res = self.k.create_policies(json.dumps(v.policy_blob),
+        res = self.k.create_policies(v.policy_blob,
                                      v.policy_mimetype)
         self.assertEqual(201, res.status_code)
-        self.k.delete_policies(target_blob=json.dumps(v.policy_blob))
+        self.k.delete_policies(target_blob=v.policy_blob)
 
     def test_list_policies_none(self):
         """ OK """
@@ -824,21 +824,18 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_list_policies(self):
         """ OK """
-        self.k.create_policies(json.dumps(v.policy_blob),
+        self.k.create_policies(v.policy_blob,
                                v.policy_mimetype)
-        self.k.create_policies(json.dumps(v.policy_blob2),
+        self.k.create_policies(v.policy_blob2,
                                v.policy_mimetype)
         res = self.k.list_policies()
         self.assertEqual(2, len(res.get('policies')))
-        self.k.delete_policies(target_blob=json.dumps(v.policy_blob))
-        self.k.delete_policies(target_blob=json.dumps(v.policy_blob2))
+        self.k.delete_policies(target_blob=v.policy_blob)
+        self.k.delete_policies(target_blob=v.policy_blob2)
 
-    '''
-    def test_list_policies_by_regular_user(self):
+    def test_list_policies_by_member(self):
         """ OK """
-        self.k.create_policies(json.dumps(v.policy_blob),
-                               v.policy_mimetype)
-        self.k.create_policies(json.dumps(v.policy_blob2),
+        self.k.create_policies(v.policy_blob3,
                                v.policy_mimetype)
         self.l.create_domain(v.net_domain_name)
         res = self.k.authenticate(v.user01_userid,
@@ -846,38 +843,36 @@ class ApiV3ClientTests(unittest.TestCase):
                                   v.net_domain_name)
         token = res.headers.get('x-subject-token')
         #res = self.k.list_policies(token=token)
+        res = self.k.list_policies()
         print res
-        self.k.delete_policies(target_blob=json.dumps(v.policy_blob))
-        self.k.delete_policies(target_blob=json.dumps(v.policy_blob2))
+        self.k.delete_policies(target_blob=v.policy_blob3)
         self.l.delete_entry(v.net_domain_name, 'domains')
-        #self.assertTrue(False)
-        '''
 
     def test_show_policies(self):
         """ OK """
-        self.k.create_policies(json.dumps(v.policy_blob),
+        self.k.create_policies(v.policy_blob,
                                v.policy_mimetype)
-        res = self.k.show_policies(target_blob=json.dumps(v.policy_blob))
+        res = self.k.show_policies(target_blob=v.policy_blob)
         self.assertEqual(200, res.status_code)
-        self.k.delete_policies(target_blob=json.dumps(v.policy_blob))
+        self.k.delete_policies(target_blob=v.policy_blob)
 
     def test_update_policies(self):
         """ OK """
-        self.k.create_policies(json.dumps(v.policy_blob),
+        self.k.create_policies(v.policy_blob,
                                v.policy_mimetype)
-        res = self.k.show_policies(target_blob=json.dumps(v.policy_blob))
+        res = self.k.show_policies(target_blob=v.policy_blob)
         payload = res.json()
         policy_id = payload.get('policy').get('id')
-        payload['policy']['blob'] = json.dumps(v.policy_blob2)
+        payload['policy']['blob'] = v.policy_blob2
         res = self.k.update_policies(target_id=policy_id, payload=payload)
         self.assertEqual(200, res.status_code)
         self.k.delete_policies(target_id=policy_id)
 
     def test_delete_policies(self):
         """ OK """
-        self.k.create_policies(json.dumps(v.policy_blob),
+        self.k.create_policies(v.policy_blob,
                                v.policy_mimetype)
-        res = self.k.show_policies(target_blob=json.dumps(v.policy_blob))
+        res = self.k.show_policies(target_blob=v.policy_blob)
         policy_id = res.json().get('policy').get('id')
         res = self.k.delete_policies(target_id=policy_id)
         self.assertEqual(204, res.status_code)

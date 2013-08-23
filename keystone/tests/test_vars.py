@@ -98,6 +98,8 @@ admin_role_name = 'admin'
 member_role_name = 'member'
 credential_type = 'ec2'
 credential_blob = {'access': 'hogehoge', 'secret': 'mogemoge'}
-policy_blob = {"default": [["rule:admin_required"]]}
-policy_blob2 = {"identity:get_service": [["rule:admin_required"]]}
+policy_blob = {"member": ""}
+policy_blob2 = {"identity:list_policies": [["rule:member"]]}
+policy_blob3 = {"member": [],
+                "identity:list_policies": [["rule:member"]]}
 policy_mimetype = 'application/json'
