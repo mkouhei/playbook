@@ -833,6 +833,26 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_policies(target_blob=json.dumps(v.policy_blob))
         self.k.delete_policies(target_blob=json.dumps(v.policy_blob2))
 
+    '''
+    def test_list_policies_by_regular_user(self):
+        """ OK """
+        self.k.create_policies(json.dumps(v.policy_blob),
+                               v.policy_mimetype)
+        self.k.create_policies(json.dumps(v.policy_blob2),
+                               v.policy_mimetype)
+        self.l.create_domain(v.net_domain_name)
+        res = self.k.authenticate(v.user01_userid,
+                                  v.user01_password,
+                                  v.net_domain_name)
+        token = res.headers.get('x-subject-token')
+        #res = self.k.list_policies(token=token)
+        print res
+        self.k.delete_policies(target_blob=json.dumps(v.policy_blob))
+        self.k.delete_policies(target_blob=json.dumps(v.policy_blob2))
+        self.l.delete_entry(v.net_domain_name, 'domains')
+        #self.assertTrue(False)
+        '''
+
     def test_show_policies(self):
         """ OK """
         self.k.create_policies(json.dumps(v.policy_blob),

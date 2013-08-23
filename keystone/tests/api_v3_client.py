@@ -155,12 +155,16 @@ class LdapClient(object):
 
 def _list(func):
     """list organizationalUnit"""
-    def list_objects(self, *args):
+    def list_objects(self, *args, **kwargs):
         target = (func.func_name.split('list_')[1],)
         if args:
             target += args
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+        else:
+            token = self.admin_token
         url = self._set_api_url_with_tuple(target)
-        headers = {'X-Auth-Token': self.admin_token}
+        headers = {'X-Auth-Token': token}
         r = requests.get(url, headers=headers,
                          timeout=TIMEOUT, verify=self.verify)
         return r.json()
@@ -169,29 +173,40 @@ def _list(func):
 
 def _show(func):
     """show target"""
-    def show_object(self, target_id=None, target_name=None,
-                    target_type=None, target_blob=None):
+    def show_object(self, **kwargs):
         """
 
         Arguments:
+
             target_id:
             target_name:
             target_type:
             target_blob:
+            token:
 
         """
         target = func.func_name.split('show_')[1]
-        if target_type:
+        if kwargs.get('target_type'):
             target_id = retrieve_id_by_type(self.list_target(target),
-                                            target_type, target)
-        elif target_name:
+                                            kwargs.get('target_type'),
+                                            target)
+        elif kwargs.get('target_name'):
             target_id = retrieve_id_by_name(self.list_target(target),
-                                            target_name, target)
-        elif target_blob:
+                                            kwargs.get('target_name'),
+                                            target)
+        elif kwargs.get('target_blob'):
             target_id = retrieve_id_by_blob(self.list_target(target),
-                                            target_blob, target)
+                                            kwargs.get('target_blob'),
+                                            target)
+        elif kwargs.get('target_id'):
+            target_id = kwargs.get('target_id')
         url = self._set_api_url(target, target_id)
-        headers = {'X-Auth-Token': self.admin_token}
+
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+        else:
+            token = self.admin_token
+        headers = {'X-Auth-Token': token}
         r = requests.get(url, headers=headers,
                          timeout=TIMEOUT, verify=self.verify)
         return r
@@ -200,29 +215,40 @@ def _show(func):
 
 def _delete(func):
     """delete target"""
-    def delete_object(self, target_id=None, target_name=None,
-                      target_type=None, target_blob=None):
+    def delete_object(self, **kwargs):
         """
 
         Arguments:
+
             target:
             target_id:
             target_name:
             target_blob:
+            token:
 
         """
         target = func.func_name.split('delete_')[1]
-        if target_type:
+        if kwargs.get('target_type'):
             target_id = retrieve_id_by_type(self.list_target(target),
-                                            target_type, target)
-        elif target_name:
+                                            kwargs.get('target_type'),
+                                            target)
+        elif kwargs.get('target_name'):
             target_id = retrieve_id_by_name(self.list_target(target),
-                                            target_name, target)
-        elif target_blob:
+                                            kwargs.get('target_name'),
+                                            target)
+        elif kwargs.get('target_blob'):
             target_id = retrieve_id_by_blob(self.list_target(target),
-                                            target_blob, target)
+                                            kwargs.get('target_blob'),
+                                            target)
+        elif kwargs.get('target_id'):
+            target_id = kwargs.get('target_id')
         url = self._set_api_url(target, target_id)
-        headers = {'X-Auth-Token': self.admin_token}
+
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+        else:
+            token = self.admin_token
+        headers = {'X-Auth-Token': token}
         r = requests.delete(url, headers=headers,
                             timeout=TIMEOUT, verify=self.verify)
         return r
@@ -230,19 +256,42 @@ def _delete(func):
 
 
 def _update(func):
-    def update_object(self, target_id=None, target_name=None,
-                      target_type=None, payload=None):
+    """ update target """
+    def update_object(self, **kwargs):
+        """
+
+        Arguments:
+            target_id:
+            target_name:
+            token:
+
+        """
+
         target = func.func_name.split('update_')[1]
-        if target_type:
+        if kwargs.get('target_type'):
             target_id = retrieve_id_by_type(self.list_target(target),
-                                            target_type, target)
-        elif target_name:
+                                            kwargs.get('target_type'),
+                                            target)
+        elif kwargs.get('target_name'):
             target_id = retrieve_id_by_name(self.list_target(target),
-                                            target_name, target)
+                                            kwargs.get('target_name'),
+                                            target)
+        elif kwargs.get('target_id'):
+            target_id = kwargs.get('target_id')
+
         url = self._set_api_url(target, target_id)
-        print url
-        headers = {'X-Auth-Token': self.admin_token,
+
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+        else:
+            token = self.admin_token
+        headers = {'X-Auth-Token': token,
                    'Content-Type': 'application/json'}
+
+        if kwargs.get('payload'):
+            payload = kwargs.get('payload')
+        else:
+            payload = None
         r = requests.patch(url, headers=headers, data=json.dumps(payload),
                            timeout=TIMEOUT, verify=self.verify)
         return r
@@ -251,9 +300,7 @@ def _update(func):
 
 def _grant_role(func):
     """grant role to <user|group> on <domain|project>"""
-    def grant_role(self, role_id=None, role_name=None,
-                   target_id=None, target_name=None,
-                   ou_id=None, ou_name=None):
+    def grant_role(self, **kwargs):
         """
 
         Arguments:
@@ -261,24 +308,41 @@ def _grant_role(func):
             target_name:
             ou_id:
             ou_name:
+            token:
 
         """
         target = func.func_name.split('grant_role_')[1].split('_')[0] + 's'
-        if target_name:
+        if kwargs.get('target_name'):
             target_id = retrieve_id_by_name(self.list_target(target),
-                                            target_name, target)
+                                            kwargs.get('target_name'),
+                                            target)
+        elif kwargs.get('target_id'):
+            target_id = kwargs.get('target_id')
+
         ou_target = func.func_name.split('_on_')[1] + 's'
-        if ou_name:
+        if kwargs.get('ou_name'):
             ou_id = retrieve_id_by_name(self.list_target(ou_target),
-                                        ou_name, ou_target)
-        if role_name:
+                                        kwargs.get('ou_name'),
+                                        ou_target)
+        elif kwargs.get('ou_id'):
+            ou_id = kwargs.get('ou_id')
+
+        if kwargs.get('role_name'):
             role_id = retrieve_id_by_name(self.list_target('roles'),
-                                          role_name, 'roles')
+                                          kwargs.get('role_name'),
+                                          'roles')
+        elif kwargs.get('role_id'):
+            role_id = kwargs.get('role_id')
 
         url = self._set_api_url(ou_target, ou_id,
                                 target, target_id,
                                 'roles', role_id)
-        headers = {'X-Auth-Token': self.admin_token}
+
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+        else:
+            token = self.admin_token
+        headers = {'X-Auth-Token': token}
         r = requests.put(url, headers=headers,
                          timeout=TIMEOUT, verify=self.verify)
         return r
@@ -287,29 +351,43 @@ def _grant_role(func):
 
 def _list_grants(func):
     """list roles to <user|group> on <domain|project>"""
-    def list_grants(self, target_id=None, target_name=None,
-                    ou_id=None, ou_name=None):
+    def list_grants(self, **kwargs):
         """
 
         Arguments:
+
             target_id:
             target_name:
             ou_id:
             ou_name:
+            token:
 
         """
         target = func.func_name.split('list_roles_')[1].split('_')[0] + 's'
-        if target_name:
+
+        if kwargs.get('target_name'):
             target_id = retrieve_id_by_name(self.list_target(target),
-                                            target_name, target)
+                                            kwargs.get('target_name'),
+                                            target)
+        elif kwargs.get('target_id'):
+            target_id = kwargs.get('target_id')
+
         ou_target = func.func_name.split('_on_')[1] + 's'
-        if ou_name:
+        if kwargs.get('ou_name'):
             ou_id = retrieve_id_by_name(self.list_target(ou_target),
-                                        ou_name, ou_target)
+                                        kwargs.get('ou_name'),
+                                        ou_target)
+        elif kwargs.get('ou_id'):
+            ou_id = kwargs.get('ou_id')
 
         url = self._set_api_url(ou_target, ou_id,
                                 target, target_id, 'roles')
-        headers = {'X-Auth-Token': self.admin_token}
+
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+        else:
+            token = self.admin_token
+        headers = {'X-Auth-Token': token}
         r = requests.get(url, headers=headers,
                          timeout=TIMEOUT, verify=self.verify)
         return r
@@ -318,36 +396,53 @@ def _list_grants(func):
 
 def _check_grant(func):
     """check <user|group> has role on <project|domain>"""
-    def check_grant(self, target_id=None, target_name=None,
-                    ou_id=None, ou_name=None,
-                    role_id=None, role_name=None):
+    def check_grant(self, **kwargs):
         """
 
         Arguments:
+
             target_id:
             target_name:
             ou_id:
             ou_name:
             role_id:
             role_name:
+            token:
+
         """
         target = func.func_name.split('check_')[1].split('_')[0] + 's'
 
-        if target_name:
+        if kwargs.get('target_name'):
             target_id = retrieve_id_by_name(self.list_target(target),
-                                            target_name, target)
+                                            kwargs.get('target_name'),
+                                            target)
+        elif kwargs.get('target_id'):
+            target_id = kwargs.get('target_id')
+
         ou_target = func.func_name.split('_on_')[1] + 's'
-        if ou_name:
+        if kwargs.get('ou_name'):
             ou_id = retrieve_id_by_name(self.list_target(ou_target),
-                                        ou_name, ou_target)
-        if role_name:
+                                        kwargs.get('ou_name'),
+                                        ou_target)
+        elif kwargs.get('ou_id'):
+            ou_id = kwargs.get('ou_id')
+
+        if kwargs.get('role_name'):
             role_id = retrieve_id_by_name(self.list_target('roles'),
-                                          role_name, 'roles')
+                                          kwargs.get('role_name'),
+                                          'roles')
+        elif kwargs.get('role_id'):
+            role_id = kwargs.get('role_id')
 
         url = self._set_api_url(ou_target, ou_id,
                                 target, target_id,
                                 'roles', role_id)
-        headers = {'X-Auth-Token': self.admin_token}
+
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+        else:
+            token = self.admin_token
+        headers = {'X-Auth-Token': token}
         r = requests.head(url, headers=headers,
                           timeout=TIMEOUT, verify=self.verify)
         return r
@@ -356,9 +451,7 @@ def _check_grant(func):
 
 def _revoke_grant(func):
     """revoke role from <user|group> on <project|domain>"""
-    def revoke_grant(self, target_id=None, target_name=None,
-                     ou_id=None, ou_name=None,
-                     role_id=None, role_name=None):
+    def revoke_grant(self, **kwargs):
         """
 
         Arguments:
@@ -368,25 +461,42 @@ def _revoke_grant(func):
             ou_name:
             role_id:
             role_name:
+            token:
         """
         target = (func.func_name.split('revoke_role_from_')[1].split('_')[0]
                   + 's')
 
-        if target_name:
+        if kwargs.get('target_name'):
             target_id = retrieve_id_by_name(self.list_target(target),
-                                            target_name, target)
+                                            kwargs.get('target_name'),
+                                            target)
+        elif kwargs.get('target_id'):
+            target_id = kwargs.get('target_id')
+
         ou_target = func.func_name.split('_on_')[1] + 's'
-        if ou_name:
+        if kwargs.get('ou_name'):
             ou_id = retrieve_id_by_name(self.list_target(ou_target),
-                                        ou_name, ou_target)
-        if role_name:
+                                        kwargs.get('ou_name'),
+                                        ou_target)
+        elif kwargs.get('ou_id'):
+            ou_id = kwargs.get('ou_id')
+
+        if kwargs.get('role_name'):
             role_id = retrieve_id_by_name(self.list_target('roles'),
-                                          role_name, 'roles')
+                                          kwargs.get('role_name'),
+                                          'roles')
+        elif kwargs.get('role_id'):
+            role_id = kwargs.get('role_id')
 
         url = self._set_api_url(ou_target, ou_id,
                                 target, target_id,
                                 'roles', role_id)
-        headers = {'X-Auth-Token': self.admin_token}
+
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+        else:
+            token = self.admin_token
+        headers = {'X-Auth-Token': token}
         r = requests.delete(url, headers=headers,
                             timeout=TIMEOUT, verify=self.verify)
         return r
@@ -408,25 +518,25 @@ class ApiV3Client(object):
         self.verify = verify
         self.region = region
 
-    def _set_api_url(self, *kwards):
+    def _set_api_url(self, *kwargs):
         """return api url
 
         Arguments:
-            *kwards:
+            *kwargs:
         """
         url = self.base_url
-        for i in kwards:
+        for i in kwargs:
             url = os.path.join(url, i)
         return url
 
-    def _set_api_url_with_tuple(self, kwards):
+    def _set_api_url_with_tuple(self, kwargs):
         """return api url
 
         Arguments:
-            *kwards:
+            *kwargs:
         """
         url = self.base_url
-        for i in kwards:
+        for i in kwargs:
             url = os.path.join(url, i)
         return url
 
