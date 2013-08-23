@@ -28,8 +28,9 @@
   when: result.stdout != '0'
 - name: prepare keystone setup
   template: src=keystone.conf.j2 dest=/etc/keystone/keystone.conf backup=yes owner=keystone group=keystone mode=0640
-- name: restart keystone
-  service: name=keystone state=restarted
+- name: rewrite policy.json
+  copy: src=policy.json_custom dest=/etc/keystone/policy.json backup=yes owner=root group=root mode=0644
+  notify: restart keystone
 - name: cleanup temporary files
   command: rm -f /tmp/{{ item }}
   with_items:
