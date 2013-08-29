@@ -565,12 +565,11 @@ class ApiV3Client(object):
         """
         url = self._set_api_url('auth/tokens')
         headers = {'Content-Type': 'application/json'}
-        '''
         payload = set_auth_payload(userid=userid,
                                    password=password,
                                    domain_name=domain_name,
                                    project_name=project_name)
-                                   '''
+        '''
         payload = {
             "auth": {
                 "identity": {
@@ -581,6 +580,7 @@ class ApiV3Client(object):
                                 "id": domain_name},
                             "id": userid,
                             "password": password}}}}}
+                            '''
         r = requests.post(url, headers=headers, data=json.dumps(payload),
                           timeout=TIMEOUT, verify=self.verify)
         return r
@@ -1050,3 +1050,14 @@ class ApiV3Client(object):
     @_update
     def update_policies(self):
         pass
+
+    def get_role_assginments(self, **kwargs):
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+        else:
+            token = self.admin_token
+        url = self._set_api_url_with_tuple(('role_assignments',))
+        headers = {'X-Auth-Token': token}
+        r = requests.get(url, headers=headers,
+                         timeout=TIMEOUT, verify=self.verify)
+        return r.json()

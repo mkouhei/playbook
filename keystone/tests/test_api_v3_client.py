@@ -786,7 +786,8 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_list_effective_role_assignments(self):
         """ not yet tested """
-        pass
+        print self.k.get_role_assginments()
+        #self.assertTrue(False)
 
     def test_create_policies(self):
         """ OK """
@@ -818,7 +819,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.l.create_domain(v.net_domain_name)
         res = self.k.authenticate(v.user01_userid,
                                   v.user01_password,
-                                  v.net_domain_name)
+                                  domain_name=v.net_domain_name)
         token = res.headers.get('x-subject-token')
         #res = self.k.list_policies(token=token)
         res = self.k.list_policies()
@@ -865,7 +866,7 @@ class ApiV3ClientTests(unittest.TestCase):
                                  group_name=v.default_group_name)
         res = self.k.authenticate(v.user01_userid,
                                   v.user01_password,
-                                  v.net_domain_name)
+                                  domain_name=v.net_domain_name)
         self.assertEqual(201, res.status_code)
         self.assertEqual(32, len(res.headers.get('x-subject-token')))
         self.k.delete_groups(target_name=v.default_group_name)
@@ -881,7 +882,7 @@ class ApiV3ClientTests(unittest.TestCase):
                                  group_name=v.default_group_name)
         res = self.k.authenticate(v.user01_userid,
                                   v.user01_password,
-                                  v.net_domain_name)
+                                  domain_name=v.net_domain_name)
         subject_token = res.headers.get('x-subject-token')
         self.assertEqual(200, self.k.validate_token(subject_token).status_code)
         self.k.delete_groups(target_name=v.default_group_name)
@@ -897,7 +898,7 @@ class ApiV3ClientTests(unittest.TestCase):
                                  group_name=v.default_group_name)
         res = self.k.authenticate(v.user01_userid,
                                   v.user01_password,
-                                  v.net_domain_name)
+                                  domain_name=v.net_domain_name)
         subject_token = res.headers.get('x-subject-token')
         self.assertEqual(204, self.k.check_token(subject_token).status_code)
         self.k.delete_groups(target_name=v.default_group_name)
@@ -913,42 +914,62 @@ class ApiV3ClientTests(unittest.TestCase):
                                  group_name=v.default_group_name)
         res = self.k.authenticate(v.user01_userid,
                                   v.user01_password,
-                                  v.net_domain_name)
+                                  domain_name=v.net_domain_name)
         subject_token = res.headers.get('x-subject-token')
         self.assertEqual(200,
                          self.k.validate_token(subject_token).status_code)
         res = self.k.revoke_token(subject_token)
         self.assertEqual(204, res.status_code)
         res = self.k.validate_token(subject_token).json()
-        #self.assertTrue('Could not find token'
-        #                in res.get('error').get('message'))
-        self.assertTrue('The request you have made requires authentication'
+        self.assertTrue('Could not find token'
                         in res.get('error').get('message'))
+        #self.assertTrue('The request you have made requires authentication'
+        #                in res.get('error').get('message'))
         self.k.delete_groups(target_name=v.default_group_name)
         self.l.delete_entry(v.net_domain_name, 'domains')
 
-    """
-    def test_validate_token_with_adminuser(self):
+    def test_authenticate_with_adminuser(self):
+        # not OK
         # domain id must be same businessCategory
-        # and be unique name and not using uuid
+        # and be unique name and not using uuid.
+
+        # authenticate() arguments
+        # -> both project_name and domain_name is not implemented.
+        # -> project_name only is either malformed or otherwise incorrect.
+        # -> domain_name only is not authorized to perform the requested action
+
+        # for member user
         self.l.create_domain(v.net_domain_name)
-        self.l.create_domain(v.default_domain_name)
-        self.k.create_group(v.default_group_name,
-                            domain_name=v.net_domain_name)
-        self.k.add_user_to_group(v.user01_userid,
-                                 group_name=v.default_group_name)
         res = self.k.authenticate(v.user01_userid,
                                   v.user01_password,
-                                  v.net_domain_name)
-        subject_token = res.headers.get('x-subject-token')
+                                  domain_name=v.net_domain_name)
+        token_user01 = res.headers.get('x-subject-token')
+        print 1, token_user01
+
+        # for admin user
+        self.k.create_project(v.default_project_name,
+                              domain_name=v.net_domain_name)
+        self.k.create_role(v.admin_role_name)
+
+        self.k.grant_role_user_on_project(ou_name=v.default_project_name,
+                                          target_id=v.admin_userid,
+                                          role_name=v.admin_role_name)
+
+        self.k.grant_role_user_on_domain(ou_name=v.net_domain_name,
+                                         target_id=v.admin_userid,
+                                         role_name=v.admin_role_name)
         res = self.k.authenticate(v.admin_userid,
-                                  v.admin_password,
-                                  v.default_domain_name)
-        admin_token = res.headers.get('x-subject-token')
-        res = self.k.validate_token(subject_token,
-                                    admin_token=admin_token).json()
-        print res
-        self.k.delete_groups(target_name=v.default_group_name)
+                                  v.user01_password,
+                                  #project_name=v.default_project_name)
+                                  domain_name=v.net_domain_name)
+        print 2, res.json()
+        token_admin = res.headers.get('x-subject-token')
+        print 3, token_admin
+        res = self.k.validate_token(token_user01, admin_token=token_admin)
+        print 4, res.headers, res.json()
+        self.assertEqual(200, res.status_code)
+        #self.assertEqual(403, res.status_code)
+        self.assertEqual(32, len(res.headers.get('x-subject-token')))
+        self.k.delete_roles(target_name=v.admin_role_name)
+        self.l.delete_entry(v.default_project_name, 'projects')
         self.l.delete_entry(v.net_domain_name, 'domains')
-        self.l.delete_entry(v.default_domain_name, 'domains')
-        """
