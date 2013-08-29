@@ -311,7 +311,7 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_create_domain_via_ldap(self):
         """ OK """
-        res = self.l.create_domain(target_id=v.net_domain_name)
+        res = self.l.create_domain(target_name=v.net_domain_name)
         self.assertTupleEqual((105, []), res)
         self.l.delete_entry(v.net_domain_name, 'domains')
 

@@ -122,12 +122,17 @@ class LdapClient(object):
             print(e)
 
     def _add_entry(func):
-        def add_entry(self, target_id):
+        def add_entry(self, target_name):
             target = func.func_name.split('create_')[1] + 's'
+            if target == 'domains':
+                target_id = target_name
+            if self.search_entry(target_name, target):
+                raise ldap.ALREADY_EXIST('%s: "%s" is already existed.'
+                                         % (target, target_name))
             attrs_d = {'objectClass': ['groupOfNames'],
-                       'description': [target_id],
+                       'description': [target_name],
                        'businessCategory': [target_id],
-                       'ou': [target_id],
+                       'ou': [target_name],
                        'enabled': ['TRUE'],
                        'member': ['cn=dumb,dc=noexistent'],
                        'cn': [target_id]}
