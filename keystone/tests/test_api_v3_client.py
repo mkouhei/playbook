@@ -928,15 +928,20 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_groups(target_name=v.default_group_name)
         self.l.delete_entry(v.net_domain_name, 'domains')
 
-    def test_authenticate_with_adminuser(self):
+    def test_authenticate_with_adminuser_over_crossdomain(self):
         # not OK
         # domain id must be same businessCategory
         # and be unique name and not using uuid.
 
-        # authenticate() arguments
-        # -> both project_name and domain_name is not implemented.
-        # -> project_name only is either malformed or otherwise incorrect.
-        # -> domain_name only is not authorized to perform the requested action
+        # authenticate() arguments of admin user
+        # without both: authenticate is OK, validate is not authorized.
+        #    -> must fix validate byself.
+        # project_name and domain_name: is not implemented.
+        #    -> must fix byself.
+        # project_name only: Expecting to find domain in project.
+        #    -> require project and domain.
+        # domain_name only: authenticate is OK, validate is not authorized.
+        #    -> must fix validate byself.
 
         # for member user
         self.l.create_domain(v.net_domain_name)
@@ -945,31 +950,109 @@ class ApiV3ClientTests(unittest.TestCase):
                                   domain_name=v.net_domain_name)
         token_user01 = res.headers.get('x-subject-token')
         print 1, token_user01
+        print
 
         # for admin user
+        self.l.create_domain(v.default_domain_name)
         self.k.create_project(v.default_project_name,
-                              domain_name=v.net_domain_name)
+                              domain_name=v.default_domain_name)
         self.k.create_role(v.admin_role_name)
 
         self.k.grant_role_user_on_project(ou_name=v.default_project_name,
                                           target_id=v.admin_userid,
                                           role_name=v.admin_role_name)
 
-        self.k.grant_role_user_on_domain(ou_name=v.net_domain_name,
+        self.k.grant_role_user_on_domain(ou_name=v.default_domain_name,
                                          target_id=v.admin_userid,
                                          role_name=v.admin_role_name)
         res = self.k.authenticate(v.admin_userid,
-                                  v.user01_password,
-                                  #project_name=v.default_project_name)
-                                  domain_name=v.net_domain_name)
+                                  v.admin_password,
+                                  #project_name=v.default_project_name,
+                                  domain_name=v.default_domain_name)
         print 2, res.json()
+        print
         token_admin = res.headers.get('x-subject-token')
         print 3, token_admin
+        print
         res = self.k.validate_token(token_user01, admin_token=token_admin)
-        print 4, res.headers, res.json()
-        self.assertEqual(200, res.status_code)
+        print 4, res.headers
+        print 5, res.json()
+        print
+        #self.assertEqual(200, res.status_code)
         #self.assertEqual(403, res.status_code)
-        self.assertEqual(32, len(res.headers.get('x-subject-token')))
+        #self.assertEqual(32, len(res.headers.get('x-subject-token')))
         self.k.delete_roles(target_name=v.admin_role_name)
         self.l.delete_entry(v.default_project_name, 'projects')
         self.l.delete_entry(v.net_domain_name, 'domains')
+        self.l.delete_entry(v.default_domain_name, 'domains')
+        self.assertTrue(False)
+
+    def test_authenticate_with_adminuser_in_samedomain(self):
+        # not OK
+        # domain id must be same businessCategory
+        # and be unique name and not using uuid.
+
+        # authenticate() arguments of admin user
+        # without both: authenticate is OK, validate is not authorized.
+        #    -> must fix validate byself.
+        # project_name and domain_name:
+        #    -> I'd implemented get_domain_by_name().
+        #    -> authenticate is OK, validate is not authorized.
+        # project_name only: Expecting to find domain in project.
+        #    -> require project and domain.
+        # domain_name only: authenticate is OK, validate is not authorized.
+        #    -> must fix validate byself.
+
+        # for member user
+        self.k.create_role(v.member_role_name)
+
+        self.l.create_domain(v.net_domain_name)
+        self.k.create_project(v.default_project_name,
+                              domain_name=v.net_domain_name)
+
+        self.k.grant_role_user_on_project(ou_name=v.default_project_name,
+                                          target_id=v.user01_userid,
+                                          role_name=v.member_role_name)
+
+        res = self.k.authenticate(v.user01_userid,
+                                  v.user01_password,
+                                  project_name=v.default_project_name,
+                                  domain_name=v.net_domain_name)
+
+        token_user01 = res.headers.get('x-subject-token')
+
+        print res.json()
+        print
+
+        # for admin user
+        self.k.create_role(v.admin_role_name)
+
+        self.k.grant_role_user_on_project(ou_name=v.default_project_name,
+                                          target_id=v.user02_userid,
+                                          role_name=v.admin_role_name)
+
+        self.k.grant_role_user_on_domain(ou_name=v.net_domain_name,
+                                         target_id=v.user02_userid,
+                                         role_name=v.admin_role_name)
+        res = self.k.authenticate(v.user02_userid,
+                                  v.user02_password,
+                                  project_name=v.default_project_name,
+                                  domain_name=v.net_domain_name)
+        print 2, res.json()
+        print
+        token_admin = res.headers.get('x-subject-token')
+        print 3, token_admin
+        print
+        res = self.k.validate_token(token_user01, admin_token=token_admin)
+        print 4, res.headers
+        print 5, res.status_code
+        print 6, res.json()
+        print
+        #self.assertEqual(200, res.status_code)
+        #self.assertEqual(403, res.status_code)
+        #self.assertEqual(32, len(res.headers.get('x-subject-token')))
+        self.k.delete_roles(target_name=v.admin_role_name)
+        self.k.delete_roles(target_name=v.member_role_name)
+        self.l.delete_entry(v.default_project_name, 'projects')
+        self.l.delete_entry(v.net_domain_name, 'domains')
+        self.assertTrue(False)

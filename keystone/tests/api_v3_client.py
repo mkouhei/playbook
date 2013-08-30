@@ -58,7 +58,7 @@ def set_auth_payload(userid=None, password=None, domain_id=None,
         payload['auth']['scope'] = {'project': {'id': project_id}}
     elif project_name and (not domain_name and not domain_id):
         payload['auth']['scope'] = {'project': {'name': project_name}}
-
+    print payload
     return payload
 
 
