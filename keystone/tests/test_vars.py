@@ -84,7 +84,7 @@ test_services = {'services': [{'id': '1111', 'type': 'identity'}]}
 
 domains_url = base_url_api_v3 + '/domains'
 domain_url = base_url_api_v3 + '/domains/default'
-domain_entry_member = ['cn=dumb,dc=nonexistent']
+domain_entry_member = ['cn=dumb,dc=noexistent']
 domain_entry_description = ['default']
 domain_entry_enabled = ['TRUE']
 domain_entry_objectClass = ['groupOfNames']

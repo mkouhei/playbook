@@ -58,7 +58,6 @@ def set_auth_payload(userid=None, password=None, domain_id=None,
         payload['auth']['scope'] = {'project': {'id': project_id}}
     elif project_name and (not domain_name and not domain_id):
         payload['auth']['scope'] = {'project': {'name': project_name}}
-    print payload
     return payload
 
 
@@ -158,6 +157,65 @@ class LdapClient(object):
         pass
 
 
+def _create(func):
+    """create target"""
+    def create_object(self, **kwargs):
+        """
+
+        Arguments:
+
+            target_id:
+            target_name:
+            target_type:
+            target_blob:
+            token:
+
+        """
+        target = func.func_name.split('create_')[1]
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+
+        payload = {target: {}}
+        if kwargs.get('target_type'):
+            payload[target]['type'] = kwargs.get('target_type')
+        if kwargs.get('target_name'):
+            payload[target]['name'] = kwargs.get('target_name')
+        if kwargs.get('target_blob'):
+            payload[target]['blob'] = kwargs.get('target_blob')
+
+        if target == 'endpoint':
+            res = self.show_services(token=token,
+                                     target_type=kwargs.get('service_type'))
+            payload[target]['service_id'] = res.json().get('service').get('id')
+            payload[target]['url'] = kwargs.get('url')
+            payload[target]['interface'] = kwargs.get('interface')
+            payload[target]['region'] = self.region
+        elif target == 'domain' or target == 'project' or target == 'group':
+            payload[target]['enabled'] = True
+            payload[target]['description'] = kwargs.get('target_name')
+
+            if kwargs.get('domain_name'):
+                payload[target]['domain_id'] = retrieve_id_by_name(
+                    self.list_domains(token=token),
+                    kwargs.get('domain_name'),
+                    'domains')
+        elif target == 'credential':
+            payload[target]['project_id'] = kwargs.get('project_id')
+            payload[target]['user_id'] = kwargs.get('user_id')
+
+        if target == 'policy':
+            url = self._set_api_url('policies')
+        else:
+            url = self._set_api_url(target + 's')
+
+        headers = {'X-Auth-Token': token, 'Content-Type': 'application/json'}
+
+        r = requests.post(url, headers=headers, data=json.dumps(payload),
+                          timeout=TIMEOUT, verify=self.verify)
+        return r
+    return create_object
+
+
 def _list(func):
     """list organizationalUnit"""
     def list_objects(self, *args, **kwargs):
@@ -166,8 +224,6 @@ def _list(func):
             target += args
         if kwargs.get('token'):
             token = kwargs.get('token')
-        else:
-            token = self.admin_token
         url = self._set_api_url_with_tuple(target)
         headers = {'X-Auth-Token': token}
         r = requests.get(url, headers=headers,
@@ -191,26 +247,29 @@ def _show(func):
 
         """
         target = func.func_name.split('show_')[1]
+
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+
         if kwargs.get('target_type'):
-            target_id = retrieve_id_by_type(self.list_target(target),
+            target_id = retrieve_id_by_type(self.list_target(target,
+                                                             token=token),
                                             kwargs.get('target_type'),
                                             target)
         elif kwargs.get('target_name'):
-            target_id = retrieve_id_by_name(self.list_target(target),
+            target_id = retrieve_id_by_name(self.list_target(target,
+                                                             token=token),
                                             kwargs.get('target_name'),
                                             target)
         elif kwargs.get('target_blob'):
-            target_id = retrieve_id_by_blob(self.list_target(target),
+            target_id = retrieve_id_by_blob(self.list_target(target,
+                                                             token=token),
                                             kwargs.get('target_blob'),
                                             target)
         elif kwargs.get('target_id'):
             target_id = kwargs.get('target_id')
         url = self._set_api_url(target, target_id)
 
-        if kwargs.get('token'):
-            token = kwargs.get('token')
-        else:
-            token = self.admin_token
         headers = {'X-Auth-Token': token}
         r = requests.get(url, headers=headers,
                          timeout=TIMEOUT, verify=self.verify)
@@ -233,26 +292,33 @@ def _delete(func):
 
         """
         target = func.func_name.split('delete_')[1]
+        if target == 'policy':
+            target = 'policie'
+        target += 's'
+
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+
         if kwargs.get('target_type'):
-            target_id = retrieve_id_by_type(self.list_target(target),
+            target_id = retrieve_id_by_type(self.list_target(target,
+                                                             token=token),
                                             kwargs.get('target_type'),
                                             target)
         elif kwargs.get('target_name'):
-            target_id = retrieve_id_by_name(self.list_target(target),
+            target_id = retrieve_id_by_name(self.list_target(target,
+                                                             token=token),
                                             kwargs.get('target_name'),
                                             target)
         elif kwargs.get('target_blob'):
-            target_id = retrieve_id_by_blob(self.list_target(target),
+            target_id = retrieve_id_by_blob(self.list_target(target,
+                                                             token=token),
                                             kwargs.get('target_blob'),
                                             target)
         elif kwargs.get('target_id'):
             target_id = kwargs.get('target_id')
+
         url = self._set_api_url(target, target_id)
 
-        if kwargs.get('token'):
-            token = kwargs.get('token')
-        else:
-            token = self.admin_token
         headers = {'X-Auth-Token': token}
         r = requests.delete(url, headers=headers,
                             timeout=TIMEOUT, verify=self.verify)
@@ -271,14 +337,22 @@ def _update(func):
             token:
 
         """
-
         target = func.func_name.split('update_')[1]
+        if target == 'policy':
+            target = 'policie'
+        target += 's'
+
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+
         if kwargs.get('target_type'):
-            target_id = retrieve_id_by_type(self.list_target(target),
+            target_id = retrieve_id_by_type(self.list_target(target,
+                                                             token=token),
                                             kwargs.get('target_type'),
                                             target)
         elif kwargs.get('target_name'):
-            target_id = retrieve_id_by_name(self.list_target(target),
+            target_id = retrieve_id_by_name(self.list_target(target,
+                                                             token=token),
                                             kwargs.get('target_name'),
                                             target)
         elif kwargs.get('target_id'):
@@ -286,10 +360,6 @@ def _update(func):
 
         url = self._set_api_url(target, target_id)
 
-        if kwargs.get('token'):
-            token = kwargs.get('token')
-        else:
-            token = self.admin_token
         headers = {'X-Auth-Token': token,
                    'Content-Type': 'application/json'}
 
@@ -317,8 +387,13 @@ def _grant_role(func):
 
         """
         target = func.func_name.split('grant_role_')[1].split('_')[0] + 's'
+
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+
         if kwargs.get('target_name'):
-            target_id = retrieve_id_by_name(self.list_target(target),
+            target_id = retrieve_id_by_name(self.list_target(target,
+                                                             token=token),
                                             kwargs.get('target_name'),
                                             target)
         elif kwargs.get('target_id'):
@@ -326,14 +401,16 @@ def _grant_role(func):
 
         ou_target = func.func_name.split('_on_')[1] + 's'
         if kwargs.get('ou_name'):
-            ou_id = retrieve_id_by_name(self.list_target(ou_target),
+            ou_id = retrieve_id_by_name(self.list_target(ou_target,
+                                                         token=token),
                                         kwargs.get('ou_name'),
                                         ou_target)
         elif kwargs.get('ou_id'):
             ou_id = kwargs.get('ou_id')
 
         if kwargs.get('role_name'):
-            role_id = retrieve_id_by_name(self.list_target('roles'),
+            role_id = retrieve_id_by_name(self.list_target('roles',
+                                                           token=token),
                                           kwargs.get('role_name'),
                                           'roles')
         elif kwargs.get('role_id'):
@@ -343,10 +420,6 @@ def _grant_role(func):
                                 target, target_id,
                                 'roles', role_id)
 
-        if kwargs.get('token'):
-            token = kwargs.get('token')
-        else:
-            token = self.admin_token
         headers = {'X-Auth-Token': token}
         r = requests.put(url, headers=headers,
                          timeout=TIMEOUT, verify=self.verify)
@@ -370,8 +443,12 @@ def _list_grants(func):
         """
         target = func.func_name.split('list_roles_')[1].split('_')[0] + 's'
 
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+
         if kwargs.get('target_name'):
-            target_id = retrieve_id_by_name(self.list_target(target),
+            target_id = retrieve_id_by_name(self.list_target(target,
+                                                             token=token),
                                             kwargs.get('target_name'),
                                             target)
         elif kwargs.get('target_id'):
@@ -379,7 +456,8 @@ def _list_grants(func):
 
         ou_target = func.func_name.split('_on_')[1] + 's'
         if kwargs.get('ou_name'):
-            ou_id = retrieve_id_by_name(self.list_target(ou_target),
+            ou_id = retrieve_id_by_name(self.list_target(ou_target,
+                                                         token=token),
                                         kwargs.get('ou_name'),
                                         ou_target)
         elif kwargs.get('ou_id'):
@@ -388,10 +466,6 @@ def _list_grants(func):
         url = self._set_api_url(ou_target, ou_id,
                                 target, target_id, 'roles')
 
-        if kwargs.get('token'):
-            token = kwargs.get('token')
-        else:
-            token = self.admin_token
         headers = {'X-Auth-Token': token}
         r = requests.get(url, headers=headers,
                          timeout=TIMEOUT, verify=self.verify)
@@ -417,8 +491,12 @@ def _check_grant(func):
         """
         target = func.func_name.split('check_')[1].split('_')[0] + 's'
 
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+
         if kwargs.get('target_name'):
-            target_id = retrieve_id_by_name(self.list_target(target),
+            target_id = retrieve_id_by_name(self.list_target(target,
+                                                             token=token),
                                             kwargs.get('target_name'),
                                             target)
         elif kwargs.get('target_id'):
@@ -426,14 +504,16 @@ def _check_grant(func):
 
         ou_target = func.func_name.split('_on_')[1] + 's'
         if kwargs.get('ou_name'):
-            ou_id = retrieve_id_by_name(self.list_target(ou_target),
+            ou_id = retrieve_id_by_name(self.list_target(ou_target,
+                                                         token=token),
                                         kwargs.get('ou_name'),
                                         ou_target)
         elif kwargs.get('ou_id'):
             ou_id = kwargs.get('ou_id')
 
         if kwargs.get('role_name'):
-            role_id = retrieve_id_by_name(self.list_target('roles'),
+            role_id = retrieve_id_by_name(self.list_target('roles',
+                                                           token=token),
                                           kwargs.get('role_name'),
                                           'roles')
         elif kwargs.get('role_id'):
@@ -443,10 +523,6 @@ def _check_grant(func):
                                 target, target_id,
                                 'roles', role_id)
 
-        if kwargs.get('token'):
-            token = kwargs.get('token')
-        else:
-            token = self.admin_token
         headers = {'X-Auth-Token': token}
         r = requests.head(url, headers=headers,
                           timeout=TIMEOUT, verify=self.verify)
@@ -471,8 +547,12 @@ def _revoke_grant(func):
         target = (func.func_name.split('revoke_role_from_')[1].split('_')[0]
                   + 's')
 
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+
         if kwargs.get('target_name'):
-            target_id = retrieve_id_by_name(self.list_target(target),
+            target_id = retrieve_id_by_name(self.list_target(target,
+                                                             token=token),
                                             kwargs.get('target_name'),
                                             target)
         elif kwargs.get('target_id'):
@@ -480,14 +560,16 @@ def _revoke_grant(func):
 
         ou_target = func.func_name.split('_on_')[1] + 's'
         if kwargs.get('ou_name'):
-            ou_id = retrieve_id_by_name(self.list_target(ou_target),
+            ou_id = retrieve_id_by_name(self.list_target(ou_target,
+                                                         token=token),
                                         kwargs.get('ou_name'),
                                         ou_target)
         elif kwargs.get('ou_id'):
             ou_id = kwargs.get('ou_id')
 
         if kwargs.get('role_name'):
-            role_id = retrieve_id_by_name(self.list_target('roles'),
+            role_id = retrieve_id_by_name(self.list_target('roles',
+                                                           token=token),
                                           kwargs.get('role_name'),
                                           'roles')
         elif kwargs.get('role_id'):
@@ -497,10 +579,6 @@ def _revoke_grant(func):
                                 target, target_id,
                                 'roles', role_id)
 
-        if kwargs.get('token'):
-            token = kwargs.get('token')
-        else:
-            token = self.admin_token
         headers = {'X-Auth-Token': token}
         r = requests.delete(url, headers=headers,
                             timeout=TIMEOUT, verify=self.verify)
@@ -510,7 +588,7 @@ def _revoke_grant(func):
 
 class ApiV3Client(object):
 
-    def __init__(self, base_url, admin_token, region, verify=True):
+    def __init__(self, base_url, region, verify=True):
         """initialize variable
 
         Arguments:
@@ -519,7 +597,6 @@ class ApiV3Client(object):
             verify:
         """
         self.base_url = base_url
-        self.admin_token = admin_token
         self.verify = verify
         self.region = region
 
@@ -545,10 +622,10 @@ class ApiV3Client(object):
             url = os.path.join(url, i)
         return url
 
-    def list_target(self, *target):
+    def list_target(self, *target, **kwargs):
         """list organizationalUnit"""
         url = self._set_api_url_with_tuple(target)
-        headers = {'X-Auth-Token': self.admin_token}
+        headers = {'X-Auth-Token': kwargs.get('token')}
         r = requests.get(url, headers=headers,
                          timeout=TIMEOUT, verify=self.verify)
         return r.json()
@@ -569,73 +646,44 @@ class ApiV3Client(object):
                                    password=password,
                                    domain_name=domain_name,
                                    project_name=project_name)
-        '''
-        payload = {
-            "auth": {
-                "identity": {
-                    "methods": ["password"],
-                    "password": {
-                        "user": {
-                            "domain": {
-                                "id": domain_name},
-                            "id": userid,
-                            "password": password}}}}}
-                            '''
         r = requests.post(url, headers=headers, data=json.dumps(payload),
                           timeout=TIMEOUT, verify=self.verify)
         return r
 
-    def validate_token(self, subject_token, admin_token=None):
+    def validate_token(self, subject_token, auth_token):
         url = self._set_api_url('auth/tokens')
-        if admin_token is None:
-            admin_token = self.admin_token
-        headers = {'X-Auth-Token': admin_token,
+        headers = {'X-Auth-Token': auth_token,
                    'X-Subject-Token': subject_token}
         r = requests.get(url, headers=headers,
                          timeout=TIMEOUT, verify=self.verify)
         return r
 
-    def check_token(self, subject_token):
+    def check_token(self, subject_token, auth_token):
         url = self._set_api_url('auth/tokens')
-        headers = {'X-Auth-Token': self.admin_token,
+        headers = {'X-Auth-Token': auth_token,
                    'X-Subject-Token': subject_token}
         r = requests.head(url, headers=headers,
                           timeout=TIMEOUT, verify=self.verify)
         return r
 
-    def revoke_token(self, subject_token):
+    def revoke_token(self, subject_token, auth_token):
         url = self._set_api_url('auth/tokens')
-        headers = {'X-Auth-Token': self.admin_token,
+        headers = {'X-Auth-Token': auth_token,
                    'X-Subject-Token': subject_token}
         r = requests.delete(url, headers=headers,
                             timeout=TIMEOUT, verify=self.verify)
         return r
 
-    def create_service(self, service_type):
-        """create service
-
-        Arguments:
-            service_type:
-
-        """
-        url = self._set_api_url('services')
-        headers = {'X-Auth-Token': self.admin_token,
-                   'Content-Type': 'application/json'}
-        payload = {'service': {'type': service_type}}
-        services = [service for service in self.list_services().get('services')
-                    if service.get('type') == service_type]
-        if services:
-            return None
-        r = requests.post(url, headers=headers, data=json.dumps(payload),
-                          timeout=TIMEOUT, verify=self.verify)
-        return r
+    @_create
+    def create_service(self):
+        pass
 
     @_list
     def list_services(self):
         pass
 
     @_update
-    def update_services(self):
+    def update_service(self):
         pass
 
     @_show
@@ -643,38 +691,12 @@ class ApiV3Client(object):
         pass
 
     @_delete
-    def delete_services(self):
+    def delete_service(self):
         pass
 
-    def create_endpoint(self, interface, endpoint_name,
-                        endpoint_url, service_type):
-        """create endpoint
-
-        Arguments:
-            interface:     [admin|public|internal]
-            endpoint_name:
-            endpoint_url:
-            service_type:
-
-        """
-        url = self._set_api_url('endpoints')
-        headers = {'X-Auth-Token': self.admin_token,
-                   'Content-Type': 'application/json'}
-        res = self.show_services(target_type=service_type).json()
-        service_id = res.get('service').get('id')
-        payload = {'endpoint': {'name': endpoint_name,
-                                'url': endpoint_url,
-                                'interface': interface,
-                                'region': self.region,
-                                'service_id': service_id}}
-        endpoints = [endpoint for endpoint
-                     in self.list_endpoints().get('endpoints')
-                     if endpoint.get('name') == endpoint_name]
-        if endpoints:
-            return None
-        r = requests.post(url, headers=headers, data=json.dumps(payload),
-                          timeout=TIMEOUT, verify=self.verify)
-        return r
+    @_create
+    def create_endpoint(self):
+        pass
 
     @_list
     def list_endpoints(self):
@@ -685,27 +707,16 @@ class ApiV3Client(object):
         pass
 
     @_update
-    def update_endpoints(self):
+    def update_endpoint(self):
         pass
 
     @_delete
-    def delete_endpoints(self):
+    def delete_endpoint(self):
         pass
 
-    def create_role(self, role_name):
-        """create role
-
-        Arguments:
-            role_name:
-
-        """
-        url = self._set_api_url('roles')
-        headers = {'X-Auth-Token': self.admin_token,
-                   'Content-Type': 'application/json'}
-        payload = {'role': {'name': role_name}}
-        r = requests.post(url, headers=headers, data=json.dumps(payload),
-                          timeout=TIMEOUT, verify=self.verify)
-        return r
+    @_create
+    def create_role(self):
+        pass
 
     @_list
     def list_roles(self):
@@ -716,11 +727,11 @@ class ApiV3Client(object):
         pass
 
     @_update
-    def update_roles(self):
+    def update_role(self):
         pass
 
     @_delete
-    def delete_roles(self):
+    def delete_role(self):
         pass
 
     @_grant_role
@@ -803,22 +814,9 @@ class ApiV3Client(object):
         """ Not Implmented"""
         pass
 
-    def create_domain(self, domain_name):
-        """Create domain
-           But must not use this method, domain_id
-
-        Argument:
-            domain_name:
-        """
-        url = self._set_api_url('domains')
-        payload = {'domain': {'description': domain_name,
-                              'enabled': True,
-                              'name': domain_name}}
-        headers = {'Content-Type': 'application/json',
-                   'X-Auth-Token': self.admin_token}
-        r = requests.post(url, headers=headers, data=json.dumps(payload),
-                          timeout=TIMEOUT, verify=self.verify)
-        return r
+    @_create
+    def create_domain(self):
+        pass
 
     @_list
     def list_domains(self):
@@ -830,12 +828,12 @@ class ApiV3Client(object):
 
     # not implemented now
     @_delete
-    def delete_domains(self):
+    def delete_domain(self):
         pass
 
     # not implemented now ?
-    def update_domain(self, domain_id, domain_name,
-                      enable=True, description=None,):
+    def update_domain(self, token, domain_id, domain_name,
+                      enable=True, description=None):
         """update domain
 
         Arguments:
@@ -851,31 +849,14 @@ class ApiV3Client(object):
                               'id': domain_id,
                               'links': {'self': url}}}
         headers = {'Content-Type': 'application/json',
-                   'X-Auth-Token': self.admin_token}
+                   'X-Auth-Token': token}
         r = requests.patch(url, headers=headers, data=json.dumps(payload),
                            timeout=TIMEOUT, verify=self.verify)
         return r
 
-    def create_project(self, project_name, domain_name=None):
-        """create project
-
-        Arguments:
-            project_name:
-            domain_name:
-        """
-        url = self._set_api_url('projects')
-        payload = {'project': {'description': project_name,
-                               'enabled': True,
-                               'name': project_name}}
-        if domain_name:
-            payload['project']['domain_id'] = retrieve_id_by_name(
-                self.list_domains(),
-                domain_name, 'domains')
-        headers = {'Content-Type': 'application/json',
-                   'X-Auth-Token': self.admin_token}
-        r = requests.post(url, headers=headers, data=json.dumps(payload),
-                          timeout=TIMEOUT, verify=self.verify)
-        return r
+    @_create
+    def create_project(self):
+        pass
 
     @_list
     def list_projects(self):
@@ -887,29 +868,12 @@ class ApiV3Client(object):
 
     # Not Implemented
     @_delete
-    def delete_projects(self):
+    def delete_project(self):
         pass
 
-    def create_group(self, group_name, domain_name=None):
-        """create group
-
-        Arguments:
-            group_name:
-            domain_name:
-        """
-        url = self._set_api_url('groups')
-        payload = {'group': {'description': group_name,
-                             'name': group_name}}
-        if domain_name:
-            payload['group']['domain_id'] = retrieve_id_by_name(
-                self.list_domains(),
-                domain_name,
-                'domains')
-        headers = {'Content-Type': 'application/json',
-                   'X-Auth-Token': self.admin_token}
-        r = requests.post(url, headers=headers, data=json.dumps(payload),
-                          timeout=TIMEOUT, verify=self.verify)
-        return r
+    @_create
+    def create_group(self):
+        pass
 
     @_list
     def list_groups(self):
@@ -920,45 +884,34 @@ class ApiV3Client(object):
         pass
 
     @_delete
-    def delete_groups(self):
+    def delete_group(self):
         pass
 
-    def delete_group(self, group_id=None, group_name=None):
-        """delete group
-
-        Arguments:
-            group_id:
-            group_name:
-        """
-        if group_name:
-            group_id = retrieve_id_by_name(self.list_groups(),
-                                           group_name, 'groups')
-        url = self._set_api_url('groups', group_id)
-        headers = {'X-Auth-Token': self.admin_token}
-        r = requests.delete(url, headers=headers,
-                            timeout=TIMEOUT, verify=self.verify)
-        return r
-
-    def add_user_to_group(self, user_id, group_id=None, group_name=None):
-        if group_name:
-            group_id = retrieve_id_by_name(self.list_groups(),
-                                           group_name, 'groups')
+    def add_user_to_group(self, user_id, **kwargs):
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+        if kwargs.get('group_id'):
+            group_id = kwargs.get('group_id')
+        elif kwargs.get('group_name'):
+            group_id = retrieve_id_by_name(self.list_groups(token=token),
+                                           kwargs.get('group_name'),
+                                           'groups')
         url = self._set_api_url('groups', group_id, 'users', user_id)
-        headers = {'X-Auth-Token': self.admin_token}
+        headers = {'X-Auth-Token': token}
         r = requests.put(url, headers=headers,
                          timeout=TIMEOUT, verify=self.verify)
         return r
 
-    def check_user_in_group(self, group_id, user_id):
+    def check_user_in_group(self, token, group_id, user_id):
         url = self._set_api_url('groups', group_id, 'users', user_id)
-        headers = {'X-Auth-Token': self.admin_token}
+        headers = {'X-Auth-Token': token}
         r = requests.head(url, headers=headers,
                           timeout=TIMEOUT, verify=self.verify)
         return r
 
-    def list_users_in_group(self, group_id):
+    def list_users_in_group(self, token, group_id):
         url = self._set_api_url('groups', group_id, 'users')
-        headers = {'X-Auth-Token': self.admin_token}
+        headers = {'X-Auth-Token': token}
         r = requests.get(url, headers=headers,
                          timeout=TIMEOUT, verify=self.verify)
         return r.json()
@@ -971,26 +924,9 @@ class ApiV3Client(object):
     def show_users(self):
         pass
 
-    def create_credentials(self, userid, credential_type,
-                           project_id, json_blob):
-        """create credential, but not implemented this API.
-
-        Arguments:
-            userid:          user id
-            credential_type: "ec2", etc.
-            project_id:      project id
-            json_blob:       JSON serialized containing 'access' and 'secret'
-        """
-        url = self._set_api_url('credentials')
-        payload = {'credential': {'blob': json_blob,
-                                  'project_id': project_id,
-                                  'type': credential_type,
-                                  'user_id': userid}}
-        headers = {'Content-Type': 'application/json',
-                   'X-Auth-Token': self.admin_token}
-        r = requests.post(url, headers=headers, data=json.dumps(payload),
-                          timeout=TIMEOUT, verify=self.verify)
-        return r
+    @_create
+    def create_credential(self):
+        pass
 
     @_list
     def list_credentials(self):
@@ -1001,39 +937,27 @@ class ApiV3Client(object):
         pass
 
     @_update
-    def update_credentials(self):
+    def update_credential(self):
         pass
 
     @_delete
-    def delete_credentials(self):
+    def delete_credential(self):
         pass
 
-    def _get(self, url):
+    def _get(self, token, url):
         """show domain
 
         Arguments:
             url:
         """
-        headers = {'X-Auth-Token': self.admin_token}
+        headers = {'X-Auth-Token': token}
         r = requests.get(url, headers=headers,
                          timeout=TIMEOUT, verify=self.verify)
         return r
 
-    def create_policies(self, json_blob, mimetype):
-        """create policy
-
-        Arguments:
-            json_blob:       JSON serialized containing 'access' and 'secret'
-            mimetype:
-        """
-        url = self._set_api_url('policies')
-        payload = {'policy': {'blob': json_blob,
-                              'type': mimetype}}
-        headers = {'Content-Type': 'application/json',
-                   'X-Auth-Token': self.admin_token}
-        r = requests.post(url, headers=headers, data=json.dumps(payload),
-                          timeout=TIMEOUT, verify=self.verify)
-        return r
+    @_create
+    def create_policy(self):
+        pass
 
     @_list
     def list_policies(self):
@@ -1044,18 +968,17 @@ class ApiV3Client(object):
         pass
 
     @_delete
-    def delete_policies(self):
+    def delete_policy(self):
         pass
 
     @_update
-    def update_policies(self):
+    def update_policy(self):
         pass
 
     def get_role_assginments(self, **kwargs):
         if kwargs.get('token'):
             token = kwargs.get('token')
-        else:
-            token = self.admin_token
+
         url = self._set_api_url_with_tuple(('role_assignments',))
         headers = {'X-Auth-Token': token}
         r = requests.get(url, headers=headers,
