@@ -284,15 +284,15 @@ class ApiV3ClientTests(unittest.TestCase):
             token=v.admin_token).get('error').get('code')
         self.assertEqual(501, creds_l)
 
-    def test_show_credentials(self):
+    def test_show_credential(self):
         """ Not implmented """
         pass
 
-    def test_update_credentials(self):
+    def test_update_credential(self):
         """ Not implmented """
         pass
 
-    def test_delete_credentials(self):
+    def test_delete_credential(self):
         """ Not implmented """
         pass
 
@@ -541,6 +541,22 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(v.default_project_name,
                          res.json()['group']['description'])
         self.assertEqual(200, res.status_code)
+        self.k.delete_group(token=v.admin_token,
+                            target_name=v.default_group_name)
+
+    def test_update_group(self):
+        """ Not implemented of name changing,
+            and internal server error when changing description, domain_id."""
+        res = self.k.create_group(token=v.admin_token,
+                                  target_name=v.default_group_name)
+        id = res.json()['group']['id']
+        payload = {'group': {'id': id,
+                             'domain_id': v.default_domain_name,
+                             'description': 'hoge'}}
+        res = self.k.update_group(token=v.admin_token,
+                                  target_id=id,
+                                  payload=payload)
+        self.assertEqual(500, res.status_code)
         self.k.delete_group(token=v.admin_token,
                             target_name=v.default_group_name)
 

@@ -880,6 +880,10 @@ class ApiV3Client(object):
     def show_group(self):
         pass
 
+    @_update
+    def update_group(self):
+        pass
+
     @_delete
     def delete_group(self):
         pass
