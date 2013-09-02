@@ -178,8 +178,8 @@ def _create(func):
             payload[target]['blob'] = kwargs.get('target_blob')
 
         if target == 'endpoint':
-            res = self.show_services(token=token,
-                                     target_type=kwargs.get('service_type'))
+            res = self.show_service(token=token,
+                                    target_type=kwargs.get('service_type'))
             payload[target]['service_id'] = res.json().get('service').get('id')
             payload[target]['url'] = kwargs.get('url')
             payload[target]['interface'] = kwargs.get('interface')
@@ -241,6 +241,9 @@ def _show(func):
 
         """
         target = func.func_name.split('show_')[1]
+        if target == 'policy':
+            target = 'policie'
+        target += 's'
 
         if kwargs.get('token'):
             token = kwargs.get('token')
@@ -681,7 +684,7 @@ class ApiV3Client(object):
         pass
 
     @_show
-    def show_services(self):
+    def show_service(self):
         pass
 
     @_delete
@@ -697,7 +700,7 @@ class ApiV3Client(object):
         pass
 
     @_show
-    def show_endpoints(self):
+    def show_endpoint(self):
         pass
 
     @_update
@@ -717,7 +720,7 @@ class ApiV3Client(object):
         pass
 
     @_show
-    def show_roles(self):
+    def show_role(self):
         pass
 
     @_update
@@ -817,7 +820,7 @@ class ApiV3Client(object):
         pass
 
     @_show
-    def show_domains(self):
+    def show_domain(self):
         pass
 
     # not implemented now
@@ -857,7 +860,7 @@ class ApiV3Client(object):
         pass
 
     @_show
-    def show_projects(self):
+    def show_project(self):
         pass
 
     # Not Implemented
@@ -874,7 +877,7 @@ class ApiV3Client(object):
         pass
 
     @_show
-    def show_groups(self):
+    def show_group(self):
         pass
 
     @_delete
@@ -915,7 +918,7 @@ class ApiV3Client(object):
         pass
 
     @_show
-    def show_users(self):
+    def show_user(self):
         pass
 
     @_create
@@ -927,7 +930,7 @@ class ApiV3Client(object):
         pass
 
     @_show
-    def show_credentials(self):
+    def show_credential(self):
         pass
 
     @_update
@@ -958,7 +961,7 @@ class ApiV3Client(object):
         pass
 
     @_show
-    def show_policies(self):
+    def show_policy(self):
         pass
 
     @_delete

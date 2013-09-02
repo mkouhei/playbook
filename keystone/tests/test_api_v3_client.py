@@ -136,8 +136,8 @@ class ApiV3ClientTests(unittest.TestCase):
         """ OK """
         self.k.create_service(token=v.admin_token,
                               target_type=v.service_type)
-        res = self.k.show_services(token=v.admin_token,
-                                   target_type=v.service_type)
+        res = self.k.show_service(token=v.admin_token,
+                                  target_type=v.service_type)
         self.assertEqual(v.service_type, res.json().get('service').get('type'))
         self.k.delete_service(token=v.admin_token,
                               target_type=v.service_type)
@@ -146,8 +146,8 @@ class ApiV3ClientTests(unittest.TestCase):
         """ OK """
         self.k.create_service(token=v.admin_token,
                               target_type=v.service_type)
-        res = self.k.show_services(token=v.admin_token,
-                                   target_type=v.service_type).json()
+        res = self.k.show_service(token=v.admin_token,
+                                  target_type=v.service_type).json()
         id = res.get('service').get('id')
         payload = {'service': {'id': id, 'type': 'auth'}}
         self.assertEqual(200,
@@ -212,8 +212,8 @@ class ApiV3ClientTests(unittest.TestCase):
                                interface=v.endpoint_interface,
                                url=v.endpoint_url,
                                service_type=v.service_type)
-        res = self.k.show_endpoints(token=v.admin_token,
-                                    target_name=v.endpoint_name).json()
+        res = self.k.show_endpoint(token=v.admin_token,
+                                   target_name=v.endpoint_name).json()
         self.assertEqual(v.endpoint_name, res.get('endpoint').get('name'))
         self.assertEqual(v.endpoint_interface,
                          res.get('endpoint').get('interface'))
@@ -233,8 +233,8 @@ class ApiV3ClientTests(unittest.TestCase):
                                interface=v.endpoint_interface,
                                url=v.endpoint_url,
                                service_type=v.service_type)
-        res = self.k.show_endpoints(token=v.admin_token,
-                                    target_name=v.endpoint_name).json()
+        res = self.k.show_endpoint(token=v.admin_token,
+                                   target_name=v.endpoint_name).json()
         id = res.get('endpoint').get('id')
         payload = {'endpoint': {'id': id, 'interface': 'admin'}}
         self.assertEqual(200,
@@ -323,8 +323,8 @@ class ApiV3ClientTests(unittest.TestCase):
         """ OK """
         self.k.create_role(token=v.admin_token,
                            target_name=v.admin_role_name)
-        res = self.k.show_roles(token=v.admin_token,
-                                target_name=v.admin_role_name).json()
+        res = self.k.show_role(token=v.admin_token,
+                               target_name=v.admin_role_name).json()
         self.assertEqual(v.admin_role_name, res.get('role').get('name'))
         self.k.delete_role(token=v.admin_token,
                            target_name=v.admin_role_name)
@@ -335,20 +335,28 @@ class ApiV3ClientTests(unittest.TestCase):
         """
         self.k.create_role(token=v.admin_token,
                            target_name=v.admin_role_name)
-        res = self.k.show_roles(token=v.admin_token,
-                                target_name=v.admin_role_name).json()
+        res = self.k.show_role(token=v.admin_token,
+                               target_name=v.admin_role_name).json()
+        print 1, res
         id = res.get('role').get('id')
         payload = {'role': {'id': id, 'name': 'member'}}
         #self.assertTrue(200, self.k.update_role(token=v.admin_token,
         #                                        target_id=id,
         #                                        payload=payload).status_code)
-        self.k.update_role(token=v.admin_token,
-                           target_id=id, payload=payload).json()
-        res = self.k.show_roles(token=v.admin_token,
-                                target_id=id).json()
+        res = self.k.update_role(token=v.admin_token,
+                                 target_id=id, payload=payload).json()
+        print 2, res
+        res = self.l.search_entry(v.member_role_name, 'roles')
+        print 3, res
+        res = self.k.show_role(token=v.admin_token,
+                               target_id=id).json()
+        print 4, res
         self.assertEqual('member', res.get('role').get('name'))
+        res = self.k.list_roles(token=v.admin_token)
+        print 5, res
         self.k.delete_role(token=v.admin_token,
                            target_id=id)
+        self.assertTrue(False)
 
     def test_delete_role(self):
         """ OK """
@@ -407,8 +415,8 @@ class ApiV3ClientTests(unittest.TestCase):
     def test_show_domain(self):
         """ OK """
         self.l.create_domain(v.default_domain_name)
-        res = self.k.show_domains(token=v.admin_token,
-                                  target_name=v.default_domain_name)
+        res = self.k.show_domain(token=v.admin_token,
+                                 target_name=v.default_domain_name)
         self.assertEqual(v.default_domain_name, res.json()['domain']['name'])
         self.assertEqual(v.default_domain_name,
                          res.json()['domain']['description'])
@@ -465,8 +473,8 @@ class ApiV3ClientTests(unittest.TestCase):
         """ OK """
         self.k.create_project(token=v.admin_token,
                               target_name=v.default_project_name)
-        res = self.k.show_projects(token=v.admin_token,
-                                   target_name=v.default_project_name)
+        res = self.k.show_project(token=v.admin_token,
+                                  target_name=v.default_project_name)
         self.assertEqual(v.default_project_name,
                          res.json()['project']['name'])
         self.assertEqual(v.default_project_name,
@@ -526,8 +534,8 @@ class ApiV3ClientTests(unittest.TestCase):
         """ OK """
         self.k.create_group(token=v.admin_token,
                             target_name=v.default_group_name)
-        res = self.k.show_groups(token=v.admin_token,
-                                 target_name=v.default_group_name)
+        res = self.k.show_group(token=v.admin_token,
+                                target_name=v.default_group_name)
         self.assertEqual(v.default_project_name,
                          res.json()['group']['name'])
         self.assertEqual(v.default_project_name,
@@ -551,15 +559,15 @@ class ApiV3ClientTests(unittest.TestCase):
 
     def test_show_users(self):
         """ OK """
-        res = self.k.show_users(token=v.admin_token,
-                                target_name=v.user01_userid).json()
+        res = self.k.show_user(token=v.admin_token,
+                               target_name=v.user01_userid).json()
         self.assertEqual(v.user01_userid, res.get('user').get('id'))
 
     def test_list_user_projects(self):
         """ fixes #1101287 by changing I449a41e9
             But this method maybe not use. """
-        res = self.k.show_users(token=v.admin_token,
-                                target_name=v.user01_userid).json()
+        res = self.k.show_user(token=v.admin_token,
+                               target_name=v.user01_userid).json()
         userid = res.get('user').get('id')
         res = self.k.list_users(userid, 'projects',
                                 token=v.admin_token)
@@ -995,13 +1003,13 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_policy(token=v.admin_token,
                              target_blob=v.policy_blob2)
 
-    def test_show_policies(self):
+    def test_show_policy(self):
         """ OK """
         self.k.create_policy(token=v.admin_token,
                              target_blob=v.policy_blob,
                              target_type=v.policy_mimetype)
-        res = self.k.show_policies(token=v.admin_token,
-                                   target_blob=v.policy_blob)
+        res = self.k.show_policy(token=v.admin_token,
+                                 target_blob=v.policy_blob)
         self.assertEqual(200, res.status_code)
         self.k.delete_policy(token=v.admin_token,
                              target_blob=v.policy_blob)
@@ -1011,8 +1019,8 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.create_policy(token=v.admin_token,
                              target_blob=v.policy_blob,
                              target_type=v.policy_mimetype)
-        res = self.k.show_policies(token=v.admin_token,
-                                   target_blob=v.policy_blob)
+        res = self.k.show_policy(token=v.admin_token,
+                                 target_blob=v.policy_blob)
         payload = res.json()
         policy_id = payload.get('policy').get('id')
         payload['policy']['blob'] = v.policy_blob2
@@ -1028,8 +1036,8 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.create_policy(token=v.admin_token,
                              target_blob=v.policy_blob,
                              target_type=v.policy_mimetype)
-        res = self.k.show_policies(token=v.admin_token,
-                                   target_blob=v.policy_blob)
+        res = self.k.show_policy(token=v.admin_token,
+                                 target_blob=v.policy_blob)
         policy_id = res.json().get('policy').get('id')
         res = self.k.delete_policy(token=v.admin_token,
                                    target_id=policy_id)
