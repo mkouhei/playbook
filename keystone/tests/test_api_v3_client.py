@@ -113,7 +113,6 @@ class ApiV3ClientTests(unittest.TestCase):
         """ OK """
         res = self.k.create_service(token=v.admin_token,
                                     target_type=v.service_type)
-        print res.json()
         self.assertEqual(201, res.status_code)
         self.k.delete_service(token=v.admin_token,
                               target_type=v.service_type)
@@ -821,15 +820,14 @@ class ApiV3ClientTests(unittest.TestCase):
                               domain_name=v.default_domain_name)
         self.k.create_role(token=v.admin_token,
                            target_name=v.member_role_name)
-        print self.k.grant_role_user_on_project(token=v.admin_token,
-                                                ou_name=v.default_project_name,
-                                                target_id=v.user01_userid,
-                                                role_name=v.member_role_name)
+        self.k.grant_role_user_on_project(token=v.admin_token,
+                                          ou_name=v.default_project_name,
+                                          target_id=v.user01_userid,
+                                          role_name=v.member_role_name)
         res = self.k.list_roles_user_on_project(
             token=v.admin_token,
             ou_name=v.default_project_name,
             target_name=v.user01_userid)
-        print res.json()
         role_id = res.json().get('roles')[0].get('id')
         self.assertEqual(200, res.status_code)
         self.assertEqual(32, len(role_id))
@@ -1016,15 +1014,14 @@ class ApiV3ClientTests(unittest.TestCase):
         res = self.k.show_policies(token=v.admin_token,
                                    target_blob=v.policy_blob)
         payload = res.json()
-        print payload
         policy_id = payload.get('policy').get('id')
         payload['policy']['blob'] = v.policy_blob2
         res = self.k.update_policy(token=v.admin_token,
                                    target_id=policy_id,
                                    payload=payload)
         self.assertEqual(200, res.status_code)
-        print self.k.delete_policy(token=v.admin_token,
-                                   target_id=policy_id)
+        self.k.delete_policy(token=v.admin_token,
+                             target_id=policy_id)
 
     def test_delete_policies(self):
         """ OK """
