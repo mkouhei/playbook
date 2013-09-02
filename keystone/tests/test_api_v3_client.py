@@ -1276,21 +1276,12 @@ class ApiV3ClientTests(unittest.TestCase):
                                   v.user01_password,
                                   project_name=v.x_project_name,
                                   domain_name=v.net_domain_name)
-        print res.status_code
-        print 0, res.json()
-        print
-        print 1, res.headers
-        print
         token = res.headers.get('x-subject-token')
-        print 2, token
-        print
-        res = self.k.list_policies(token=token)
-        print 3, res
-        print
+        res = self.k.list_services(token=token)
+        self.assertEqual(1, len(res.get('services')))
         self.k.delete_role(token=v.admin_token,
                            target_name=v.member_role_name)
         self.l.delete_entry(v.x_project_name, 'projects')
         self.k.delete_service(token=v.admin_token,
                               target_type=v.service_type)
         self.l.delete_entry(v.net_domain_name, 'domains')
-        #self.assertTrue(False)
