@@ -61,43 +61,38 @@ def set_auth_payload(userid=None, password=None, domain_id=None,
     return payload
 
 
-def retrieve_id_by_name(list_json, entry_name, key):
-    """retrieve id by name, for except services
+def _retrieve_id(func):
+    """retrieve id by (name|type|blob)
 
     Arguments:
+
         list_json:
-        entry_name:
-        key:
+        entry_key:
+        target_key:
+
     """
-    return [entry.get('id')
-            for entry in list_json.get(key)
-            if entry.get('name') == entry_name][0]
+    def retrieve_id(*args):
+        print args
+        data_type = func.func_name.split('retrieve_id_by_')[1]
+        return [entry.get('id')
+                for entry in args[0].get(args[2])
+                if entry.get(data_type) == args[1]][0]
+    return retrieve_id
 
 
-def retrieve_id_by_type(list_json, entry_type, key):
-    """retrieve id by type, for services
-
-    Arguments:
-        list_json:
-        entry_type:
-        key:
-    """
-    return [entry.get('id')
-            for entry in list_json.get(key)
-            if entry.get('type') == entry_type][0]
+@_retrieve_id
+def retrieve_id_by_name():
+    pass
 
 
-def retrieve_id_by_blob(list_json, entry_name, key):
-    """retrieve id by blob, for except services
+@_retrieve_id
+def retrieve_id_by_type():
+    pass
 
-    Arguments:
-        list_json:
-        entry_name:
-        key:
-    """
-    return [entry.get('id')
-            for entry in list_json.get(key)
-            if entry.get('blob') == entry_name][0]
+
+@_retrieve_id
+def retrieve_id_by_blob():
+    pass
 
 
 class LdapClient(object):

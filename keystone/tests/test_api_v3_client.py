@@ -133,44 +133,6 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_service(token=v.admin_token,
                               target_type=v.service_type)
 
-    def test_list_services_by_member(self):
-        """ OK """
-        self.k.create_service(token=v.admin_token,
-                              target_type=v.service_type)
-        self.l.create_domain(v.net_domain_name)
-        self.k.create_project(token=v.admin_token,
-                              target_name=v.x_project_name,
-                              domain_name=v.net_domain_name)
-        # prepare role
-        self.k.create_role(token=v.admin_token,
-                           target_name=v.member_role_name)
-        self.k.grant_role_user_on_project(token=v.admin_token,
-                                          ou_name=v.x_project_name,
-                                          target_id=v.user01_userid,
-                                          role_name=v.member_role_name)
-        res = self.k.authenticate(v.user01_userid,
-                                  v.user01_password,
-                                  project_name=v.x_project_name,
-                                  domain_name=v.net_domain_name)
-        print res.status_code
-        print 0, res.json()
-        print
-        print 1, res.headers
-        print
-        token = res.headers.get('x-subject-token')
-        print 2, token
-        print
-        res = self.k.list_policies(token=token)
-        print 3, res
-        print
-        self.k.delete_role(token=v.admin_token,
-                           target_name=v.member_role_name)
-        self.l.delete_entry(v.x_project_name, 'projects')
-        self.k.delete_service(token=v.admin_token,
-                              target_type=v.service_type)
-        self.l.delete_entry(v.net_domain_name, 'domains')
-        #self.assertTrue(False)
-
     def test_show_service(self):
         """ OK """
         self.k.create_service(token=v.admin_token,
@@ -1297,3 +1259,41 @@ class ApiV3ClientTests(unittest.TestCase):
                            target_name=v.member_role_name)
         self.l.delete_entry(v.default_project_name, 'projects')
         self.l.delete_entry(v.net_domain_name, 'domains')
+
+    def test_list_services_by_member(self):
+        """ OK """
+        self.k.create_service(token=v.admin_token,
+                              target_type=v.service_type)
+        self.l.create_domain(v.net_domain_name)
+        self.k.create_project(token=v.admin_token,
+                              target_name=v.x_project_name,
+                              domain_name=v.net_domain_name)
+        # prepare role
+        self.k.create_role(token=v.admin_token,
+                           target_name=v.member_role_name)
+        self.k.grant_role_user_on_project(token=v.admin_token,
+                                          ou_name=v.x_project_name,
+                                          target_id=v.user01_userid,
+                                          role_name=v.member_role_name)
+        res = self.k.authenticate(v.user01_userid,
+                                  v.user01_password,
+                                  project_name=v.x_project_name,
+                                  domain_name=v.net_domain_name)
+        print res.status_code
+        print 0, res.json()
+        print
+        print 1, res.headers
+        print
+        token = res.headers.get('x-subject-token')
+        print 2, token
+        print
+        res = self.k.list_policies(token=token)
+        print 3, res
+        print
+        self.k.delete_role(token=v.admin_token,
+                           target_name=v.member_role_name)
+        self.l.delete_entry(v.x_project_name, 'projects')
+        self.k.delete_service(token=v.admin_token,
+                              target_type=v.service_type)
+        self.l.delete_entry(v.net_domain_name, 'domains')
+        #self.assertTrue(False)
