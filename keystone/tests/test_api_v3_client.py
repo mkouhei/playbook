@@ -1047,7 +1047,7 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_policy(token=v.admin_token,
                              target_id=policy_id)
 
-    def test_delete_policies(self):
+    def test_delete_policy(self):
         """ OK """
         self.k.create_policy(token=v.admin_token,
                              target_blob=v.policy_blob,
@@ -1059,7 +1059,7 @@ class ApiV3ClientTests(unittest.TestCase):
                                    target_id=policy_id)
         self.assertEqual(204, res.status_code)
 
-    def test_authenticate_hoge(self):
+    def test_authenticate_by_admin_user(self):
         # domain id must be same businessCategory
         # and be unique name and not using uuid
         self.l.create_domain(v.net_domain_name)
