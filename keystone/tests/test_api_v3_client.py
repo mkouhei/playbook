@@ -1092,9 +1092,8 @@ class ApiV3ClientTests(unittest.TestCase):
                                   v.user01_password,
                                   domain_name=v.net_domain_name)
         subject_token = res.headers.get('x-subject-token')
-        self.assertEqual(200,
-                         self.k.validate_token(subject_token,
-                                               v.admin_token).status_code)
+        res = self.k.validate_token(subject_token, v.admin_token)
+        self.assertEqual(200, res.status_code)
         self.k.delete_group(token=v.admin_token,
                             target_name=v.default_group_name)
         self.l.delete_entry(v.net_domain_name, 'domains')
@@ -1309,3 +1308,50 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_service(token=v.admin_token,
                               target_type=v.service_type)
         self.l.delete_entry(v.net_domain_name, 'domains')
+
+    def test_validate_token_with_policy(self):
+        # domain id must be same businessCategory
+        # and be unique name and not using uuid
+        self.k.create_policy(token=v.admin_token,
+                             target_blob=json.loads(v.policy_cinder),
+                             target_type=v.policy_mimetype)
+        self.l.create_domain(v.net_domain_name)
+        self.k.create_project(token=v.admin_token,
+                              target_name=v.x_project_name,
+                              domain_name=v.net_domain_name)
+        self.k.create_group(token=v.admin_token,
+                            target_name=v.default_group_name,
+                            domain_name=v.net_domain_name)
+        self.k.create_role(token=v.admin_token,
+                           target_name=v.member_role_name)
+        '''
+        self.k.grant_role_group_on_project(token=v.admin_token,
+                                           ou_name=v.x_project_name,
+                                           target_name=v.default_group_name,
+                                           role_name=v.member_role_name)
+        self.k.add_user_to_group(v.user01_userid,
+                                 token=v.admin_token,
+                                 group_name=v.default_group_name)
+        '''
+        self.k.grant_role_user_on_project(token=v.admin_token,
+                                          ou_name=v.x_project_name,
+                                          target_id=v.user01_userid,
+                                          role_name=v.member_role_name)
+
+        res = self.k.authenticate(v.user01_userid,
+                                  v.user01_password,
+                                  project_name=v.x_project_name,
+                                  domain_name=v.net_domain_name)
+        subject_token = res.headers.get('x-subject-token')
+        res = self.k.validate_token_with_policy(subject_token, v.admin_token)
+        self.assertEqual(200, res.status_code)
+        self.assertTrue(res.json().get('allow_actions'))
+        res = self.k.list_policies(token=v.admin_token)
+        self.k.delete_role(token=v.admin_token,
+                           target_name=v.member_role_name)
+        self.k.delete_group(token=v.admin_token,
+                            target_name=v.default_group_name)
+        self.l.delete_entry(v.x_project_name, 'projects')
+        self.l.delete_entry(v.net_domain_name, 'domains')
+        self.k.delete_policy(token=v.admin_token,
+                             target_blob=json.loads(v.policy_cinder))

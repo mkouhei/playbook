@@ -671,6 +671,14 @@ class ApiV3Client(object):
                             timeout=TIMEOUT, verify=self.verify)
         return r
 
+    def validate_token_with_policy(self, subject_token, auth_token):
+        url = self._set_api_url('auth/tokens/policies')
+        headers = {'X-Auth-Token': auth_token,
+                   'X-Subject-Token': subject_token}
+        r = requests.get(url, headers=headers,
+                         timeout=TIMEOUT, verify=self.verify)
+        return r
+
     @_create
     def create_service(self):
         pass

@@ -104,4 +104,6 @@ policy_blob = {"member": ""}
 policy_blob2 = {"identity:list_policies": [["rule:member"]]}
 policy_blob3 = {"member": [],
                 "identity:list_policies": [["rule:member"]]}
+with open('tests/policy.json') as f:
+    policy_cinder = f.read()
 policy_mimetype = 'application/json'
