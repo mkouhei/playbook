@@ -12,7 +12,7 @@
   template: src=organizationalUnit.ldif.j2 dest=/tmp/{{ item.ou }}.ldif
   with_items:
     - { ou: 'People' }
-    - { ou: 'ServerAdmin', dc: $organization_dc }
+    - { ou: 'ServiceAdmin', dc: $organization_dc }
     - { ou: 'ProjectUser', dc: $organization_dc }
     - { ou: 'Projects', dc: $organization_dc }
     - { ou: 'Roles', dc: $organization_dc }
@@ -25,12 +25,12 @@
 - name: add organizationalUnit of People
   command: ldapadd -x -h localhost -D {{ rootdn }} -w {{ rootpw }} -f /tmp/People.ldif
   when: result.stdout != '0'
-- name: check organizationUnit of ServerAdmin
+- name: check organizationUnit of ServiceAdmin
   shell: |
-    ldapsearch -x -h localhost -b {{ basedn }} ou=ServerAdmin | grep -q '^dn:'; echo $?
+    ldapsearch -x -h localhost -b {{ basedn }} ou=ServiceAdmin | grep -q '^dn:'; echo $?
   register: result
-- name: add organizationalUnit of ServerAdmin
-  command: ldapadd -x -h localhost -D {{ rootdn }} -w {{ rootpw }} -f /tmp/ServerAdmin.ldif
+- name: add organizationalUnit of ServiceAdmin
+  command: ldapadd -x -h localhost -D {{ rootdn }} -w {{ rootpw }} -f /tmp/ServiceAdmin.ldif
   when: result.stdout != '0'
 - name: check organizationUnit of Roles
   shell: |

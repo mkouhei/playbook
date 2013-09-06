@@ -17,7 +17,7 @@
     - add_module_memberof
     - add_olcOverlay_memberof
     - People
-    - ServerAdmin
+    - ServiceAdmin
     - ProjectUser
     - Projects
     - Roles

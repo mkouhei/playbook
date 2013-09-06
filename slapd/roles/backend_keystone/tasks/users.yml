@@ -13,12 +13,12 @@
         - { uid: 'user13', cn: 'sato_saburo', desc: 'com', password: '{SSHA}qlkQl5tkHOKqTIu0MiwUlhWlf9TfrQce', uidNumber: '20013', gidNumber: '20000', sn: 'sato' }
         - { uid: 'user14', cn: 'nakamura_shiro', desc: 'com', password: '{SSHA}qlkQl5tkHOKqTIu0MiwUlhWlf9TfrQce', uidNumber: '20014', gidNumber: '20000', sn: 'nakamura' }
         - { uid: 'user15', cn: 'suzuki_goro', desc: 'com', password: '{SSHA}qlkQl5tkHOKqTIu0MiwUlhWlf9TfrQce', uidNumber: '20015', gidNumber: '20000', sn: 'suzuki' }
-        - { uid: 'service-admin', cn: 'service-admin', dn: $organization_dn, password: '{SSHA}qlkQl5tkHOKqTIu0MiwUlhWlf9TfrQce', uidNumber: '2000', gidNumber: '2000', sn: 'service-admin', homeDirectory: '/noexistence' }
-        - { uid: 'keystone', cn: 'keystone', dn: $organization_dn, password: '{SSHA}qlkQl5tkHOKqTIu0MiwUlhWlf9TfrQce', uidNumber: '2001', gidNumber: '2000', sn: 'keystone', homeDirectory: '/var/lib/keystone' }
-        - { uid: 'nova', cn: 'nova', dn: $organization_dn, password: '{SSHA}qlkQl5tkHOKqTIu0MiwUlhWlf9TfrQce', uidNumber: '2002', gidNumber: '2000', sn: 'nova', homeDirectory: '/var/lib/nova' }
-        - { uid: 'swift', cn: 'swift', dn: $organization_dn, password: '{SSHA}qlkQl5tkHOKqTIu0MiwUlhWlf9TfrQce', uidNumber: '2003', gidNumber: '2000', sn: 'swift', homeDirectory: '/var/lib/swift' }
-        - { uid: 'glance', cn: 'glance', dn: $organization_dn, password: '{SSHA}qlkQl5tkHOKqTIu0MiwUlhWlf9TfrQce', uidNumber: '2004', gidNumber: '2000', sn: 'glance', homeDirectory: '/var/lib/glance' }
-        - { uid: 'cinder', cn: 'cinder', dn: $organization_dn, password: '{SSHA}qlkQl5tkHOKqTIu0MiwUlhWlf9TfrQce', uidNumber: '2005', gidNumber: '2000', sn: 'cinder', homeDirectory: '/var/lib/cinder' }
+        - { uid: 'service-admin', cn: 'service-admin', dc: $organization_dc, password: '{SSHA}qlkQl5tkHOKqTIu0MiwUlhWlf9TfrQce', uidNumber: '2000', gidNumber: '2000', sn: 'service-admin', homeDirectory: '/noexistence' }
+        - { uid: 'keystone', cn: 'keystone', dc: $organization_dc, password: '{SSHA}qlkQl5tkHOKqTIu0MiwUlhWlf9TfrQce', uidNumber: '2001', gidNumber: '2000', sn: 'keystone', homeDirectory: '/var/lib/keystone' }
+        - { uid: 'nova', cn: 'nova', dc: $organization_dc, password: '{SSHA}qlkQl5tkHOKqTIu0MiwUlhWlf9TfrQce', uidNumber: '2002', gidNumber: '2000', sn: 'nova', homeDirectory: '/var/lib/nova' }
+        - { uid: 'swift', cn: 'swift', dc: $organization_dc, password: '{SSHA}qlkQl5tkHOKqTIu0MiwUlhWlf9TfrQce', uidNumber: '2003', gidNumber: '2000', sn: 'swift', homeDirectory: '/var/lib/swift' }
+        - { uid: 'glance', cn: 'glance', dc: $organization_dc, password: '{SSHA}qlkQl5tkHOKqTIu0MiwUlhWlf9TfrQce', uidNumber: '2004', gidNumber: '2000', sn: 'glance', homeDirectory: '/var/lib/glance' }
+        - { uid: 'cinder', cn: 'cinder', dc: $organization_dc, password: '{SSHA}qlkQl5tkHOKqTIu0MiwUlhWlf9TfrQce', uidNumber: '2005', gidNumber: '2000', sn: 'cinder', homeDirectory: '/var/lib/cinder' }
 - name: check users
   shell: |
     ldapsearch -x -b {{ basedn }} -h localhost uid=user01 | grep -q '^dn:'; echo $?
