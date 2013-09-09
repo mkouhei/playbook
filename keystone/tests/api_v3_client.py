@@ -73,9 +73,13 @@ def _retrieve_id(func):
     """
     def retrieve_id(*args):
         data_type = func.func_name.split('retrieve_id_by_')[1]
-        return [entry.get('id')
-                for entry in args[0].get(args[2])
-                if entry.get(data_type) == args[1]][0]
+        res = [entry.get('id')
+               for entry in args[0].get(args[2])
+               if entry.get(data_type) == args[1]]
+        if res:
+            return res[0]
+        else:
+            raise ldap.NO_SUCH_OBJECT('No such %s: %s' % (args[2], args[1]))
     return retrieve_id
 
 
