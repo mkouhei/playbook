@@ -988,7 +988,7 @@ class ApiV3Client(object):
     def update_policy(self):
         pass
 
-    def get_role_assginments(self, **kwargs):
+    def get_role_assignments(self, **kwargs):
         if kwargs.get('token'):
             token = kwargs.get('token')
 

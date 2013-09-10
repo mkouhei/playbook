@@ -32,6 +32,10 @@ class ApiV3ClientTests(unittest.TestCase):
                                v.region,
                                verify=v.verify)
         self.l = c.LdapClient(v.ldap_url, v.search_base, v.binddn, v.bindpw)
+        [self.k.delete_service(token=v.admin_token, target_id=s.get('id'))
+         for s in self.k.list_services(token=v.admin_token).get('services')]
+        [self.k.delete_policy(token=v.admin_token, target_id=p.get('id'))
+         for p in self.k.list_policies(token=v.admin_token).get('policies')]
 
     def test_set_auth_payload_with_domain_name_and_project_name(self):
         """ OK """
@@ -1359,3 +1363,156 @@ class ApiV3ClientTests(unittest.TestCase):
         self.l.delete_entry(v.net_domain_name, 'domains')
         self.k.delete_policy(token=v.admin_token,
                              target_blob=v.policy_cinder)
+        self.assertTrue(False)
+
+    def test_member_of_user_on_project(self):
+        # domain id must be same businessCategory
+        # and be unique name and not using uuid
+        self.k.create_service(token=v.admin_token,
+                              target_name=v.service_name,
+                              target_type=v.service_type)
+        self.l.create_domain(v.net_domain_name)
+        self.k.create_project(token=v.admin_token,
+                              target_name=v.x_project_name,
+                              domain_name=v.net_domain_name)
+        self.k.create_role(token=v.admin_token,
+                           target_name=v.member_role_name)
+        self.k.grant_role_user_on_project(token=v.admin_token,
+                                          ou_name=v.x_project_name,
+                                          target_id=v.user01_userid,
+                                          role_name=v.member_role_name)
+        res = self.k.authenticate(v.user01_userid,
+                                  v.user01_password,
+                                  project_name=v.x_project_name,
+                                  domain_name=v.net_domain_name)
+        subject_token = res.headers.get('x-subject-token')
+        res = self.k.validate_token(subject_token, v.admin_token)
+        self.assertEqual(200, res.status_code)
+        res = self.k.list_services(token=subject_token)
+        self.assertEqual(v.service_type,
+                         res.get('services')[0].get('type'))
+        self.assertEqual(v.service_name,
+                         res.get('services')[0].get('name'))
+        self.k.delete_role(token=v.admin_token,
+                           target_name=v.member_role_name)
+        self.l.delete_entry(v.x_project_name, 'projects')
+        self.l.delete_entry(v.net_domain_name, 'domains')
+        self.k.delete_service(token=v.admin_token,
+                              target_name=v.service_name,
+                              target_type=v.service_type)
+
+    def test_member_of_group_on_project(self):
+        # domain id must be same businessCategory
+        # and be unique name and not using uuid
+        self.k.create_service(token=v.admin_token,
+                              target_name=v.service_name,
+                              target_type=v.service_type)
+        self.l.create_domain(v.net_domain_name)
+        self.k.create_project(token=v.admin_token,
+                              target_name=v.x_project_name,
+                              domain_name=v.net_domain_name)
+        self.k.create_group(token=v.admin_token,
+                            target_name=v.y_group_name)
+        self.k.create_role(token=v.admin_token,
+                           target_name=v.member_role_name)
+        self.k.grant_role_group_on_project(token=v.admin_token,
+                                           ou_name=v.x_project_name,
+                                           target_name=v.y_group_name,
+                                           role_name=v.member_role_name)
+        self.k.add_user_to_group(v.user01_userid,
+                                 token=v.admin_token,
+                                 group_name=v.y_group_name)
+        res = self.k.authenticate(v.user01_userid,
+                                  v.user01_password,
+                                  project_name=v.x_project_name,
+                                  domain_name=v.net_domain_name)
+        subject_token = res.headers.get('x-subject-token')
+        res = self.k.validate_token(subject_token, v.admin_token)
+        self.assertEqual(200, res.status_code)
+        res = self.k.list_services(token=subject_token)
+        self.assertEqual(v.service_type,
+                         res.get('services')[0].get('type'))
+        self.assertEqual(v.service_name,
+                         res.get('services')[0].get('name'))
+        self.k.delete_role(token=v.admin_token,
+                           target_name=v.member_role_name)
+        self.k.delete_group(token=v.admin_token,
+                            target_name=v.y_group_name)
+        self.l.delete_entry(v.x_project_name, 'projects')
+        self.l.delete_entry(v.net_domain_name, 'domains')
+        self.k.delete_service(token=v.admin_token,
+                              target_name=v.service_name,
+                              target_type=v.service_type)
+
+    def test_member_of_user_on_domain(self):
+        # domain id must be same businessCategory
+        # and be unique name and not using uuid
+
+        # must not specify project.
+        self.k.create_service(token=v.admin_token,
+                              target_name=v.service_name,
+                              target_type=v.service_type)
+        self.l.create_domain(v.net_domain_name)
+        self.k.create_role(token=v.admin_token,
+                           target_name=v.member_role_name)
+        self.k.grant_role_user_on_domain(token=v.admin_token,
+                                         ou_name=v.net_domain_name,
+                                         target_id=v.user01_userid,
+                                         role_name=v.member_role_name)
+        res = self.k.authenticate(v.user01_userid,
+                                  v.user01_password,
+                                  domain_name=v.net_domain_name)
+        subject_token = res.headers.get('x-subject-token')
+        res = self.k.validate_token(subject_token, v.admin_token)
+        self.assertEqual(200, res.status_code)
+        res = self.k.list_services(token=subject_token)
+        self.assertEqual(v.service_type,
+                         res.get('services')[0].get('type'))
+        self.assertEqual(v.service_name,
+                         res.get('services')[0].get('name'))
+        self.k.delete_role(token=v.admin_token,
+                           target_name=v.member_role_name)
+        self.l.delete_entry(v.net_domain_name, 'domains')
+        self.k.delete_service(token=v.admin_token,
+                              target_name=v.service_name,
+                              target_type=v.service_type)
+
+    def test_member_of_group_on_domain(self):
+        # domain id must be same businessCategory
+        # and be unique name and not using uuid
+
+        # must not specify project.
+        self.k.create_service(token=v.admin_token,
+                              target_name=v.service_name,
+                              target_type=v.service_type)
+        self.l.create_domain(v.net_domain_name)
+        self.k.create_group(token=v.admin_token,
+                            target_name=v.y_group_name)
+        self.k.create_role(token=v.admin_token,
+                           target_name=v.member_role_name)
+        self.k.grant_role_group_on_domain(token=v.admin_token,
+                                          ou_name=v.net_domain_name,
+                                          target_id=v.y_group_name,
+                                          role_name=v.member_role_name)
+        self.k.add_user_to_group(v.user01_userid,
+                                 token=v.admin_token,
+                                 group_name=v.y_group_name)
+        res = self.k.authenticate(v.user01_userid,
+                                  v.user01_password,
+                                  domain_name=v.net_domain_name)
+        subject_token = res.headers.get('x-subject-token')
+        res = self.k.validate_token(subject_token, v.admin_token)
+        self.assertEqual(200, res.status_code)
+        res = self.k.list_services(token=subject_token)
+        self.assertEqual(v.service_type,
+                         res.get('services')[0].get('type'))
+        self.assertEqual(v.service_name,
+                         res.get('services')[0].get('name'))
+        self.k.delete_role(token=v.admin_token,
+                           target_name=v.member_role_name)
+        self.k.delete_group(token=v.admin_token,
+                            target_name=v.y_group_name)
+        self.l.delete_entry(v.net_domain_name, 'domains')
+        self.k.delete_service(token=v.admin_token,
+                              target_name=v.service_name,
+                              target_type=v.service_type)
