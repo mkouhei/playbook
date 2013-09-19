@@ -1163,6 +1163,9 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.create_policy(token=v.admin_token,
                              target_blob=v.policy_cinder,
                              target_type=v.policy_mimetype)
+        self.k.create_policy(token=v.admin_token,
+                             target_blob=v.policy_nova,
+                             target_type=v.policy_mimetype)
         self.l.create_domain(v.default_domain_name)
         self.l.create_domain(v.net_domain_name)
         self.k.create_project(token=v.admin_token,
@@ -1180,6 +1183,15 @@ class ApiV3ClientTests(unittest.TestCase):
                                      url=v.endpoint_url,
                                      service_type=v.service_type)
 
+        self.k.create_service(token=v.admin_token,
+                              target_name=v.service_name2,
+                              target_type=v.service_type2)
+        res = self.k.create_endpoint(token=v.admin_token,
+                                     target_name=v.endpoint_name2,
+                                     interface=v.endpoint_interface2,
+                                     url=v.endpoint_url2,
+                                     service_type=v.service_type2)
+
         # prepare role
         self.k.create_role(token=v.admin_token,
                            target_name=v.member_role_name)
@@ -1194,7 +1206,7 @@ class ApiV3ClientTests(unittest.TestCase):
 
         self.k.grant_role_user_on_project(token=v.admin_token,
                                           ou_name=v.default_project_name,
-                                          target_id=v.admin_userid,
+                                          target_id=v.service_userid,
                                           role_name=v.admin_role_name)
 
         # authenticate member
@@ -1208,16 +1220,17 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertNotEqual(None, token_member)
 
         # for admin user
-        res = self.k.authenticate(v.admin_userid,
-                                  v.admin_password,
+        res = self.k.authenticate(v.service_userid,
+                                  v.service_password,
                                   project_name=v.default_project_name,
                                   domain_name=v.default_domain_name)
+        #print res.json()
         token_admin = res.headers.get('x-subject-token')
         self.assertNotEqual(None, token_admin)
 
         # validation
         res = self.k.validate_token(token_member, token_admin)
-        print res.json()
+        #print res.json()
         self.assertEqual(token_member, res.headers['x-subject-token'])
         self.assertEqual(200, res.status_code)
         self.assertEqual(32, len(res.headers.get('x-subject-token')))
@@ -1234,9 +1247,13 @@ class ApiV3ClientTests(unittest.TestCase):
         self.l.delete_entry(v.default_domain_name, 'domains')
         self.k.delete_service(token=v.admin_token,
                               target_type=v.service_type)
+        self.k.delete_service(token=v.admin_token,
+                              target_type=v.service_type2)
         self.k.delete_policy(token=v.admin_token,
                              target_blob=v.policy_cinder)
-        #self.assertTrue(False)
+        self.k.delete_policy(token=v.admin_token,
+                             target_blob=v.policy_nova)
+        self.assertTrue(False)
 
     def test_authenticate_with_adminuser_in_samedomain(self):
         # not OK

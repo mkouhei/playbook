@@ -7,6 +7,8 @@ bindpw = 'password'
 verify = False
 admin_userid = 'service-admin'
 admin_password = 'password'
+service_userid = 'cinder'
+service_password = 'password'
 admin_token = 'password'
 user01_userid = 'user01'
 user01_password = 'password'
@@ -96,6 +98,11 @@ service_type = 'identity'
 endpoint_interface = 'internal'
 endpoint_name = 'KeyStone Authentication'
 endpoint_url = 'http://localhost:35357/v3/'
+service_name2 = 'cinder'
+service_type2 = 'volume'
+endpoint_interface2 = 'internal'
+endpoint_name2 = 'cinder'
+endpoint_url2 = 'http://cinder.examle.org/'
 region = 'regionOne'
 admin_role_name = 'admin'
 member_role_name = 'member'
@@ -107,4 +114,6 @@ policy_blob3 = {"member": [],
                 "identity:list_policies": [["rule:member"]]}
 with open('tests/policy.json') as f:
     policy_cinder = f.read()
+with open('tests/policy.json2') as f:
+    policy_nova = f.read()
 policy_mimetype = 'application/json'

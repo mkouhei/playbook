@@ -1,0 +1,64 @@
+{
+    "context_is_admin":  "role:admin",
+    "admin_or_owner":  "is_admin:True or project_id:%(project_id)s",
+    "member_and_owner":  "is_admin:True",
+    "member_or_owner":  "role:member or project_id:%(project_id)s",
+    "default": "rule:admin_or_owner",
+    "admin_api": "is_admin:True",
+    "admin_only": "rule:context_is_admin",
+    "is_admin":  "role:admin or role:administrator",
+    "member": "",
+
+    "compute:create_instance": "rule:member",
+    "compute:describe_instance": "rule:member_and_owner",
+
+    "compute:create_tftpprofile": "rule:member_and_owner",
+    "cumpute:list_tftpprofiles": "rule:member_and_owner",
+    "compute:get_tftpprofile": "rule:member_and_owner",
+    "compute:update_tftpprofile": "rule:member_and_owner",
+    "compute:delete_tftpprofile": "rule:member_and_owner",
+
+    "compute:create_tftpsnippet": "rule:member_and_owner",
+    "cumpute:list_tftpsnippets": "rule:member_and_owner",
+    "compute:get_tftpsnippet": "rule:member_and_owner",
+    "compute:update_tftpsnippet": "rule:member_and_owner",
+    "compute:delete_tftpsnippet": "rule:member_and_owner",
+
+    "compute:create_vlan": "rule:member_and_owner",
+    "cumpute:list_vlans": "rule:member_and_owner",
+    "compute:get_vlan": "rule:member_and_owner",
+    "compute:update_vlan": "rule:member_and_owner",
+    "compute:delete_vlan": "rule:member_and_owner",
+
+    "compute:create_host": "rule:member_and_owner",
+    "cumpute:list_hosts": "rule:member_and_owner",
+    "compute:get_host": "rule:member_and_owner",
+    "compute:update_host": "rule:member_and_owner",
+    "compute:delete_host": "rule:member_and_owner",
+
+    "compute:create_zone": "rule:member_and_owner",
+    "cumpute:list_zones": "rule:member_and_owner",
+    "compute:get_zone": "rule:member_and_owner",
+    "compute:update_zone": "rule:member_and_owner",
+    "compute:delete_zone": "rule:member_and_owner",
+
+    "compute:create_record": "rule:member_and_owner",
+    "cumpute:list_records": "rule:member_and_owner",
+    "compute:get_record": "rule:member_and_owner",
+    "compute:update_record": "rule:member_and_owner",
+    "compute:delete_record": "rule:member_and_owner",
+
+    "compute:create_instancetype": "rule:member_and_owner",
+    "cumpute:list_instancetypes": "rule:member_and_owner",
+    "compute:get_instancetype": "rule:member_and_owner",
+    "compute:update_instancetype": "rule:member_and_owner",
+    "compute:delete_instancetype": "rule:member_and_owner",
+
+    "cumpute:get_cost": "rule:member_and_owner",
+    "cumpute:get_count": "rule:member_and_owner",
+
+    "compute:create_mailalias": "rule:member_and_owner",
+    "cumpute:list_mailaliases": "rule:member_and_owner",
+    "cumpute:get_mailalias": "rule:member_and_owner"
+
+}
