@@ -568,6 +568,9 @@ class ApiV3ClientTests(unittest.TestCase):
         """ OK """
         self.k.create_group(token=v.admin_token,
                             target_name=v.default_group_name)
+        self.k.add_user_to_group(v.user01_userid,
+                                 token=v.admin_token,
+                                 group_name=v.default_group_name)
         res = self.k.delete_group(token=v.admin_token,
                                   target_name=v.default_group_name)
         self.assertEqual(204, res.status_code)
