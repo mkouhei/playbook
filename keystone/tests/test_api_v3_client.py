@@ -1256,7 +1256,6 @@ class ApiV3ClientTests(unittest.TestCase):
                              target_blob=v.policy_cinder)
         self.k.delete_policy(token=v.admin_token,
                              target_blob=v.policy_nova)
-        self.assertTrue(False)
 
     def test_authenticate_with_adminuser_in_samedomain(self):
         # not OK
@@ -1360,13 +1359,25 @@ class ApiV3ClientTests(unittest.TestCase):
     def test_validate_token_with_policy(self):
         # domain id must be same businessCategory
         # and be unique name and not using uuid
+        self.k.create_service(token=v.admin_token,
+                              target_name=v.service_name2,
+                              target_type=v.service_type2)
+        res = self.k.create_endpoint(token=v.admin_token,
+                                     target_name=v.endpoint_name2,
+                                     interface=v.endpoint_interface2,
+                                     url=v.endpoint_url2,
+                                     service_type=v.service_type2)
         self.k.create_policy(token=v.admin_token,
                              target_blob=v.policy_cinder,
                              target_type=v.policy_mimetype)
+        self.l.create_domain(v.default_domain_name)
         self.l.create_domain(v.net_domain_name)
         self.k.create_project(token=v.admin_token,
                               target_name=v.x_project_name,
                               domain_name=v.net_domain_name)
+        self.k.create_project(token=v.admin_token,
+                              target_name=v.default_project_name,
+                              domain_name=v.default_domain_name)
         self.k.create_group(token=v.admin_token,
                             target_name=v.default_group_name,
                             domain_name=v.net_domain_name)
@@ -1381,17 +1392,31 @@ class ApiV3ClientTests(unittest.TestCase):
                                           target_id=v.user01_userid,
                                           role_name=v.member_role_name)
 
+        self.k.grant_role_user_on_project(token=v.admin_token,
+                                          ou_name=v.default_project_name,
+                                          target_id=v.service_userid,
+                                          role_name=v.admin_role_name)
+
         res = self.k.authenticate(v.user01_userid,
                                   v.user01_password,
                                   project_name=v.x_project_name,
                                   domain_name=v.net_domain_name)
         print "authenticate:\n\n", res.json()
-        subject_token = res.headers.get('x-subject-token')
-        res = self.k.validate_token_with_policy(subject_token, v.admin_token)
+        member_token = res.headers.get('x-subject-token')
+
+        res = self.k.authenticate(v.service_userid,
+                                  v.service_password,
+                                  project_name=v.default_project_name,
+                                  domain_name=v.default_domain_name)
+        print res.json()
+        print res.headers
+        admin_token = res.headers.get('x-subject-token')
+        res = self.k.validate_token_with_policy(member_token, admin_token)
+        print res.json()
         self.assertEqual(200, res.status_code)
         print "\nvalidate:\n\n", res.json()
         self.assertTrue(res.json().get('allowed_actions'))
-        res = self.k.list_services(token=subject_token)
+        res = self.k.list_services(token=member_token)
         print "\nlist_service by menber:\n\n", res
         self.k.delete_role(token=v.admin_token,
                            target_name=v.admin_role_name)
@@ -1401,6 +1426,10 @@ class ApiV3ClientTests(unittest.TestCase):
                             target_name=v.default_group_name)
         self.l.delete_entry(v.x_project_name, 'projects')
         self.l.delete_entry(v.net_domain_name, 'domains')
+        self.l.delete_entry(v.default_project_name, 'projects')
+        self.l.delete_entry(v.default_domain_name, 'domains')
+        self.k.delete_service(token=v.admin_token,
+                              target_type=v.service_type2)
         self.k.delete_policy(token=v.admin_token,
                              target_blob=v.policy_cinder)
 
