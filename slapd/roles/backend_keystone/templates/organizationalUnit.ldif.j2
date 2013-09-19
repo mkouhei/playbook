@@ -1,4 +1,4 @@
-{% if item.dc %}
+{% if item.get('dc') %}
 dn: ou={{ item.ou }},dc={{ item.dc }},{{ basedn }}
 {% else %}
 dn: ou={{ item.ou }},{{ basedn }}

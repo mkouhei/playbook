@@ -1,5 +1,5 @@
 {% for user in item.users %}
-{% if user.dc %}
+{% if user.get('dc') %}
 dn: uid={{ user.uid }},ou=ServiceAdmin,dc={{ user.dc }},{{ basedn }}
 {% else %}
 dn: uid={{ user.uid }},ou=People,{{ basedn }}
@@ -8,7 +8,7 @@ cn: {{ user.cn }}
 objectClass: inetOrgPerson
 objectClass: posixAccount
 description: default
-{% if user.desc %}
+{% if user.get('desc') %}
 description: {{ user.desc }}
 businessCategory: {{ user.desc }}
 {% endif %}
@@ -17,7 +17,7 @@ userPassword: {{ user.password }}
 uidNumber: {{ user.uidNumber }}
 gidNumber: {{ user.gidNumber }}
 sn: {{ user.sn }}
-{% if user.homeDirectory %}
+{% if user.get('homeDirectory') %}
 homeDirectory: {{ user.homeDirectory }}
 {% else %}
 homeDirectory: /home/{{ user.uid }}
