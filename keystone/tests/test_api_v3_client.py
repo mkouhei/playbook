@@ -266,7 +266,7 @@ class ApiV3ClientTests(unittest.TestCase):
                               target_type=v.service_type)
 
     def test_create_credential(self):
-        """ Not Implemented """
+        """ OK """
         self.l.create_domain(v.default_domain_name)
         res = self.k.create_project(token=v.admin_token,
                                     target_name=v.default_project_name)
@@ -276,29 +276,115 @@ class ApiV3ClientTests(unittest.TestCase):
                                        target_blob=v.credential_blob,
                                        user_id=v.user01_userid,
                                        project_id=project_id)
-        #self.assertEqual(201, res.status_code)
-        self.assertEqual(501, res.status_code)
-        #self.delete_credential(target_id=credential_id)
+        self.assertEqual(201, res.status_code)
+        credential_id = res.json().get('credential').get('id')
+        print self.k.delete_credential(token=v.admin_token,
+                                       target_id=credential_id)
         self.l.delete_entry(v.default_project_name, 'projects')
         self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_list_credentials(self):
-        """ Not implmented """
-        creds_l = self.k.list_credentials(
-            token=v.admin_token).get('error').get('code')
-        self.assertEqual(501, creds_l)
+        """ OK """
+        self.l.create_domain(v.default_domain_name)
+        res = self.k.create_project(token=v.admin_token,
+                                    target_name=v.default_project_name)
+        project_id = res.json().get('project').get('id')
+        self.k.create_credential(token=v.admin_token,
+                                 target_type=v.credential_type,
+                                 target_blob=v.credential_blob,
+                                 user_id=v.user01_userid,
+                                 project_id=project_id)
+        res = self.k.list_credentials(token=v.admin_token)
+        self.assertEqual(1, len(res.get('credentials')))
+        self.assertEqual(v.credential_blob,
+                         res.get('credentials')[0].get('blob'))
+        credential_id = res.get('credentials')[0].get('id')
+        self.k.delete_credential(token=v.admin_token,
+                                 target_id=credential_id)
+        self.l.delete_entry(v.default_project_name, 'projects')
+        self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_show_credential(self):
-        """ Not implmented """
-        pass
+        """ OK """
+        self.l.create_domain(v.default_domain_name)
+        res = self.k.create_project(token=v.admin_token,
+                                    target_name=v.default_project_name)
+        project_id = res.json().get('project').get('id')
+        res = self.k.create_credential(token=v.admin_token,
+                                       target_type=v.credential_type,
+                                       target_blob=v.credential_blob,
+                                       user_id=v.user01_userid,
+                                       project_id=project_id)
+        credential_id = res.json().get('credential').get('id')
+        res = self.k.show_credential(token=v.admin_token,
+                                     target_id=credential_id)
+        self.assertEqual(200, res.status_code)
+        self.assertEqual(v.credential_blob,
+                         res.json().get('credential').get('blob'))
+        self.k.delete_credential(token=v.admin_token,
+                                 target_id=credential_id)
+        self.l.delete_entry(v.default_project_name, 'projects')
+        self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_update_credential(self):
-        """ Not implmented """
-        pass
+        """ OK """
+        self.l.create_domain(v.default_domain_name)
+        res = self.k.create_project(token=v.admin_token,
+                                    target_name=v.default_project_name)
+        project_id = res.json().get('project').get('id')
+        res = self.k.create_credential(token=v.admin_token,
+                                       target_type=v.credential_type,
+                                       target_blob=v.credential_blob,
+                                       user_id=v.user01_userid,
+                                       project_id=project_id)
+        credential_id = res.json().get('credential').get('id')
+        payload = {'credential': {'blob': v.credential_blob2}}
+        res = self.k.update_credential(token=v.admin_token,
+                                       target_id=credential_id,
+                                       payload=payload)
+        self.assertEqual(v.credential_blob2,
+                         res.json().get('credential').get('blob'))
+        res = self.k.delete_credential(token=v.admin_token,
+                                       target_id=credential_id)
+        self.assertEqual(204, res.status_code)
+        self.l.delete_entry(v.default_project_name, 'projects')
+        self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_delete_credential(self):
-        """ Not implmented """
-        pass
+        """ OK """
+        self.l.create_domain(v.default_domain_name)
+        res = self.k.create_project(token=v.admin_token,
+                                    target_name=v.default_project_name)
+        project_id = res.json().get('project').get('id')
+        res = self.k.create_credential(token=v.admin_token,
+                                       target_type=v.credential_type,
+                                       target_blob=v.credential_blob,
+                                       user_id=v.user01_userid,
+                                       project_id=project_id)
+        credential_id = res.json().get('credential').get('id')
+        res = self.k.delete_credential(token=v.admin_token,
+                                       target_id=credential_id)
+        self.assertEqual(204, res.status_code)
+        self.l.delete_entry(v.default_project_name, 'projects')
+        self.l.delete_entry(v.default_domain_name, 'domains')
+
+    def test_authenticate_with_credential(self):
+        """ not yet tested """
+        self.l.create_domain(v.default_domain_name)
+        res = self.k.create_project(token=v.admin_token,
+                                    target_name=v.default_project_name)
+        project_id = res.json().get('project').get('id')
+        res = self.k.create_credential(token=v.admin_token,
+                                       target_type=v.credential_type,
+                                       target_blob=v.credential_blob,
+                                       user_id=v.user01_userid,
+                                       project_id=project_id)
+        credential_id = res.json().get('credential').get('id')
+        # TODO test authenticate with ec2 type credential
+        self.k.delete_credential(token=v.admin_token,
+                                 target_id=credential_id)
+        self.l.delete_entry(v.default_project_name, 'projects')
+        self.l.delete_entry(v.default_domain_name, 'domains')
 
     def test_create_role(self):
         """ OK """

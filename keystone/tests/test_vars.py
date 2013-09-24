@@ -108,6 +108,7 @@ admin_role_name = 'admin'
 member_role_name = 'member'
 credential_type = 'ec2'
 credential_blob = {'access': 'hogehoge', 'secret': 'mogemoge'}
+credential_blob2 = {'access': 'foobar', 'secret': 'fugafuga'}
 policy_blob = {"member": ""}
 policy_blob2 = {"identity:list_policies": [["rule:member"]]}
 policy_blob3 = {"member": [],
