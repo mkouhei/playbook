@@ -571,6 +571,27 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.add_user_to_group(v.user01_userid,
                                  token=v.admin_token,
                                  group_name=v.default_group_name)
+        self.k.remove_user_from_group(v.user01_userid,
+                                      token=v.admin_token,
+                                      group_name=v.default_group_name)
+        res = self.k.delete_group(token=v.admin_token,
+                                  target_name=v.default_group_name)
+        self.assertEqual(204, res.status_code)
+
+    def test_fail_delete_group(self):
+        """ OK """
+        self.k.create_group(token=v.admin_token,
+                            target_name=v.default_group_name)
+        self.k.add_user_to_group(v.user01_userid,
+                                 token=v.admin_token,
+                                 group_name=v.default_group_name)
+        res = self.k.delete_group(token=v.admin_token,
+                                  target_name=v.default_group_name)
+        self.assertEqual(403, res.status_code)
+        res = self.k.remove_user_from_group(v.user01_userid,
+                                            token=v.admin_token,
+                                            group_name=v.default_group_name)
+        self.assertEqual(204, res.status_code)
         res = self.k.delete_group(token=v.admin_token,
                                   target_name=v.default_group_name)
         self.assertEqual(204, res.status_code)
@@ -608,6 +629,9 @@ class ApiV3ClientTests(unittest.TestCase):
         res = self.k.list_users(v.user01_userid, 'groups',
                                 token=v.admin_token)
         self.assertTrue(v.user01_userid in res.get('links').get('self'))
+        self.k.remove_user_from_group(v.user01_userid,
+                                      token=v.admin_token,
+                                      group_name=v.x_group_name)
         self.k.delete_group(token=v.admin_token,
                             target_name=v.x_group_name)
         self.l.delete_entry(v.default_domain_name, 'domains')
@@ -622,6 +646,9 @@ class ApiV3ClientTests(unittest.TestCase):
                                        token=v.admin_token,
                                        group_name=v.default_group_name)
         self.assertEqual(204, res.status_code)
+        self.k.remove_user_from_group(v.user01_userid,
+                                      token=v.admin_token,
+                                      group_name=v.default_group_name)
         self.k.delete_group(token=v.admin_token,
                             target_name=v.default_group_name)
         self.l.delete_entry(v.default_domain_name, 'domains')
@@ -1083,6 +1110,9 @@ class ApiV3ClientTests(unittest.TestCase):
                                   domain_name=v.net_domain_name)
         self.assertEqual(201, res.status_code)
         self.assertEqual(32, len(res.headers.get('x-subject-token')))
+        self.k.remove_user_from_group(v.user01_userid,
+                                      token=v.admin_token,
+                                      group_name=v.default_group_name)
         self.k.delete_group(token=v.admin_token,
                             target_name=v.default_group_name)
         self.l.delete_entry(v.net_domain_name, 'domains')
@@ -1103,6 +1133,9 @@ class ApiV3ClientTests(unittest.TestCase):
         subject_token = res.headers.get('x-subject-token')
         res = self.k.validate_token(subject_token, v.admin_token)
         self.assertEqual(200, res.status_code)
+        self.k.remove_user_from_group(v.user01_userid,
+                                      token=v.admin_token,
+                                      group_name=v.default_group_name)
         self.k.delete_group(token=v.admin_token,
                             target_name=v.default_group_name)
         self.l.delete_entry(v.net_domain_name, 'domains')
@@ -1124,6 +1157,9 @@ class ApiV3ClientTests(unittest.TestCase):
         self.assertEqual(204,
                          self.k.check_token(subject_token,
                                             v.admin_token).status_code)
+        self.k.remove_user_from_group(v.user01_userid,
+                                      token=v.admin_token,
+                                      group_name=v.default_group_name)
         self.k.delete_group(token=v.admin_token,
                             target_name=v.default_group_name)
         self.l.delete_entry(v.net_domain_name, 'domains')
@@ -1153,6 +1189,9 @@ class ApiV3ClientTests(unittest.TestCase):
                         in res.get('error').get('message'))
         #self.assertTrue('The request you have made requires authentication'
         #                in res.get('error').get('message'))
+        self.k.remove_user_from_group(v.user01_userid,
+                                      token=v.admin_token,
+                                      group_name=v.default_group_name)
         self.k.delete_group(token=v.admin_token,
                             target_name=v.default_group_name)
         self.l.delete_entry(v.net_domain_name, 'domains')
@@ -1507,6 +1546,9 @@ class ApiV3ClientTests(unittest.TestCase):
         self.k.delete_group(token=v.admin_token,
                             target_name=v.y_group_name)
         self.l.delete_entry(v.x_project_name, 'projects')
+        self.k.remove_user_from_group(v.user01_userid,
+                                      token=v.admin_token,
+                                      group_name=v.y_group_name)
         self.l.delete_entry(v.net_domain_name, 'domains')
         self.k.delete_service(token=v.admin_token,
                               target_name=v.service_name,
@@ -1578,6 +1620,9 @@ class ApiV3ClientTests(unittest.TestCase):
                          res.get('services')[0].get('name'))
         self.k.delete_role(token=v.admin_token,
                            target_name=v.member_role_name)
+        self.k.remove_user_from_group(v.user01_userid,
+                                      token=v.admin_token,
+                                      group_name=v.y_group_name)
         self.k.delete_group(token=v.admin_token,
                             target_name=v.y_group_name)
         self.l.delete_entry(v.net_domain_name, 'domains')

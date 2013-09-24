@@ -929,6 +929,21 @@ class ApiV3Client(object):
                          timeout=TIMEOUT, verify=self.verify)
         return r.json()
 
+    def remove_user_from_group(self, user_id, **kwargs):
+        if kwargs.get('token'):
+            token = kwargs.get('token')
+        if kwargs.get('group_id'):
+            group_id = kwargs.get('group_id')
+        elif kwargs.get('group_name'):
+            group_id = retrieve_id_by_name(self.list_groups(token=token),
+                                           kwargs.get('group_name'),
+                                           'groups')
+        url = self._set_api_url('groups', group_id, 'users', user_id)
+        headers = {'X-Auth-Token': token}
+        r = requests.delete(url, headers=headers,
+                            timeout=TIMEOUT, verify=self.verify)
+        return r
+
     @_list
     def list_users(self):
         pass
