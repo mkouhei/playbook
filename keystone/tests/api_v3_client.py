@@ -24,11 +24,35 @@ import ldap.modlist
 TIMEOUT = 5.000
 
 
-def set_auth_payload(userid=None, password=None, domain_id=None,
-                     domain_name=None, project_id=None, project_name=None):
-    payload = {'auth': {'identity': {'methods': ['password'],
+def set_auth_payload(**kwargs):
+    if kwargs.get('methods'):
+        methods = kwargs.get('methods')
+    else:
+        methods = 'password'
+    if kwargs.get('userid'):
+        userid = kwargs.get('userid')
+    if kwargs.get('password'):
+        password = kwargs.get('password')
+    if kwargs.get('domain_name'):
+        domain_name = kwargs.get('domain_name')
+    else:
+        domain_name = None
+    if kwargs.get('project_name'):
+        project_name = kwargs.get('project_name')
+    else:
+        project_name = None
+    if kwargs.get('domain_id'):
+        domain_id = kwargs.get('domain_id')
+    else:
+        domain_id = None
+    if kwargs.get('project_id'):
+        project_id = kwargs.get('project_id')
+    else:
+        project_id = None
+
+    payload = {'auth': {'identity': {'methods': [methods],
                                      'password': {'user': {}}}}}
-    if userid:
+    if userid and password:
         payload['auth']['identity']['password']['user'] = {
             'id': userid,
             'password': password}
