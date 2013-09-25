@@ -1629,12 +1629,12 @@ class ApiV3ClientTests(unittest.TestCase):
                          res.get('services')[0].get('name'))
         self.k.delete_role(token=v.admin_token,
                            target_name=v.member_role_name)
-        self.k.delete_group(token=v.admin_token,
-                            target_name=v.y_group_name)
         self.l.delete_entry(v.x_project_name, 'projects')
         self.k.remove_user_from_group(v.user01_userid,
                                       token=v.admin_token,
                                       group_name=v.y_group_name)
+        self.k.delete_group(token=v.admin_token,
+                            target_name=v.y_group_name)
         self.l.delete_entry(v.net_domain_name, 'domains')
         self.k.delete_service(token=v.admin_token,
                               target_name=v.service_name,
