@@ -1,0 +1,21 @@
+---
+# file: roles/common/tasks/etckeeper.yml
+
+- name: be sure etckeeper is installed
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - git
+    - etckeeper
+  tags:
+    - packages
+    - etckeeper
+  notify:
+    - initialize etckeeper
+
+- name: be sure etckeeper configured
+  copy: src=etckeeper.conf dest=/etc/etckeeper/etckeeper.conf owner=root group=root mode=0644
+  tags:
+    - etckeeper
+    - configuration
+  notify:
+    - initialize etckeeper

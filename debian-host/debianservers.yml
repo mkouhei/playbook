@@ -1,0 +1,8 @@
+---
+- hosts: debianservers
+  sudo: yes
+  roles:
+    - common
+#    - network
+#    - netfilter
+#    - ssh

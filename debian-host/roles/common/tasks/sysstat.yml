@@ -1,0 +1,16 @@
+---
+# file: roles/common/tasks/sysstat.yml
+
+- name: be sure sysstat is installed
+  apt: pkg=sysstat state=installed
+  tags:
+    - packages
+    - sysstat
+
+- name: be sure sysstat is configured
+  copy: src=sysstat dest=/etc/default/sysstat
+  tags:
+    - sysstat
+    - configuration
+  notify:
+    - initialize sysstat

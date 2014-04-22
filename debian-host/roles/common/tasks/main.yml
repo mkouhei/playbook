@@ -1,0 +1,22 @@
+---
+# file: roles/common/tasks/main.yml
+
+- name: upgrade all packages
+  apt: upgrade=full update_cache=yes
+  tags: packages
+
+- name: Base package for operation
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - lv
+    - dstat
+    - sudo
+
+- name: Purge packages
+  apt: pkg={{ item }} state=absent
+  with_items:
+    - nano
+
+- include: sysstat.yml
+
+- include: etckeeper.yml
