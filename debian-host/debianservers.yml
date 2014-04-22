@@ -3,6 +3,6 @@
   sudo: yes
   roles:
     - common
-#    - network
+    - network
 #    - netfilter
 #    - ssh

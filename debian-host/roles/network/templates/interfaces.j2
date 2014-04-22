@@ -1,0 +1,27 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto eth0
+iface eth0 inet static
+        address {{ ipv4_address }}
+        netmask {{ ipv4_netmask }}
+        network {{ ipv4_network }}
+        broadcast {{ ipv4_broadcast }}
+        gateway {{ ipv4_gateway }}
+        # dns-* options are implemented by the resolvconf package, if installed
+        dns-nameservers {{ ipv4_dns_nameservers }}
+        dns-search {{ ipv4_dns_search }}
+
+iface eth0 inet6 static
+        address {{ ipv6_address }}
+        netmask {{ ipv6_netmask }}
+        gateway {{ ipv6_gateway }}
+        accept_ra {{ ipv6_accept_ra }}
+        autoconf {{ ipv6_autoconf }}
+        privext {{ ipv6_privext }}
+        dns-nameservers {{ ipv6_dns_nameservers }}
