@@ -1,5 +1,6 @@
 ---
 - name: restart network
-  service: name=networking state=restarted
+  #service: name=networking state=restarted
+  shell: ifdown eth0; ifup eth0
   tags:
     - network
