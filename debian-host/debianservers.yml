@@ -4,5 +4,5 @@
   roles:
     - common
     - network
+    - ssh
 #    - netfilter
-#    - ssh
