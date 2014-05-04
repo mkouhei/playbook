@@ -1,0 +1,6 @@
+---
+- name: be sure firewalld is installed
+  apt: pkg=firewalld state=installed
+  tags:
+    - packages
+    - firewalld
