@@ -4,3 +4,5 @@
   tags:
     - packages
     - firewalld
+
+- include: firewalld.yml

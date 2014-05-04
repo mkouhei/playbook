@@ -1,0 +1,10 @@
+---
+- name: be sure enabled ssh service
+  firewalld: zone=public service=ssh permanent=true state=enabled
+  tags:
+    - firewalld
+
+- name: be sure disabled dhcpv6-client service
+  firewalld: zone=public service=dhcpv6-client permanent=true state=disabled
+  tags:
+    - firewalld
