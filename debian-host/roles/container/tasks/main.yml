@@ -1,0 +1,6 @@
+---
+- name: be sure lxc is installed
+  apt: pkg=lxc state=installed
+  tags:
+    - packages
+    - lxc

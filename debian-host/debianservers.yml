@@ -6,3 +6,4 @@
     - network
     - ssh
     - firewalld
+    - container
