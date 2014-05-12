@@ -4,3 +4,42 @@
   tags:
     - packages
     - lxc
+
+- name: be sure prepared group
+  group: name={{ lxc_gid }} gid={{ lxc_gidnumber }} state=present
+  tags:
+    - lxc
+    - group
+
+- name: be sure prepared non-previlleged admin user
+  user: name={{ lxc_uid }} uid={{ lxc_uidnumber }} createhome=yes group={{ lxc_gid }} state=present
+  tags:
+    - lxc
+    - user
+
+- name: be sure prepared configuration directory
+  file: path=/home/{{ lxc_uid }}/.config/lxc recurse=yes owner={{ lxc_uid }} group={{ lxc_gid }} state=directory mode=0700
+  tags:
+    - lxc
+    - user
+
+- name: be sure lxc_uid_map
+  shell: awk -F':' '/lxcadmin/ { $1=""; print}' /etc/subuid
+  register: lxc_uid_map
+  tags:
+    - lxc
+    - configuration
+
+- name: be sure lxc_gid_map
+  shell: awk -F':' '/lxcadmin/ { $1=""; print}' /etc/subgid
+  register: lxc_gid_map
+  tags:
+    - lxc
+    - configuration
+
+- name: be sure prepared configuration
+  template: src=default.conf.j2 dest=/home/{{ lxc_uid }}/.config/lxc/default.conf owner={{ lxc_uid }} group={{ lxc_gid }} mode=0600
+  tags:
+    - lxc
+    - user
+    - configuration
