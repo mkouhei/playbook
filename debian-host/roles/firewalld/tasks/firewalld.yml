@@ -1,10 +1,48 @@
 ---
 - name: be sure enabled ssh service
   firewalld: zone=public service=ssh permanent=true state=enabled
+  notify:
+    - reload firewalld
   tags:
     - firewalld
 
-- name: be sure disabled dhcpv6-client service
+- name: be sure disabled dhcpv6-client service in public
   firewalld: zone=public service=dhcpv6-client permanent=true state=disabled
+  notify:
+    - reload firewalld
+  tags:
+    - firewalld
+
+- name: be sure disabled dhcpv6-client service in internal
+  firewalld: zone=internal service={{ item }} permanent=true state=disabled
+  with_items:
+    - dhcpv6-client
+    - ipp-client
+    - mdns
+    - samba-client
+  notify:
+    - reload firewalld
+  tags:
+    - firewalld
+
+- name: be sure disabled dhcpv6-client service in home
+  firewalld: zone=home service={{ item }} permanent=true state=disabled
+  with_items:
+    - dhcpv6-client
+    - ipp-client
+    - mdns
+    - samba-client
+  notify:
+    - reload firewalld
+  tags:
+    - firewalld
+
+- name: be sure disabled some service in work
+  firewalld: zone=work service={{ item }} permanent=true state=disabled
+  with_items:
+    - dhcpv6-client
+    - ipp-client
+  notify:
+    - reload firewalld
   tags:
     - firewalld
