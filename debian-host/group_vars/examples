@@ -1,0 +1,25 @@
+---
+# This files is the examples.
+# TEST-NET-1 RFC5735 Special Use IPv4 Addresss
+ipv4_address: 192.0.2.100
+ipv4_netmask: 255.255.255.0
+ipv4_network: 192.0.2.0
+ipv4_broadcast: 192.0.2.255
+ipv4_gateway: 192.0.2.1
+# TEST-NET-2 RFC5735 Special Use IPv4 Addresss
+ipv4_dns_nameservers: "198.51.100.2 198.51.100.3"
+ipv4_dns_search: example.org
+# RFC3849 the documentation addresses
+ipv6_address: 2001:0db8:100:100:192:0:2:100
+ipv6_netmask: 64
+ipv6_gateway: 2001:0db8:100:100::1 fe80::1
+ipv6_accept_ra: 0
+ipv6_autoconf: 0
+ipv6_privext: 0
+ipv6_dns_nameservers: 2001:0db8:200:1
+permit_root_login: "no"
+password_authentication: "no"
+lxc_uid: guestuser
+lxc_gid: guestuser
+lxc_uidnumber: 2000
+lxc_gidnumber: 2000

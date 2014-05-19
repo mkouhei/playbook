@@ -1,0 +1,8 @@
+[examples:children]
+debianservers
+
+[debianservers]
+myhost.example.org
+
+[local]
+localhost ansible_connection=local
