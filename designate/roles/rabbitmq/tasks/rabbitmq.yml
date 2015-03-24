@@ -1,0 +1,29 @@
+---
+# file: roles/rabbitmq/tasks/rabbitmq.yml
+
+- name: '[rabbitmq] packages'
+  apt:
+    pkg={{ item }}
+    state=present
+  with_items:
+    - rabbitmq-server
+
+- name: '[rabbitmq] configuration'
+  template:
+    src=rabbitmq-env.conf.j2
+    dest=/etc/rabbitmq/rabbitmq-env.conf
+    owner=root
+    group=root
+    mode=0644
+  notify:
+    - restart rabbitmq
+
+- name: '[rabbitmq] user'
+  rabbitmq_user:
+    user={{ rabbitmq_user }}
+    password={{ rabbitmq_password }}
+    configure_priv=.*
+    read_priv=.*
+    write_priv=.*
+    state=present
+  

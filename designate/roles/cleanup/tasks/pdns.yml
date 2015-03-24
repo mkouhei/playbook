@@ -1,0 +1,19 @@
+---
+# file: roles/cleanup/tasks/pdns.yml
+
+- name: '[cleanup] packages are purged'
+  apt:
+    pkg={{ item }}
+    state=absent
+    purge=yes
+  with_items:
+    - pdns-server
+
+- name: '[cleanup] files'
+  file:
+    path={{ item }}
+    state=absent
+  with_items:
+    - /etc/powerdns
+    - /var/lib/powerdns
+    - /var/log/powerdns

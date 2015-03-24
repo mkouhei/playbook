@@ -1,0 +1,8 @@
+---
+# file: roles/rabbitmq/handlers/main.yml
+
+- name: restart rabbitmq
+  service:
+    name=rabbitmq-server
+    state=restarted
+    

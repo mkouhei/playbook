@@ -1,0 +1,7 @@
+---
+# mysql
+mysql_root: root
+
+# designate
+designate_user: designate
+designate_group: designate

@@ -1,0 +1,23 @@
+# file: roles/cleanup/tasks/mysql.yml
+
+- name: '[cleanup] packages are purged'
+  apt:
+    pkg={{ item }}
+    state=absent
+    purge=yes
+  with_items:
+    - mysql-server-5.5
+    - libmysqlclient-dev
+    - mysql-common
+    - python-mysqldb
+
+- name: '[cleanup] be sure mysql directories are removed'
+  file:
+    path={{ item }}
+    state=absent
+  with_items:
+    - /etc/mysql
+    - /var/lib/mysql
+    - /var/log/mysql
+    - /var/log/mysql.log
+    - /var/log/mysql.err

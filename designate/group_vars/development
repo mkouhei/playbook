@@ -1,0 +1,29 @@
+---
+# mysql
+mysql_root_password: passw0rd
+bind_address: 127.0.0.1
+server_id: 1
+expire_logs_days: 30
+binlog_format: MIXED
+sync_binlog: 1
+innodb_support_xa: 1
+
+# pdns
+gmysql_host: localhost
+gmysql_dbname: pdns
+gmysql_user: pdns
+gmysql_password: passw0rd
+gmysql_dnssec: yes
+
+# rabbit
+node_ip_address: 127.0.0.1
+node_port: 5672
+rabbitmq_user: designate
+rabbitmq_password: passw0rd
+
+# designate
+auth_strategy: noauth
+enabled_extensions_v1: diagnostics, quotas, reports, sync, touch
+enabled_extensions_v2: quotas, reports
+backend: powerdns
+pool_id : 794ccc2c-d751-44fe-b57f-8894c9f5c842

@@ -1,0 +1,15 @@
+---
+# file: roles/mysql/tasks/databases.yml
+
+- name: create a new database
+  mysql_db:
+    name={{ item }}
+    state=present
+    encoding=utf8
+    collation=utf8_general_ci
+    login_user={{ mysql_root }}
+    login_password={{ mysql_root_password }}
+  with_items:
+    - pdns
+    - designate
+    - designate_pool_manager

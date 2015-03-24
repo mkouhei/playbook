@@ -1,0 +1,5 @@
+---
+# file: roles/cleanup/tasks/main.yml
+
+- include: pdns.yml
+- include: mysql.yml

@@ -1,0 +1,18 @@
+---
+# file: roles/pdns/task/pdns-server.yml
+
+- name: '[pdns] packages are installed'
+  apt:
+    pkg={{ item }}
+    state=present
+  with_items:
+    - pdns-server
+    - pdns-backend-mysql
+
+- name: '[pdns] configuration is prepared'
+  template:
+    src=pdns.conf.j2
+    dest=/etc/powerdns/pdns.conf
+  notify:
+    - restart pdns
+  

@@ -1,0 +1,11 @@
+---
+# file: roles/mysql/tasks/users.yml
+
+- name: '[mysql] user'
+  mysql_user:
+    name={{ gmysql_user }}
+    password={{ gmysql_password }}
+    priv="*.*:ALL"
+    state=present
+    login_user={{ mysql_root }}
+    login_password={{ mysql_root_password }}

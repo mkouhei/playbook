@@ -1,0 +1,15 @@
+---
+# file: roles/designate/tasks/users.yml
+
+- name: '[designate] group'
+  group:
+    name={{ designate_group }}
+    system=yes
+
+- name: '[designate] user'
+  user:
+    name={{ designate_user }}
+    group={{ designate_group }}
+    home=/srv/designate
+    system=yes
+    

@@ -1,0 +1,7 @@
+---
+# file: roles/designate/tasks/main.yml
+
+- include: users.yml
+- include: sources.yml
+- include: designate.yml
+  

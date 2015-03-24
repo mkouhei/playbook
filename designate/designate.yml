@@ -1,0 +1,9 @@
+---
+- hosts: designate
+  sudo: yes
+  roles:
+    - {role: cleanup, tags: ['cleanup']}
+    - {role: mysql, tags: ['development']}
+    - {role: pdns, tags: ['development']}
+    - {role: rabbitmq, tags: ['development']}
+    - {role: designate, tags: ['development']}

@@ -1,0 +1,8 @@
+---
+# file: roles/designate/tasks/sources.yml
+
+- name: '[designate] git clone'
+  git:
+    repo=https://github.com/openstack/designate.git
+    dest=/srv/designate/designate
+  sudo_user: '{{ designate_user }}'

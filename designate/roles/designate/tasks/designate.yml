@@ -1,0 +1,57 @@
+---
+# file: roles/designate/tasks/designate.yml
+
+- name: '[designate] packages'
+  apt:
+    pkg='{{ item }}'
+    state=present
+  with_items:
+    - python-virtualenv
+
+- name: '[designate] python packages'
+  pip:
+    requirements='/srv/designate/designate/{{ item }}'
+    virtualenv=/srv/designate/.venv
+    virtualenv_site_packages=yes
+  sudo_user: '{{ designate_user }}'
+  with_items:
+    - requirements.txt
+    - test-requirements.txt
+
+- name: '[designate] install'
+  shell: '../.venv/bin/python setup.py develop'
+  args:
+    chdir: /srv/designate/designate
+  sudo_user: '{{ designate_user }}'
+
+- name: '[designate] directories'
+  file:
+    path='{{ item }}'
+    owner=designate
+    group=designate
+    mode=0700
+    state=directory
+    recurse=yes
+  with_items:
+    - /srv/designate/etc
+    - /srv/designate/lib/designate
+    - /srv/designate/log/designate
+
+- name: '[designate] config directory'
+  file:
+    src=/srv/designate/designate/etc/designate
+    dest=/srv/designate/etc/designate
+    state=link
+
+- name: '[designate] designate.conf'
+  template:
+    src=designate.conf.j2
+    dest=/srv/designate/etc/designate/designate.conf
+    owner=designate
+    group=designate
+    mode=0600
+
+- name: '[designate] sync database'
+  shell:
+    /srv/designate/.venv/bin/designate-manage --config-dir /srv/designate/etc/designate/ database sync
+  sudo_user: '{{ designate_user }}'
