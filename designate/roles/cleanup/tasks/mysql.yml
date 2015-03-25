@@ -16,8 +16,8 @@
     path={{ item }}
     state=absent
   with_items:
-    - /etc/mysql
-    - /var/lib/mysql
-    - /var/log/mysql
+    - /etc/mysql/
+    - /var/lib/mysql/
+    - /var/log/mysql/
     - /var/log/mysql.log
     - /var/log/mysql.err

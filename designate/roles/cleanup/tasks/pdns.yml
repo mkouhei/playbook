@@ -14,6 +14,6 @@
     path={{ item }}
     state=absent
   with_items:
-    - /etc/powerdns
-    - /var/lib/powerdns
-    - /var/log/powerdns
+    - /etc/powerdns/
+    - /var/lib/powerdns/
+    - /var/log/powerdns/

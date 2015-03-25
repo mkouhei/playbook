@@ -33,25 +33,67 @@
     state=directory
     recurse=yes
   with_items:
-    - /srv/designate/etc
     - /srv/designate/lib/designate
     - /srv/designate/log/designate
-
-- name: '[designate] config directory'
-  file:
-    src=/srv/designate/designate/etc/designate
-    dest=/srv/designate/etc/designate
-    state=link
 
 - name: '[designate] designate.conf'
   template:
     src=designate.conf.j2
-    dest=/srv/designate/etc/designate/designate.conf
+    dest=/srv/designate/designate/etc/designate/designate.conf
     owner=designate
     group=designate
     mode=0600
 
 - name: '[designate] sync database'
   shell:
-    /srv/designate/.venv/bin/designate-manage --config-dir /srv/designate/etc/designate/ database sync
+    /srv/designate/.venv/bin/designate-manage --config-dir /srv/designate/designate/etc/designate/ database sync
   sudo_user: '{{ designate_user }}'
+
+- name: '[designate] checking central service'
+  shell:
+    ps -ef | grep designate-central | grep -v grep -q; echo $?
+  register: result_central
+
+- name: '[designate] central service started'
+  shell:
+    nohup /srv/designate/.venv/bin/designate-central --config-dir /srv/designate/designate/etc/designate/ &
+  sudo_user: '{{ designate_user }}'
+  when: result_central.stdout != '0'
+
+- name: '[designate] checking API service'
+  shell:
+    ps -ef | grep designate-api | grep -v grep -q; echo $?
+  register: result_api
+
+- name: '[designate] API service started'
+  shell:
+    nohup /srv/designate/.venv/bin/designate-api --config-dir /srv/designate/designate/etc/designate/ &
+  sudo_user: '{{ designate_user }}'
+  when: result_api.stdout != '0'
+
+#- name: '[designate] Pool Manager service initialize'
+#  shell:
+#    /srv/designate/.venv/bin/designate-manage --config-dir /srv/designate/designate/etc/designate/ pool-manager-cache sync
+#  sudo_user: '{{ designate_user }}'
+# 
+#- name: '[designate] checking Pool Manager service'
+#  shell:
+#    ps -ef | grep designate-pool-manager | grep -v grep -q; echo $?
+#  register: result_pool
+# 
+#- name: '[designate] Pool Manager service started'
+#  shell:
+#    nohup /srv/designate/.venv/bin/designate-pool-manager --config-dir /srv/designate/designate/etc/designate/ &
+#  sudo_user: '{{ designate_user }}'
+#  when: result_pool.stdout != '0'
+
+- name: '[designate] checking mdns service'
+  shell:
+    ps -ef | grep designate-mdns | grep -v grep -q; echo $?
+  register: result_mdns
+
+- name: '[designate] mdns service started'
+  shell:
+    nohup /srv/designate/.venv/bin/designate-mdns --config-dir /srv/designate/designate/etc/designate/ &
+  sudo_user: '{{ designate_user }}'
+  when: result_mdns.stdout != '0'

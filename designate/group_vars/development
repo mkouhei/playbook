@@ -10,7 +10,8 @@ innodb_support_xa: 1
 
 # pdns
 gmysql_host: localhost
-gmysql_dbname: pdns
+gmysql_dbname: designate
+gmysql_pool_dbname: designate_pool_manager
 gmysql_user: pdns
 gmysql_password: passw0rd
 gmysql_dnssec: yes

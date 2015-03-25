@@ -1,5 +1,5 @@
 ---
 # file: roles/pdns/tasks/main.yml
-- include: debconf.yml
+#- include: debconf.yml
 - include: pdns-server.yml
   

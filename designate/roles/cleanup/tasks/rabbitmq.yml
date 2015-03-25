@@ -1,0 +1,10 @@
+---
+# file: roles/cleanup/tasks/rabbitmq.yml
+
+- name: '[cleanup] package are purged'
+  apt:
+    pkg={{ item }}
+    state=absent
+    purge=yes
+  with_items:
+    - rabbitmq-server

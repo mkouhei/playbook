@@ -1,16 +1,9 @@
 ---
 # file: roles/pdns/tasks/debconf.yml
 
-- name: '[pdns] debconf pdns-backend-mysql/mysql/app-pass'
+- name: '[pdns] debconf pdns-backend-mysql/password-confirm'
   debconf:
     name=pdns-backend-mysql
-    question='pdns-backend-mysql/mysql/app-pass'
-    value='{{ gmysql_password }}'
-    vtype=password
-
-- name: '[pdns] debconf pdns-backend-mysql/app-password-confirm'
-  debconf:
-    name=pdns-backend-mysql
-    question='pdns-backend-mysql/app-password-confirm'
+    question='pdns-backend-mysql/password-confirm'
     value='{{ gmysql_password }}'
     vtype=password

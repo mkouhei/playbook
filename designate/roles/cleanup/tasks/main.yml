@@ -1,5 +1,8 @@
 ---
 # file: roles/cleanup/tasks/main.yml
 
+- include: designate.yml
 - include: pdns.yml
 - include: mysql.yml
+- include: rabbitmq.yml
+  
