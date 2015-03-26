@@ -10,8 +10,7 @@ innodb_support_xa: 1
 
 # pdns
 gmysql_host: localhost
-gmysql_dbname: designate
-gmysql_pool_dbname: designate_pool_manager
+gmysql_dbname: pdns
 gmysql_user: pdns
 gmysql_password: passw0rd
 gmysql_dnssec: yes
@@ -28,3 +27,5 @@ enabled_extensions_v1: diagnostics, quotas, reports, sync, touch
 enabled_extensions_v2: quotas, reports
 backend: powerdns
 pool_id : 794ccc2c-d751-44fe-b57f-8894c9f5c842
+designate_dbname: designate
+designate_pool_dbname: designate_pool_manager

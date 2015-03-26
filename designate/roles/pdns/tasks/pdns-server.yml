@@ -22,3 +22,8 @@
     dest=/etc/powerdns/pdns.d/pdns.local.gmysql.conf
   notify:
     - restart pdns
+
+- name: 'execute DDL to MySQL'
+  shell:
+    mysql -u {{ gmysql_user }} --password={{ gmysql_password }} {{ gmysql_dbname }} < /usr/share/dbconfig-common/data/pdns-backend-mysql/install/mysql
+  

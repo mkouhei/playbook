@@ -191,7 +191,7 @@ pool_id = {{ pool_id }}
 # Database connection string - to configure options for a given implementation
 # like sqlalchemy or other see below
 #connection = sqlite:///$state_path/designate.sqlite
-connection = mysql://{{ gmysql_user }}:{{ gmysql_password }}@{{ bind_address }}/{{ gmysql_dbname }}
+connection = mysql://{{ gmysql_user }}:{{ gmysql_password }}@{{ bind_address }}/{{ designate_dbname }}
 #connection_debug = 0
 #connection_trace = False
 #sqlite_synchronous = True
@@ -229,7 +229,7 @@ connection = mysql://{{ gmysql_user }}:{{ gmysql_password }}@{{ bind_address }}/
 # SQLAlchemy Pool Manager Cache
 #-----------------------
 [pool_manager_cache:sqlalchemy]
-connection = mysql://{{ gmysql_user }}:{{ gmysql_password }}@{{ bind_address }}/{[ gmysql_pool_dbname }}
+connection = mysql://{{ gmysql_user }}:{{ gmysql_password }}@{{ bind_address }}/{[ designate_pool_dbname }}
 #connection = sqlite:///$state_path/designate_pool_manager.sqlite
 #connection_debug = 100
 #connection_trace = False
