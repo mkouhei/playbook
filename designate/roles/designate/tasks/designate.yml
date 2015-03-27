@@ -71,21 +71,21 @@
   sudo_user: '{{ designate_user }}'
   when: result_api.stdout != '0'
 
-#- name: '[designate] Pool Manager service initialize'
-#  shell:
-#    /srv/designate/.venv/bin/designate-manage --config-dir /srv/designate/designate/etc/designate/ pool-manager-cache sync
-#  sudo_user: '{{ designate_user }}'
-# 
-#- name: '[designate] checking Pool Manager service'
-#  shell:
-#    ps -ef | grep designate-pool-manager | grep -v grep -q; echo $?
-#  register: result_pool
-# 
-#- name: '[designate] Pool Manager service started'
-#  shell:
-#    nohup /srv/designate/.venv/bin/designate-pool-manager --config-dir /srv/designate/designate/etc/designate/ &
-#  sudo_user: '{{ designate_user }}'
-#  when: result_pool.stdout != '0'
+- name: '[designate] Pool Manager service initialize'
+  shell:
+    /srv/designate/.venv/bin/designate-manage --config-dir /srv/designate/designate/etc/designate/ pool-manager-cache sync
+  sudo_user: '{{ designate_user }}'
+ 
+- name: '[designate] checking Pool Manager service'
+  shell:
+    ps -ef | grep designate-pool-manager | grep -v grep -q; echo $?
+  register: result_pool
+ 
+- name: '[designate] Pool Manager service started'
+  shell:
+    nohup /srv/designate/.venv/bin/designate-pool-manager --config-dir /srv/designate/designate/etc/designate/ &
+  sudo_user: '{{ designate_user }}'
+  when: result_pool.stdout != '0'
 
 - name: '[designate] checking mdns service'
   shell:

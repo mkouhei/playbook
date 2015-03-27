@@ -26,6 +26,7 @@ auth_strategy: noauth
 enabled_extensions_v1: diagnostics, quotas, reports, sync, touch
 enabled_extensions_v2: quotas, reports
 backend: powerdns
+backend_server_id: 6a5032b6-2d96-43ee-b25b-7d784e2bf3b2
 pool_id : 794ccc2c-d751-44fe-b57f-8894c9f5c842
 designate_dbname: designate
 designate_pool_dbname: designate_pool_manager

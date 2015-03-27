@@ -23,7 +23,13 @@
   notify:
     - restart pdns
 
+- name: check DDL
+  shell:
+    echo 'show tables' | mysql -u {{ gmysql_user }} --password={{ gmysql_password }} {{ gmysql_dbname }}
+  register: result
+
 - name: 'execute DDL to MySQL'
   shell:
     mysql -u {{ gmysql_user }} --password={{ gmysql_password }} {{ gmysql_dbname }} < /usr/share/dbconfig-common/data/pdns-backend-mysql/install/mysql
+  when: result.stdout == ''
   

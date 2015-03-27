@@ -229,7 +229,7 @@ connection = mysql://{{ gmysql_user }}:{{ gmysql_password }}@{{ bind_address }}/
 # SQLAlchemy Pool Manager Cache
 #-----------------------
 [pool_manager_cache:sqlalchemy]
-connection = mysql://{{ gmysql_user }}:{{ gmysql_password }}@{{ bind_address }}/{[ designate_pool_dbname }}
+connection = mysql://{{ gmysql_user }}:{{ gmysql_password }}@{{ bind_address }}/{{ designate_pool_dbname }}
 #connection = sqlite:///$state_path/designate_pool_manager.sqlite
 #connection_debug = 100
 #connection_trace = False
@@ -263,6 +263,18 @@ connection = mysql://{{ gmysql_user }}:{{ gmysql_password }}@{{ bind_address }}/
 #rndc_config_file = /etc/rndc.conf
 #rndc_key_file = /etc/rndc.key
 
+
+[backend:powerdns]
+server_ids = {{ backend_server_id }}
+connection = mysql://{{ gmysql_user }}:{{ gmysql_password }}@{{ gmysql_host }}/{{ gmysql_dbname }}
+#connection_debug = 100
+#connection_trace = True
+#sqlite_synchronous = True
+idle_timeout = 3600
+max_retries = 10
+retry_interval = 10
+
+
 #-----------------------
 # Server Specific Bind9 Pool Backend
 #-----------------------
@@ -280,12 +292,3 @@ connection = mysql://{{ gmysql_user }}:{{ gmysql_password }}@{{ bind_address }}/
 #rndc_key_file = /etc/rndc.key
 #zone_file_path = $state_path/zones
 #query_destination = 127.0.0.1
-
-[backend:powerdns]
-connection = mysql://{{ gmysql_user }}:{{ gmysql_password }}@{{ gmysql_host }}/{{ gmysql_dbname }}
-#connection_debug = 100
-#connection_trace = True
-#sqlite_synchronous = True
-idle_timeout = 3600
-max_retries = 10
-retry_interval = 10
