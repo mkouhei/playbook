@@ -1,0 +1,10 @@
+---
+# file: roles/pdns/tasks/main.yml
+- include: packages.yml
+- include: pdns.yml
+- include_vars: master.yml
+  when: env == 'master'
+- include: master.yml
+- include_vars: slave.yml
+  when: env == 'slave'
+- include: slave.yml

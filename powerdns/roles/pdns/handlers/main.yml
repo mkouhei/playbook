@@ -1,0 +1,8 @@
+---
+# file: roles/pdns/handlers/main.yml
+
+- name: restart pdns
+  service:
+    name=pdns
+    state=restarted
+    

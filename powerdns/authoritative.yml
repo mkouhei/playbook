@@ -1,0 +1,10 @@
+---
+# file: authoritative.yml
+- hosts: authoritative
+  sudo: yes
+  vars_prompt:
+    env: "wahat is your target env?"
+  roles:
+    - common
+    - {role: mysql, tags: ['mysql']}
+    - {role: pdns, tags: ['pdns']}

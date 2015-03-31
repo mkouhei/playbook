@@ -1,0 +1,10 @@
+---
+# file: roles/pdns/tasks/master.yml
+
+- name: master configuration
+  template:
+    src=pdns.conf.j2
+    dest=/etc/powerdns/pdns.conf
+  tags: master
+  notify:
+    - restart pdns

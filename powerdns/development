@@ -1,0 +1,20 @@
+[development:children]
+authoritative
+recursor
+
+[authoritative:children]
+master
+slave
+
+[master]
+#ns00.example.org
+localhost ansible_connection=local
+
+[slave]
+ns01.example.org
+
+[recursor]
+ns02.example.org
+
+[local]
+localhost ansible_connection=local

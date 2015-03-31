@@ -1,0 +1,11 @@
+---
+# file: roles/common/tasks/packages.yml
+
+- name: debconf packages
+  apt:
+    pkg={{ item }}
+    state=present
+  with_items:
+    - debconf
+    - debconf-utils
+  

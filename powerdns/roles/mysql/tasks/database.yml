@@ -1,0 +1,12 @@
+---
+# file: roles/mysql/tasks/database.yml
+
+- name: database of powerdns
+  mysql_db:
+    name={{ item }}
+    state=present
+    encoding=utf8
+    login_user={{ mysql_root }}
+    login_password={{ mysql_root_password }}
+  with_items:
+    - pdns

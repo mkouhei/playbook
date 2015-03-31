@@ -1,0 +1,11 @@
+---
+# mysql
+mysql_root: root
+mysql_default_character_set: utf8
+mysql_character_set_server: utf8
+mysql_binlog_format: MIXED
+mysql_sync_binlog: 1
+mysql_innodb_support_xa: 1
+
+# powerdns
+pdns_gmysql_user: pdns

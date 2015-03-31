@@ -1,0 +1,10 @@
+---
+# file: roles/pdns/tasks/packages.yml
+
+- name: PowerDNS packages
+  apt:
+    pkg={{ item }}
+    state=present
+  with_items:
+    - pdns-server
+    - pdns-backend-mysql

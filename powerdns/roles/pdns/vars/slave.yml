@@ -1,0 +1,5 @@
+---
+# file: roles/pdns/vars/slave.yml
+pdns_disable_axfr: yes
+pdns_master: no
+pdns_slave: yes
