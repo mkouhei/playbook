@@ -26,7 +26,7 @@ allow-recursion=127.0.0.1
 #################################
 # cache-ttl	Seconds to store packets in the PacketCache
 #
-# cache-ttl=20
+cache-ttl=0
 
 #################################
 # carbon-interval	Number of seconds between carbon (graphite) updates
@@ -111,7 +111,7 @@ daemon=yes
 #################################
 # disable-axfr	Disable zonetransfers but do allow TCP queries
 #
-# disable-axfr=no
+disable-axfr=no
 
 #################################
 # disable-axfr-rectify	Disable the rectify step during an outgoing AXFR. Only required for regression testing.
@@ -293,7 +293,7 @@ launch=
 #################################
 # negquery-cache-ttl	Seconds to store negative query results in the QueryCache
 #
-# negquery-cache-ttl=60
+negquery-cache-ttl=0
 
 #################################
 # no-shuffle	Set this to prevent random shuffling of answers - for regression testing
@@ -328,7 +328,7 @@ launch=
 #################################
 # query-cache-ttl	Seconds to store query results in the QueryCache
 #
-# query-cache-ttl=20
+query-cache-ttl=0
 
 #################################
 # query-local-address	Source IP address for sending queries
@@ -408,7 +408,7 @@ setuid=pdns
 #################################
 # slave	Act as a slave
 #
-# slave=no
+slave=yes
 
 #################################
 # slave-cycle-interval	Reschedule failed SOA serial checks once every .. seconds
