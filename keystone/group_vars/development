@@ -1,0 +1,21 @@
+---
+# mysql
+mysql_root_password: passw0rd
+bind_address: 127.0.0.1
+server_id: 1
+expire_logs_days: 30
+binlog_format: MIXED
+sync_binlog: 1
+innodb_support_xa: 1
+
+# rabbit
+node_ip_address: 127.0.0.1
+node_port: 5672
+rabbitmq_user: designate
+rabbitmq_password: passw0rd
+
+# keystone
+mysql_user: keystone
+mysql_password: passw0rd
+mysql_dbname: keystone
+admin_token: secretkey

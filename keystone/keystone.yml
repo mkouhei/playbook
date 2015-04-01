@@ -1,0 +1,11 @@
+---
+# file: keystone.yml
+- hosts: keystone
+  sudo: yes
+  roles:
+    - {role: cleanup, tags: ['cleanup']}
+    - {role: common, tags: ['development']}
+    - {role: mysql, tags: ['development', 'mysql']}
+    - {role: rabbitmq, tags: ['development', 'rabbitmq']}
+    - {role: keystone, tags: ['development', 'keystone']}
+    #- {role: yrmcds, tags: ['desvelopment', 'yrmcds']}

@@ -1,0 +1,9 @@
+---
+# file: roles/mysql/tasks/global-variables.yml
+
+- name: be sure mysql configuration is prepared
+  template:
+    src=my.cnf.j2
+    dest=/etc/mysql/my.cnf
+  notify:
+    - restart mysql

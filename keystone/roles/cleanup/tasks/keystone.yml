@@ -1,0 +1,10 @@
+---
+# file: roles/cleanup/tasks/keystone.yml
+
+- name: release ephemeral port
+  sysctl:
+    name=net.ipv4.ip_local_reserved_ports
+    sysctrl_set=yes
+    state=absent
+    sysctrl_file=/etc/sysctl.d/keystone.conf
+    reload=yes

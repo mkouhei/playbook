@@ -1,0 +1,8 @@
+---
+# mysql
+mysql_root: root
+
+# keystone
+openstack_name: keystone
+openstack_user: keystone
+openstack_group: keystone

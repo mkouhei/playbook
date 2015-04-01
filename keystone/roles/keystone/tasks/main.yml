@@ -1,0 +1,6 @@
+---
+# file: roles/keystone/tasks/main.yml
+
+- include: users.yml
+- include: sources.yml
+- include: keystone.yml

@@ -1,7 +1,4 @@
 ---
-- hosts: test_servers
-  sudo: yes
-  roles:
-    - common
-    #- development
-    #- backend_ldap
+# file: site.yml
+- include: keystone.yml
+  

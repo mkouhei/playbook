@@ -1,0 +1,15 @@
+---
+# file: roles/keystone/tasks/users.yml
+
+- name: group
+  group:
+    name={{ openstack_group }}
+    system=yes
+
+- name: user
+  user:
+    name={{ openstack_user }}
+    group={{ openstack_group }}
+    home=/srv/{{ openstack_name }}
+    system=yes
+    

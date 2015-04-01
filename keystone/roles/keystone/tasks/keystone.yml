@@ -1,0 +1,53 @@
+---
+# file: roles/keystone/tasks/designate.yml
+
+- name: '{{ openstack_name }} packages'
+  apt:
+    pkg='{{ item }}'
+    state=present
+  with_items:
+    - python-virtualenv
+
+- name: venv
+  pip:
+    requirements=/srv/{{ openstack_name }}/{{ openstack_name }}/{{ item }}
+    virtualenv=/srv/{{ openstack_name }}/.venv
+    virtualenv_site_packages=yes
+  sudo_user: '{{ openstack_user }}'
+  with_items:
+    - requirements.txt
+    - test-requirements.txt
+
+- name: install
+  shell: '../.venv/bin/python setup.py install'
+  args:
+    chdir: /srv/{{ openstack_name }}/{{ openstack_name }}
+  sudo_user: "{{ openstack_user }}"
+
+- name: reserve ephemeral port
+  sysctl:
+    name=net.ipv4.ip_local_reserved_ports
+    value=35357
+    sysctl_set=yes
+    sysctl_file=/etc/sysctl.d/keystone.conf
+    reload=yes
+
+- name: directories
+  file:
+    path='{{ item }}'
+    owner={{ openstack_user }}
+    group={{ openstack_group }}
+    mode=0700
+    state=directory
+    recurse=yes
+  with_items:
+    - "/srv/{{ openstack_name }}/lib/{{ openstack_name }}"
+    - "/srv/{{ openstack_name }}/log/{{ openstack_name }}"
+
+- name: configuration
+  template:
+    src={{ openstack_name }}.conf.j2
+    dest=/srv/{{ openstack_name }}/{{ openstack_name }}/etc/{{ openstack_name }}.conf
+    owner={{ openstack_user }}
+    group={{ openstack_group }}
+    mode=0600

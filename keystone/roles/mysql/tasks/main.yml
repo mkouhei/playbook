@@ -1,0 +1,9 @@
+---
+# file: role/mysql/tasks/main.yml
+
+- include: debconf.yml
+- include: packages.yml
+- include: global-variables.yml
+- include: databases.yml
+- include: users.yml
+  

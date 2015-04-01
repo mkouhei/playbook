@@ -1,0 +1,23 @@
+---
+# file: roles/mysql/tasks/debconf.yml
+
+- name: debconf mysql root password
+  debconf:
+    name=mysql-server-5.5
+    question='mysql-server/root_password'
+    value='{{ mysql_root_password }}'
+    vtype=password
+
+- name: debconf mysql root passwod again
+  debconf:
+    name=mysql-server-5.5
+    question='mysql-server/root_password_again'
+    value='{{ mysql_root_password }}'
+    vtype=password
+
+- name: debconf mysql start_on_boot
+  debconf:
+    name=mysql-server-5.5
+    question='mysql-server-5.5/start_on_boot'
+    value='true'
+    vtype=boolean

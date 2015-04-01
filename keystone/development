@@ -1,0 +1,5 @@
+[development:children]
+keystone
+
+[keystone]
+localhost ansible_connection=local
