@@ -51,3 +51,14 @@
     owner={{ openstack_user }}
     group={{ openstack_group }}
     mode=0600
+
+- name: checking process
+  shell:
+    ps -ef | grep keystone-all | grep -v grep -q; echo $?
+  register: result
+
+- name: process start
+  shell:
+    nohup /srv/{{ openstack_name }}/.venv/bin/keystone-all --config-dir /srv/{{ openstack_name }}/{{ openstack_name }}/etc &
+  sudo_user: "{{ openstack_user }}"
+  when: result.stdout != '0'
