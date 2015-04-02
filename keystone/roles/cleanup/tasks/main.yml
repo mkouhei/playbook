@@ -3,4 +3,4 @@
 
 - include: mysql.yml
 - include: rabbitmq.yml
-  
+- include: keystone.yml  

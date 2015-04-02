@@ -1,10 +1,28 @@
 ---
 # file: roles/cleanup/tasks/keystone.yml
 
+- name: check keystone process
+  shell:
+    ps -ef | grep 'bin/keystone-all' | grep -v grep -q; echo $?
+  register: result
+
+- name: pkill keystone
+  shell:
+    pkill keystone
+  when: result.stdout == '0'
+
 - name: release ephemeral port
   sysctl:
     name=net.ipv4.ip_local_reserved_ports
-    sysctrl_set=yes
     state=absent
-    sysctrl_file=/etc/sysctl.d/keystone.conf
+    sysctl_file=/etc/sysctl.d/keystone.conf
     reload=yes
+
+- name: remove keystone directory
+  file:
+    path={{ item }}
+    state=absent
+  with_items:
+    - /srv/{{ openstack_name }}/
+    - /etc/sysctl.d/keystone.conf
+    
