@@ -1,0 +1,8 @@
+---
+# mysql
+mysql_root: root
+
+# neutron
+openstack_name: neutron
+openstack_user: neutron
+openstack_group: neutron

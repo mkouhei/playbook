@@ -1,0 +1,19 @@
+---
+# file: roles/cleanup/tasks/keystone.yml
+
+#- name: check ceilometer process
+#  shell:
+#    ps -ef | grep 'bin/xxxxxx' | grep -v grep -q; echo $?
+#  register: result
+# 
+#- name: pkill ceilometer
+#  shell:
+#    pkill ceilometer
+#  when: result.stdout == '0'
+
+- name: remove neutron directory
+  file:
+    path={{ item }}
+    state=absent
+  with_items:
+    - /srv/{{ openstack_name }}/

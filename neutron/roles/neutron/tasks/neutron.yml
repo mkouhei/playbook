@@ -1,0 +1,68 @@
+---
+# file: roles/neutron/tasks/neutron.yml
+
+- name: '{{ openstack_name }} packages'
+  apt:
+    pkg='{{ item }}'
+    state=present
+  with_items:
+    - python-virtualenv
+
+- name: venv
+  pip:
+    requirements=/srv/{{ openstack_name }}/{{ openstack_name }}/{{ item }}
+    virtualenv=/srv/{{ openstack_name }}/.venv
+    virtualenv_site_packages=yes
+  sudo_user: '{{ openstack_user }}'
+  with_items:
+    - requirements.txt
+    - test-requirements.txt
+
+- name: venv
+  pip:
+    name=tox
+    virtualenv=/srv/{{ openstack_name }}/.venv
+    virtualenv_site_packages=yes
+  sudo_user: '{{ openstack_user }}'
+
+- name: install
+  shell: '../.venv/bin/python setup.py install'
+  args:
+    chdir: /srv/{{ openstack_name }}/{{ openstack_name }}
+  sudo_user: "{{ openstack_user }}"
+
+  
+- name: directories
+  file:
+    path='{{ item }}'
+    owner={{ openstack_user }}
+    group={{ openstack_group }}
+    mode=0700
+    state=directory
+    recurse=yes
+  with_items:
+    - "/srv/{{ openstack_name }}/lib/{{ openstack_name }}"
+    - "/srv/{{ openstack_name }}/log/{{ openstack_name }}"
+
+- name: configuration
+  template:
+    src={{ openstack_name }}.conf.j2
+    dest=/srv/{{ openstack_name }}/{{ openstack_name }}/etc/{{ openstack_name }}.conf
+    owner={{ openstack_user }}
+    group={{ openstack_group }}
+    mode=0600
+
+- name: populate the database
+  shell:
+    /srv/{{ openstack_name }}/.venv/bin/neutron-db-manage --config-file /srv/{{ openstack_name }}/{{ openstack_name }}/etc/{{ openstack_name }}.conf --config-file /srv/{{ openstack_name }}/{{ openstack_name }}/etc/{{ openstack_name }}/plugins/ml2/ml2_conf.ini upgrade {{ populate_target }}
+
+- name: checking process
+  shell:
+    ps -ef | grep 'bin/neutron-server'  | grep -v grep -q; echo $?
+  register: result
+
+- name: process start
+  shell:
+    nohup /srv/{{ openstack_name }}/.venv/bin/neutron-server --config-dir /srv/{{ openstack_name }}/{{ openstack_name }}/etc &
+  sudo_user: "{{ openstack_user }}"
+  when: result.stdout != '0'

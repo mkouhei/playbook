@@ -1,0 +1,5 @@
+[development:children]
+neutron
+
+[neutron]
+localhost ansible_connection=local

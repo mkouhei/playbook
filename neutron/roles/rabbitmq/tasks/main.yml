@@ -1,0 +1,5 @@
+---
+# file: tasks/rabbitmq/tasks/main.yml
+
+- include: rabbitmq.yml
+  

@@ -1,0 +1,11 @@
+---
+# file: neutron.yml
+- hosts: neutron
+  sudo: yes
+  roles:
+    - {role: cleanup, tags: ['cleanup']}
+    - {role: common, tags: ['development']}
+    - {role: mysql, tags: ['development', 'mysql']}
+    - {role: rabbitmq, tags: ['development', 'rabbitmq']}
+    - {role: neutron, tags: ['development', 'neutron']}
+    #- {role: yrmcds, tags: ['desvelopment', 'yrmcds']}

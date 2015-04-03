@@ -1,0 +1,35 @@
+---
+# mysql
+mysql_root_password: passw0rd
+bind_address: 127.0.0.1
+server_id: 1
+expire_logs_days: 30
+binlog_format: MIXED
+sync_binlog: 1
+innodb_support_xa: 1
+
+# rabbit
+node_ip_address: 127.0.0.1
+node_port: 5672
+rabbitmq_user: neutron
+rabbitmq_password: passw0rd
+
+# neutron
+mysql_user: neutron
+mysql_password: passw0rd
+mysql_dbname: neutron
+neutron_verbose: True
+admin_token: secretkey
+auth_uri: http://127.0.0.1:35357/v3.0/
+identity_uri: http://127.0.0.1:5000
+core_plugin: ml2
+service_plugins: router
+allow_overlapping_ips: True
+notify_nova_on_port_status_changes: True
+notify_nova_on_port_data_changes: True
+nova_url: http://127.0.0.1:8774/v2
+nova_region_name: regionOne
+nova_admin_username: nova
+nova_admin_tenant_id: nova
+nova_admin_password: passw0rd
+populate_target: juno

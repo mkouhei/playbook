@@ -1,0 +1,8 @@
+---
+# file: roles/ceilometer/tasks/sources.yml
+
+- name: git clone
+  git:
+    repo=https://github.com/openstack/{{ openstack_name }}.git
+    dest=/srv/{{ openstack_name }}/{{ openstack_name }}
+  sudo_user: '{{ openstack_user }}'

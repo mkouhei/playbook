@@ -1,0 +1,6 @@
+---
+# file: roles/cleanup/tasks/main.yml
+
+- include: mysql.yml
+- include: rabbitmq.yml
+- include: neutron.yml  

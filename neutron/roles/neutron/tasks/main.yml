@@ -1,0 +1,7 @@
+---
+# file: roles/ceilometer/tasks/main.yml
+
+- include: users.yml
+- include: sources.yml
+- include: neutron.yml
+  
